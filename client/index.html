@@ -98,7 +98,12 @@
 				socket.on('question', function(sender, msg){
 					var newQuestion = $('<li>').text("QUESTION from: " +sender + ": " +msg);
 					newQuestion.css({"background-color":"yellow", "font-size": "120%"});
-					$('#messages').append(newQuestion);
+
+					var htmlArrow = html('&#8593');
+
+					var something = $('<input/>').attr({ type: 'button', name:'Upvote', value:htmlArrow });
+					//something.css("border": "solid black", "border-width": "0 3px 3px 0", "display": "inline-block", "padding": "3px");
+					$('#messages').append(newQuestion, something);
 				});
 			});
 		</script>
