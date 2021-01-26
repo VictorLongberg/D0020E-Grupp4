@@ -4,6 +4,7 @@ var http = require('http').createServer(app);
 var io = require('socket.io')(http)
 const port = 3000
 
+var questionCounter = 0;
 
 app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/client/index.html');
@@ -20,9 +21,15 @@ io.on('connection', (socket) => {
 		io.emit('chat message', sender, msg);
 	});
 
-	socket.on('question', (sender, msg) => {
+	socket.on('question', (sender, msg, questionID) => {
 		console.log(sender + ": <question> " + msg);
-		io.emit('question', sender, msg);
+		io.emit('question', sender, msg, questionCounter);
+		questionCounter++;
+	});
+	
+	socket.on('upvote', (questionID) => {
+		console.log('question ' +questionID +'was upvoted');
+		io.emit('upvote', questionID);
 	});
 });
 

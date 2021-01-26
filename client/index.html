@@ -70,11 +70,11 @@
 					if (document.getElementById("questionCheck").checked) {
 
 						if (document.getElementById("anonCheck").checked) {
-							socket.emit('question', "Anonymous", $('#m').val());
+							socket.emit('question', "Anonymous", $('#m').val(), 'ninja');
 						}
 
 						else {
-							socket.emit('question', name, $('#m').val());
+							socket.emit('question', name, $('#m').val(), 'ninja');
 						}
 					}
 
@@ -95,12 +95,21 @@
 					$('#messages').append($('<li>').text(sender + ": " +msg));
 				});
 
-				socket.on('question', function(sender, msg){
-					var newQuestion = $('<li>').text("QUESTION from: " +sender + ": " +msg);
-					newQuestion.css({"background-color":"yellow", "font-size": "120%"});
-					var something = $('<input/>').attr({ type: 'button', name:'Upvote', value:('\u25B2') });
-					//something.css("border": "solid black", "border-width": "0 3px 3px 0", "display": "inline-block", "padding": "3px");
-					$('#messages').append(newQuestion, something);
+				socket.on('question', function(sender, questionMsg, questionID){
+					var question = $('<li>').text(sender + ": " +questionMsg);
+					question.css({"background-color":"yellow", "font-size": "120%"});
+					question.attr({id: 'question' +questionID});
+					var upvoteButton = $('<input/>').attr({id: 'upvote' +questionID, type: 'button', name:'Upvote', value:('\u25B2') });
+					$('#messages').append(question, upvoteButton);
+					$('#'+ 'upvote' +questionID).click(function() {
+						socket.emit('upvote', questionID);
+					});
+				});
+				
+				socket.on('upvote', function(questionID) {
+					var fontsize = $('#'+'question'+questionID).css("font-size");
+					newFontsize = fontsize.split("px")[0] * 1.1;
+					$('#'+'question'+questionID).css("font-size", newFontsize);
 				});
 			});
 		</script>
