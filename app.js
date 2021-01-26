@@ -2,11 +2,21 @@
 var app = require('express')();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http)
+var session = require('express-session')
+
 const port = 3000
 
+//Sessions (experess-session)
+app.use(session({
+  secret: '=very! ¤secret# "key/',
+  resave: false,
+  saveUninitialized: true,
+  //cookie: { secure: true , maxAge : 60000}
+}))
 
 app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/client/index.html');
+	console.log(req.session.id);
 });
 
 io.on('connection', (socket) => {
