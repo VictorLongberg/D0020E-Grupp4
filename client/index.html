@@ -1,6 +1,11 @@
 <!doctype html>
 <html>
 	<head>
+
+	<script>
+	var name = prompt("YO what up mister.....??");
+	</script>
+
 	<style>
 		* { margin: 0; padding: 0; box-sizing: border-box; }
 		body { font: 13px Helvetica, Arial; }
@@ -29,12 +34,12 @@
 				var socket = io();
 				$('form').submit(function(e) {
 					e.preventDefault();
-					socket.emit('chat message', $('#m').val());
+					socket.emit('chat message', name, $('#m').val());
 					$('#m').val('');
 					return false;
 				});
-				socket.on('chat message', function(msg){
-					$('#messages').append($('<li>').text(msg));
+				socket.on('chat message', function(sender, msg){
+					$('#messages').append($('<li>').text(sender + ": " +msg));
 				});
 			});
 		</script>
