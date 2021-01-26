@@ -7,18 +7,17 @@ var session = require('express-session')
 const port = 3000
 
 class lecture {
-	students = ["t"];
+	constructor(){
+		this.students = [];
+	}
 
 	add_student(id, name){
-		let stud = new student(id, name);
+		var stud = new student(id, name);
 		this.students.push(stud);
 	}
 
 	get_student_name(id){
-		let i;
-		console.log(this.students.lenght);
-		for (i = 0; i < this.students.lenght; i++){
-			console.log(this.students[i].session_id);
+		for (var i = 0; i < this.students.length; i++){
 			if (this.students[i].session_id == id){
 				return this.students[i].name;
 			}
@@ -38,7 +37,7 @@ class student {
 	}
 }
 
-let lecture_1 = new lecture();
+const lecture_1 = new lecture();
 
 
 //Sessions (experess-session)
