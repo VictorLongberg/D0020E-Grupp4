@@ -6,6 +6,41 @@ var session = require('express-session')
 
 const port = 3000
 
+class lecture {
+	students = ["t"];
+
+	add_student(id, name){
+		let stud = new student(id, name);
+		this.students.push(stud);
+	}
+
+	get_student_name(id){
+		let i;
+		console.log(this.students.lenght);
+		for (i = 0; i < this.students.lenght; i++){
+			console.log(this.students[i].session_id);
+			if (this.students[i].session_id == id){
+				return this.students[i].name;
+			}
+		}
+		return "Unknown";
+	}
+}
+
+class student {
+	constructor(id, name) {
+		this.session_id = id;
+		this.name = name;
+	}
+
+	getName() {
+		return this.name;
+	}
+}
+
+let lecture_1 = new lecture();
+
+
 //Sessions (experess-session)
 app.use(session({
   secret: '=very! ¤secret# "key/',
@@ -17,6 +52,8 @@ app.use(session({
 app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/client/index.html');
 	console.log(req.session.id);
+	lecture_1.add_student(req.session.id, "test");
+	console.log(lecture_1.get_student_name(req.session.id));
 });
 
 io.on('connection', (socket) => {
