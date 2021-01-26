@@ -96,7 +96,9 @@
 				});
 
 				socket.on('question', function(sender, msg){
-					$('#messages').append($('<li>').text("QUESTION from: " +sender + ": " +msg));
+					var newQuestion = $('<li>').text("QUESTION from: " +sender + ": " +msg);
+					newQuestion.css({"background-color":"yellow", "font-size": "120%"});
+					$('#messages').append(newQuestion);
 				});
 			});
 		</script>
