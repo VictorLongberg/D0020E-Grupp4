@@ -9,27 +9,19 @@
 		* { margin: 0; padding: 0; box-sizing: border-box; }
 		body { font: 13px Helvetica, Arial; }
 		form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-		form input { border: 0; padding: 10px; width: 90%; margin-right: 0.5%; }
+		form input { border: 0; padding: 10px; width: 84%; margin-right: 0.5%; }
 		form button { width: 5%; background: rgb(130, 224, 255); border: none; padding: 10px; }
 		#messages { list-style-type: none; margin: 0; padding: 0; }
 		#messages li { padding: 5px 10px; }
 		#messages li:nth-child(odd) { background: #eee; }
 		
 		.checkboxes { 
-			width: 4.5%; 
+			width: 5%; 
 			background: rgb(130, 224, 255); 
 			border: none; 
-			padding: 0px;  
-			display: block;
-			position: relative;
-			margin-top: -1.4em;  /* make this margin match whatever your line-height is */
-			line-height: 1.4em;  /* can be set here, or elsewehere */
+			padding: 10px;  
 			float: right;
 		}
-
-
-
-
 
     </style>
 		
@@ -40,12 +32,17 @@
 	<body>
 		<ul id="messages"></ul>
 		<form action="">
-			<div class="checkboxes">
-						<label for="x"><input type="checkbox" id="anonCheck" /> <span>Anonymous</span></label>
-						<label for="y"><input type="checkbox" id="questionCheck" /> <span>Question</span></label>
-						<label for="z"><input type="checkbox" id="test" /> <span>TestCheckbox</span></label>			
-			</div>
+				<div class="checkboxes">
+					<span>Question</span><label> <input type="checkbox" id="questionCheck" /></label>
+			
+
+				</div> 
+				<div class="checkboxes">
+					<span>Anonymous</span><label> <input type="checkbox" id="anonCheck" /></label>
+				</div>     	
+					
 				<input id="m" autocomplete="off" /><button>Send</button>	
+
 		</form>
 
 
