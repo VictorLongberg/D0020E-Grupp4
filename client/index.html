@@ -22,6 +22,7 @@
 	<body>
 		<ul id="messages"></ul>
 		<form action="">
+			<input type="checkbox" id="anonCheck">
 			<input id="m" autocomplete="off" /><button>Send</button>
 		</form>
 
@@ -34,7 +35,13 @@
 				var socket = io();
 				$('form').submit(function(e) {
 					e.preventDefault();
-					socket.emit('chat message', name, $('#m').val());
+					if (document.getElementById("anonCheck").checked) {
+						socket.emit('chat message', "Anonymous", $('#m').val());
+					}
+
+					else {
+						socket.emit('chat message', name, $('#m').val());
+					}
 					$('#m').val('');
 					return false;
 				});
