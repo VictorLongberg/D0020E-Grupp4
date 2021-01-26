@@ -23,6 +23,7 @@
 		<ul id="messages"></ul>
 		<form action="">
 			<input type="checkbox" id="anonCheck">
+			<input type="checkbox" id="questionCheck">
 			<input id="m" autocomplete="off" /><button>Send</button>
 		</form>
 
@@ -35,18 +36,38 @@
 				var socket = io();
 				$('form').submit(function(e) {
 					e.preventDefault();
-					if (document.getElementById("anonCheck").checked) {
-						socket.emit('chat message', "Anonymous", $('#m').val());
+
+					//Check question
+					if (document.getElementById("questionCheck").checked) {
+
+						if (document.getElementById("anonCheck").checked) {
+							socket.emit('question', "Anonymous", $('#m').val());
+						}
+
+						else {
+							socket.emit('question', name, $('#m').val());
+						}
 					}
 
 					else {
-						socket.emit('chat message', name, $('#m').val());
+						if (document.getElementById("anonCheck").checked) {
+							socket.emit('chat message', "Anonymous", $('#m').val());
+						}
+
+						else {
+							socket.emit('chat message', name, $('#m').val());
+						}
 					}
+
 					$('#m').val('');
 					return false;
 				});
 				socket.on('chat message', function(sender, msg){
 					$('#messages').append($('<li>').text(sender + ": " +msg));
+				});
+
+				socket.on('question', function(sender, msg){
+					$('#messages').append($('<li>').text("QUESTION from: " +sender + ": " +msg));
 				});
 			});
 		</script>

@@ -19,6 +19,11 @@ io.on('connection', (socket) => {
 		console.log(sender + ": " + msg);
 		io.emit('chat message', sender, msg);
 	});
+
+	socket.on('question', (sender, msg) => {
+		console.log(sender + ": <question> " + msg);
+		io.emit('question', sender, msg);
+	});
 });
 
 
