@@ -77,31 +77,26 @@
 
 	<body>
 		<ul id="messages"></ul>
-<<<<<<< HEAD
 		<div class="OverlappingFix">
 			<form action=""> <!-- Tillåter skapandet av meddelanden att vissas på chatten?!?-->
 				<div class="TextWindowBottom">
 
 						<div class="checkboxes">
-							Question<label class="test">  <input type="checkbox" id="questionCheck" /></label>
+							Question<label class="test">  <input type="checkbox" id="questionCheck" onclick="updateChatAs()" /></label>
 						</div> 
 
 						<div class="checkboxes">
-							Anonymous<label> <input type="checkbox" id="anonCheck" /></label>
+							Anonymous<label> <input type="checkbox" id="anonCheck" onclick="updateChatAs()" /></label>
 						</div>     	
 						
-						<div class="CurrentUser">
-							Victor Longberg Test<label> <!-- <input type="user" id="currentUser" /> --> </label>
+						<div class="CurrentUser" id="currentName">
+							Chatting as: <label> <!-- <input type="user" id="currentUser" /> --> </label>
 						</div> 
 
 						<div> 
 							<input id="m" autocomplete="off" /><button>Send</button>	
 						</div>	
 				</div>
-			</form>
-		</div>
-=======
-		<form action="">
 				
 				<script>
 				
@@ -127,29 +122,11 @@
 					document.getElementById('currentName').innerHTML = chatAsText;
 				}
 				
+				updateChatAs();
+				
 				</script>
- 				
-				<div class="checkboxes">
-					Question<label class="test">  <input type="checkbox" id="questionCheck" onclick="updateChatAs()" /></label>
-				</div> 
-
-				<div class="checkboxes">
-					Anonymous<label> <input type="checkbox" id="anonCheck" onclick="updateChatAs()" /></label>
-				</div> 	    	
-				
-				<div class="CurrentUser" id="currentName">
-					Chatting as: <label> <!-- <input type="user" id="currentUser" /> --> </label>
-				</div> 
-				
-				<script> updateChatAs(); </script>
-
-				<div> 
-					<input id="m" autocomplete="off" /><button>Send</button>	
-				</div>	
-		</form>
-
->>>>>>> ba4d7b0421869f3f09c144d39447e947c2520255
-
+			</form>
+		</div>
 
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
