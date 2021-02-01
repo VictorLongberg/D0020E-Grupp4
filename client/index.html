@@ -3,6 +3,10 @@
 	<head>
 	<script>
 	var name = prompt("Enter nickname: ");
+	
+	function getName() {
+		return name;
+	}
 	</script>
 
 	<style>
@@ -18,9 +22,12 @@
 
 		.TextWindowBottom { 
 			background: #000; 
-			padding: 3px; position: fixed; 
-			bottom: 10px; width: 100%;
+			padding: 3px; 
+			position: fixed; 
+			bottom: 10px; 
+			width: 100%;
 			margin-left: 0%;
+			right: 0px;
 		}
 
 		.TextWindowBottom input { 
@@ -28,14 +35,35 @@
 			padding: 11px; 
 			width: 79%; 
 			margin-right: 0%;
-			margin-left: 2px;}
+			margin-left: 2px;
+		}
 
 		.TextWindowBottom button { 
 			width: 5%;
 		 	background: lightgray; 
-			 border: black; 
-			 padding: 12px; 
-			 float:right; }
+			border: black; 
+			padding: 12px; 
+			float:right; 
+		}
+		
+		.thumbs-up-facebook {
+			width: 0%;  
+			padding: 3px; 
+			position: fixed; 
+			bottom: 55px; 
+			width: 100%;
+		}
+
+		.thumbs-up-facebook input[type="checkbox"] {
+    		opacity: 0;
+		}
+
+		img {
+			border: white solid 1px;
+			height: 50px;
+			width: 50px;
+			margin-top: 90%;
+		}
 
 
 		.checkboxes { 
@@ -79,21 +107,6 @@
 		}
 	    
 
-		.thumbs-up-facebook {
-			width: 10%;
-		}
-
-		.thumbs-up-facebook input[type="checkbox"] {
-    		opacity: 0;
-		}
-		
-		img {
-			border: white solid 1px;
-			height: 50px;
-			width: 50px;
-
-		}
-
 	</style>
 		
 		<title>Simple chat</title>
@@ -103,6 +116,12 @@
 	<body>
 		<ul id="messages"></ul>
 		<div class="OverlappingFix">
+
+			<div class="thumbs-up-facebook"> 
+				<input type="checkbox" id="myCheckbox1" onclick="toggleConfused()"/>
+				<label for="myCheckbox1"><img id="confusedPic" src="https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png" /></label>
+			</div>
+
 			<form action=""> <!-- Tillåter skapandet av meddelanden att vissas på chatten?!?-->
 				<div class="TextWindowBottom">
 
@@ -119,31 +138,31 @@
 
 						</div> 
 
-						<div class="thumbs-up-facebook"> 
-							<input type="checkbox" id="myCheckbox1" onclick="toggleConfused()"/>
-							<label for="myCheckbox1"><img id="confusedPic" src="https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png" /></label>
-						</div>
 						<div> 
 							<input id="m" autocomplete="off" /><button>Send</button>	
 						</div>	
 				</div>
 				
 				<script>
+				var confuseTimer;
 				
 				function toggleConfused() {
-					document.getElementById('currentName').innerHTML = "u dumb as hell";
 					// Become confused
 					if (document.getElementById('myCheckbox1').checked) {
-						$("#confusedPic").attr("src", "https://previews.123rf.com/images/denisfilm/denisfilm1709/denisfilm170901306/86174983-black-man-with-hands-in-different-sides-confused-man-in-white-shirt-spreads-his-hands-to-the-sides-i.jpg");
-						
-						var confuseTimer = window.setTimeout(toggleConfused(), 3000);
+						$("#confusedPic").fadeTo(300, 0.2);
+						$('#messages').append($('<li>').text("You are confused!"));
+						confuseTimer = setTimeout(confuseTimerDone, 1000);
 					}
 					
 					else {
-						$("#confusedPic").attr("src", "https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png");
-						
-						window.clearTimeout(confuseTimer);
+						$("#confusedPic").fadeTo(300, 1);
+						clearTimeout(confuseTimer);
 					}
+				}
+				
+				function confuseTimerDone() {
+					$("#myCheckbox1").prop("checked", false);
+					toggleConfused();
 				}
 				
 				function updateChatAs() {
