@@ -120,8 +120,8 @@
 						</div> 
 
 						<div class="thumbs-up-facebook"> 
-							<input type="checkbox" id="myCheckbox1" />
-							<label for="myCheckbox1"><img src="https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png" /></label>
+							<input type="checkbox" id="myCheckbox1" onclick="toggleConfused()"/>
+							<label for="myCheckbox1"><img id="confusedPic" src="https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png" /></label>
 						</div>
 						<div> 
 							<input id="m" autocomplete="off" /><button>Send</button>	
@@ -129,6 +129,22 @@
 				</div>
 				
 				<script>
+				
+				function toggleConfused() {
+					document.getElementById('currentName').innerHTML = "u dumb as hell";
+					// Become confused
+					if (document.getElementById('myCheckbox1').checked) {
+						$("#confusedPic").attr("src", "https://previews.123rf.com/images/denisfilm/denisfilm1709/denisfilm170901306/86174983-black-man-with-hands-in-different-sides-confused-man-in-white-shirt-spreads-his-hands-to-the-sides-i.jpg");
+						
+						var confuseTimer = window.setTimeout(toggleConfused(), 3000);
+					}
+					
+					else {
+						$("#confusedPic").attr("src", "https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png");
+						
+						window.clearTimeout(confuseTimer);
+					}
+				}
 				
 				function updateChatAs() {
 					var chatAsText = "";
