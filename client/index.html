@@ -163,12 +163,18 @@
 					$('#messages').append(question, upvoteButton);
 					$('#'+ 'upvote' +questionID).click(function() {
 						socket.emit('upvote', questionID);
+						$('#'+ 'upvote' +questionID).remove();
 					});
 				});
 				
-				socket.on('upvote', function(questionID) {
+				socket.on('upvote', function(questionID, memberNum) {
 					var fontsize = $('#'+'question'+questionID).css("font-size");
-					newFontsize = fontsize.split("px")[0] * 1.1;
+					newFontsize = fontsize.split("px")[0] * (1 + 1 / memberNum);
+					
+					if (newFontsize > 15.6 * 2) {
+						newFontsize = 15.6 * 2;
+					}
+					
 					$('#'+'question'+questionID).css("font-size", newFontsize);
 				});
 			});
