@@ -2,7 +2,11 @@
 <html>
 	<head>
 	<script>
-	var name = prompt("YO what up mister.....??");
+	var name = prompt("Enter nickname: ");
+	
+	function getName() {
+		return name;
+	}
 	</script>
 
 	<style>
@@ -73,6 +77,7 @@
 
 	<body>
 		<ul id="messages"></ul>
+<<<<<<< HEAD
 		<div class="OverlappingFix">
 			<form action=""> <!-- Tillåter skapandet av meddelanden att vissas på chatten?!?-->
 				<div class="TextWindowBottom">
@@ -95,6 +100,55 @@
 				</div>
 			</form>
 		</div>
+=======
+		<form action="">
+				
+				<script>
+				
+				function updateChatAs() {
+					var chatAsText = "";
+				
+					if (document.getElementById('questionCheck').checked) {
+						chatAsText += 'Asking question as: ';
+					}
+					
+					else {
+						chatAsText += 'Chatting as: ';
+					}
+				
+					if (document.getElementById('anonCheck').checked) {
+						chatAsText += 'Anonymous';
+					}
+					
+					else {
+						chatAsText += getName();
+					}
+					
+					document.getElementById('currentName').innerHTML = chatAsText;
+				}
+				
+				</script>
+ 				
+				<div class="checkboxes">
+					Question<label class="test">  <input type="checkbox" id="questionCheck" onclick="updateChatAs()" /></label>
+				</div> 
+
+				<div class="checkboxes">
+					Anonymous<label> <input type="checkbox" id="anonCheck" onclick="updateChatAs()" /></label>
+				</div> 	    	
+				
+				<div class="CurrentUser" id="currentName">
+					Chatting as: <label> <!-- <input type="user" id="currentUser" /> --> </label>
+				</div> 
+				
+				<script> updateChatAs(); </script>
+
+				<div> 
+					<input id="m" autocomplete="off" /><button>Send</button>	
+				</div>	
+		</form>
+
+>>>>>>> ba4d7b0421869f3f09c144d39447e947c2520255
 
 
 		<script src="/socket.io/socket.io.js"></script>
