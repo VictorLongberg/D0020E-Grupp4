@@ -11,22 +11,24 @@
 
 	<style>
 		* {  
+			
 			box-sizing: border-box; 
 			
-			/* CSS display box debug mode. 
-			outline: 1px solid red;
-  			outline-offset: -1px;
-			*/
+			/* CSS display box debug mode. */
+			
+			
+	
+		}
 
-		} 
-		body { font: 13px Helvetica, Arial; }
-		form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-		form input { border: 0; padding: 11px; width: 79%; margin-right: 0%;}
-		form button { width: 5%; background: lightgray; border: black; padding: 12px; float:right; }
+		body { font: 13px Helvetica, Arial; border: black 3px;}
+		.TextWindowBottom { background: #000; padding: 3px; position: fixed; bottom: 10px; width: 100%; margin-left: 0%;}
+		.TextWindowBottom input { border: 0; padding: 11px; width: 79%; margin-right: 0%; margin-left: 2px;}
+		.TextWindowBottom button { width: 5%; background: lightgray; border: black; padding: 12px; float:right; }
 		#messages { list-style-type: none; margin: 0; padding: 0; }
-		#messages li { padding: 5px 10px; }
+		#messages li { padding: 8px 10px; }
 		#messages li:nth-child(odd) { background: #eee; }
-		
+		#messages li:nth-child(even) { background: lightblue; }
+
 		.checkboxes { 
 			width: 4%; 
 			background:lightgray; 
@@ -60,8 +62,14 @@
 			padding-right: 0mm;
 		}
 
-	      
-    </style>
+		.OverlappingFix { /* Ghetto lösning som ej är bra men nu overlappar inte chat med meddelande window */
+			border: white 15px solid; 
+			position: absolute;
+			max-width: 90%;
+			padding-bottom: 30px;
+		}
+	    
+	</style>
 		
 		<title>Simple chat</title>
 
@@ -69,6 +77,30 @@
 
 	<body>
 		<ul id="messages"></ul>
+<<<<<<< HEAD
+		<div class="OverlappingFix">
+			<form action=""> <!-- Tillåter skapandet av meddelanden att vissas på chatten?!?-->
+				<div class="TextWindowBottom">
+
+						<div class="checkboxes">
+							Question<label class="test">  <input type="checkbox" id="questionCheck" /></label>
+						</div> 
+
+						<div class="checkboxes">
+							Anonymous<label> <input type="checkbox" id="anonCheck" /></label>
+						</div>     	
+						
+						<div class="CurrentUser">
+							Victor Longberg Test<label> <!-- <input type="user" id="currentUser" /> --> </label>
+						</div> 
+
+						<div> 
+							<input id="m" autocomplete="off" /><button>Send</button>	
+						</div>	
+				</div>
+			</form>
+		</div>
+=======
 		<form action="">
 				
 				<script>
@@ -116,6 +148,7 @@
 				</div>	
 		</form>
 
+>>>>>>> ba4d7b0421869f3f09c144d39447e947c2520255
 
 
 		<script src="/socket.io/socket.io.js"></script>
