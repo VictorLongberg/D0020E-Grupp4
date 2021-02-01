@@ -13,14 +13,14 @@
 		body { font: 13px Helvetica, Arial; border: black 3px;}
 		#messages { list-style-type: none; margin: 0; padding: 0; }
 		#messages li { padding: 8px 10px; }
-		#messages li:nth-child(odd) { background: #eee; }
-		#messages li:nth-child(even) { background: lightblue; }
+		#messages li:nth-child(odd) { background: #eee;  border-bottom: black solid 1px;}
+		#messages li:nth-child(even) { background: lightblue;  border-bottom: black solid 1px;}
 
 		.TextWindowBottom { 
 			background: #000; 
 			padding: 3px; position: fixed; 
 			bottom: 10px; width: 100%;
-			 margin-left: 0%;
+			margin-left: 0%;
 		}
 
 		.TextWindowBottom input { 
@@ -78,6 +78,7 @@
 			padding-bottom: 30px;
 		}
 	    
+
 	</style>
 		
 		<title>Simple chat</title>
@@ -91,24 +92,57 @@
 				<div class="TextWindowBottom">
 
 						<div class="checkboxes">
-							Question<label class="test">  <input type="checkbox" id="questionCheck" /></label>
+							Question<label class="test">  <input type="checkbox" id="questionCheck" onclick="updateChatAs()" /></label>
 						</div> 
 
 						<div class="checkboxes">
-							Anonymous<label> <input type="checkbox" id="anonCheck" /></label>
+							Anonymous<label> <input type="checkbox" id="anonCheck" onclick="updateChatAs()" /></label>
 						</div>     	
 						
 						<div class="CurrentUser" id="currentName">
 							Chatting as: <label> <!-- <input type="user" id="currentUser" /> --> </label>
-						</div>  
 
+						</div> 
+
+						<div class="thumbs-up-facebook"> 
+							<input type="checkbox" id="myCheckbox1" />
+							<label for="myCheckbox1"><img src="https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png" /></label>
+						</div>
 						<div> 
 							<input id="m" autocomplete="off" /><button>Send</button>	
 						</div>	
+
 				</div>
+				
+				<script>
+				
+				function updateChatAs() {
+					var chatAsText = "";
+				
+					if (document.getElementById('questionCheck').checked) {
+						chatAsText += 'Asking question as: ';
+					}
+					
+					else {
+						chatAsText += 'Chatting as: ';
+					}
+				
+					if (document.getElementById('anonCheck').checked) {
+						chatAsText += 'Anonymous';
+					}
+					
+					else {
+						chatAsText += getName();
+					}
+					
+					document.getElementById('currentName').innerHTML = chatAsText;
+				}
+				
+				updateChatAs();
+				
+				</script>
 			</form>
 		</div>
-
 
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -155,12 +189,18 @@
 					$('#messages').append(question, upvoteButton);
 					$('#'+ 'upvote' +questionID).click(function() {
 						socket.emit('upvote', questionID);
+						$('#'+ 'upvote' +questionID).remove();
 					});
 				});
 				
-				socket.on('upvote', function(questionID) {
+				socket.on('upvote', function(questionID, memberNum) {
 					var fontsize = $('#'+'question'+questionID).css("font-size");
-					newFontsize = fontsize.split("px")[0] * 1.1;
+					newFontsize = fontsize.split("px")[0] * (1 + 1 / memberNum);
+					
+					if (newFontsize > 15.6 * 2) {
+						newFontsize = 15.6 * 2;
+					}
+					
 					$('#'+'question'+questionID).css("font-size", newFontsize);
 				});
 			});

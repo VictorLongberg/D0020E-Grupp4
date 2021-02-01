@@ -5,15 +5,19 @@ var io = require('socket.io')(http)
 const port = 3000
 
 var questionCounter = 0;
+var memberCounter = 0;
 
 app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/client/index.html');
 });
 
 io.on('connection', (socket) => {
-	console.log('user connected')
+	memberCounter++;
+	console.log('user connected, total users: ' +memberCounter);
+	
 	socket.on('disconnect', () => {
-		console.log('user disconnected');
+		console.log('user disconnected, total users: ' +memberCounter);
+		memberCounter--;
 	});
 
 	socket.on('chat message', (sender, msg) => {
@@ -27,9 +31,9 @@ io.on('connection', (socket) => {
 		questionCounter++;
 	});
 	
-	socket.on('upvote', (questionID) => {
-		console.log('question ' +questionID +'was upvoted');
-		io.emit('upvote', questionID);
+	socket.on('upvote', (questionID, memberNum) => {
+		console.log('question ' +questionID +' was upvoted');
+		io.emit('upvote', questionID, memberCounter);
 	});
 });
 
