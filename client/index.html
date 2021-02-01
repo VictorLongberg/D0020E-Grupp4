@@ -18,9 +18,12 @@
 
 		.TextWindowBottom { 
 			background: #000; 
-			padding: 3px; position: fixed; 
-			bottom: 10px; width: 100%;
+			padding: 3px; 
+			position: fixed; 
+			bottom: 10px; 
+			width: 100%;
 			margin-left: 0%;
+			right: 0px;
 		}
 
 		.TextWindowBottom input { 
@@ -28,14 +31,35 @@
 			padding: 11px; 
 			width: 79%; 
 			margin-right: 0%;
-			margin-left: 2px;}
+			margin-left: 2px;
+		}
 
 		.TextWindowBottom button { 
 			width: 5%;
 		 	background: lightgray; 
 			 border: black; 
 			 padding: 12px; 
-			 float:right; }
+			 float:right; 
+		}
+		
+		.thumbs-up-facebook {
+			width: 0%;  
+			padding: 3px; 
+			position: fixed; 
+			bottom: 55px; 
+			width: 100%;
+		}
+
+		.thumbs-up-facebook input[type="checkbox"] {
+    		opacity: 0;
+		}
+
+		img {
+			border: white solid 1px;
+			height: 50px;
+			width: 50px;
+			margin-top: 90%;
+		}
 
 
 		.checkboxes { 
@@ -79,21 +103,6 @@
 		}
 	    
 
-		.thumbs-up-facebook {
-			width: 0%;
-		}
-
-		.thumbs-up-facebook input[type="checkbox"] {
-    		opacity: 0;
-		}
-		
-		img {
-			border: white solid 1px;
-			height: 50px;
-			width: 50px;
-
-		}
-
 	</style>
 		
 		<title>Simple chat</title>
@@ -103,6 +112,19 @@
 	<body>
 		<ul id="messages"></ul>
 		<div class="OverlappingFix">
+
+			<div class="thumbs-up-facebook"> 
+				<input type="checkbox" id="myCheckbox1" />
+				<label for="myCheckbox1"><img src="https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png" /></label>
+			</div>
+
+			<div class="thumbs-up-facebook"> 
+				<input type="checkbox" id="myCheckbox2" />
+				<label for="myCheckbox2"><img src="data:image/jpeg;base64,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" /></label>
+			</div>
+
+
+
 			<form action=""> <!-- Tillåter skapandet av meddelanden att vissas på chatten?!?-->
 				<div class="TextWindowBottom">
 
@@ -119,10 +141,6 @@
 
 						</div> 
 
-						<div class="thumbs-up-facebook"> 
-							<input type="checkbox" id="myCheckbox1" />
-							<label for="myCheckbox1"><img src="https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png" /></label>
-						</div>
 						<div> 
 							<input id="m" autocomplete="off" /><button>Send</button>	
 						</div>	
