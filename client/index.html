@@ -4,6 +4,10 @@
 	<script>
 	var name = prompt("Enter nickname: ");
 	
+	while (name == "null" || !name || name.length > 30) {
+		name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
+	}
+	
 	function getName() {
 		return name;
 	}
