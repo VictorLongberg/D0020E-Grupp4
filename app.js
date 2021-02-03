@@ -4,6 +4,13 @@ var http = require('http').createServer(app);
 var io = require('socket.io')(http)
 var session = require('express-session')
 
+var sessionMiddleware = session({
+  secret: '=very! ¤secret# "key/',
+  resave: false,
+  saveUninitialized: true,
+  //cookie: { secure: true , maxAge : 60000}
+});
+
 const port = 3000
 
 class lecture {
@@ -41,12 +48,11 @@ const lecture_1 = new lecture();
 
 
 //Sessions (experess-session)
-app.use(session({
-  secret: '=very! ¤secret# "key/',
-  resave: false,
-  saveUninitialized: true,
-  //cookie: { secure: true , maxAge : 60000}
-}))
+app.use(sessionMiddleware);
+
+io.use((socket, next) => {
+	sessionMiddleware(socket.request, {}, next);
+});
 
 app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/client/index.html');
@@ -56,7 +62,10 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-	console.log('user connected')
+
+	console.log('user connected');
+	console.log('sesssionID', socket.request.session.id);
+
 	socket.on('disconnect', () => {
 		console.log('user disconnected');
 	});
