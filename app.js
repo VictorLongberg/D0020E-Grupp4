@@ -44,7 +44,7 @@ class Student {
 		this.session_id = id;
 		this.name = name;
 		this.timeJoined = this.timeJoined;
-		this.timeLeft = timeLeft;
+		//this.timeLeft = timeLeft;
 		this.msg = [];
 	}
 
@@ -79,7 +79,6 @@ io.use((socket, next) => {
 app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/client/index.html');
 	console.log(req.session.id);
-	lecture_1.add_student(req.session.id, "test");
 	console.log(lecture_1.get_student_name(req.session.id));
 });
 
@@ -93,13 +92,18 @@ io.on('connection', (socket) => {
 	});
 
 	socket.on('chat message', (msg) => {
-		//Lägga till det som skickas till message listan i Student.
-		console.log('m: ' + msg);
+		name = lecture_1.get_student_name(socket.request.session.id);
+		io.emit('chat message', name, msg);
 	});
 
 	socket.on('question', (sender, msg) => {
 		console.log(sender + ": <question> " + msg);
 		io.emit('question', sender, msg);
+	});
+
+	socket.on('name', (name) => {
+		console.log('name', name);
+		lecture_1.add_student(socket.request.session.id, name);
 	});
 });
 

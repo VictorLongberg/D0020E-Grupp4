@@ -63,6 +63,9 @@
 		<script>
 			$(function () {
 				var socket = io();
+
+				socket.emit('name', name);
+
 				$('form').submit(function(e) {
 					e.preventDefault();
 
@@ -84,7 +87,7 @@
 						}
 
 						else {
-							socket.emit('chat message', name, $('#m').val());
+							socket.emit('chat message', $('#m').val());
 						}
 					}
 
