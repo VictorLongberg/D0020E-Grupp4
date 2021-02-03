@@ -73,21 +73,21 @@
 					if (document.getElementById("questionCheck").checked) {
 
 						if (document.getElementById("anonCheck").checked) {
-							socket.emit('question', "Anonymous", $('#m').val());
+							socket.emit('question', true, $('#m').val());
 						}
 
 						else {
-							socket.emit('question', name, $('#m').val());
+							socket.emit('question', false, $('#m').val());
 						}
 					}
 
 					else {
 						if (document.getElementById("anonCheck").checked) {
-							socket.emit('chat message', "Anonymous", $('#m').val());
+							socket.emit('chat message', true, $('#m').val());
 						}
 
 						else {
-							socket.emit('chat message', $('#m').val());
+							socket.emit('chat message', false, $('#m').val());
 						}
 					}
 

@@ -84,21 +84,26 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
 
-	console.log('user connected');
-	console.log('sesssionID', socket.request.session.id);
-
 	socket.on('disconnect', () => {
 		console.log('user disconnected');
 	});
 
-	socket.on('chat message', (msg) => {
-		name = lecture_1.get_student_name(socket.request.session.id);
+	socket.on('chat message', (isAnonymous, msg) => {
+		if (isAnonymous){
+			name = "Anonymous";
+		} else {
+			name = lecture_1.get_student_name(socket.request.session.id);
+		}
 		io.emit('chat message', name, msg);
 	});
 
-	socket.on('question', (sender, msg) => {
-		console.log(sender + ": <question> " + msg);
-		io.emit('question', sender, msg);
+	socket.on('question', (isAnonymous, msg) => {
+		if (isAnonymous){
+			name = "Anonymous";
+		} else {
+			name = lecture_1.get_student_name(socket.request.session.id);
+		}
+		io.emit('question', name, msg);
 	});
 
 	socket.on('name', (name) => {
