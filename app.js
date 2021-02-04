@@ -165,7 +165,7 @@ io.on('connection', (socket) => {
 		}
 		io.emit('question', name, msg, questionCounter, date.valueOf());
 		
-		var logInfo = "Question by: " +name +":" +msg;
+		var logInfo = "Question #" +questionCounter +" by: " +name +":" +msg;
 		
 		if (date.getHours() < 10) {
 			logInfo += " - 0" +date.getHours();

@@ -5,20 +5,30 @@
 	<script>
 	//setname();
 
-	var name = prompt("Enter nickname: ");	
-
+	var name = "error";	
+	
+	setname();
 
 	function setname () {
+<<<<<<< Updated upstream
 		name = prompt("Change nickname: ");
 		while (name == "null" || !name || name.length > 30) {
 		name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
 		}
 		updateChatAs();		
-	}
-
-
-	while (name == "null" || !name || name.length > 30) {
-		name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
+=======
+		name = prompt("Enter nickname: ");
+		
+		var element = document.createElement('div');
+		element.innerText = name;
+		name = element.innerHTML;
+		
+		while (name == "null" || !name || name.length > 30) {
+			name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
+		}
+		
+		updateChatAs();	
+>>>>>>> Stashed changes
 	}
 	
 	function getName() {
@@ -185,8 +195,7 @@ padding-right: 10px
 						<ul id="messages"></ul>
 					</div>
 
-								<!--<input type="checkbox" id="myCheckbox1" />
-								<label for="myCheckbox1"><img src="https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png" /></label>-->
+								<img id="confusedPic" onclick="toggleConfused()" src="https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png" />
 							<form action="">  <!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
 								<!--<div class="row">-->
 									<div class="row justify-content-between">
@@ -225,16 +234,19 @@ padding-right: 10px
 
 				<script>
 				var confuseTimer;
-
+				var confusedBool = false;
+				
 				function toggleConfused() {
 					// Become confused
-					if (document.getElementById('myCheckbox1').checked) {
+					if (!confusedBool) {
+						confusedBool = true;
 						$("#confusedPic").fadeTo(300, 0.2);
 						$('#messages').append($('<li>').text("You are confused!"));
 						confuseTimer = setTimeout(confuseTimerDone, 1000);
 					}
 
 					else {
+						confusedBool = false;
 						$("#confusedPic").fadeTo(300, 1);
 						clearTimeout(confuseTimer);
 					}
@@ -318,13 +330,25 @@ padding-right: 10px
 					var dt = new Date(date);
 					var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
 					//time.css({ "font-size": "120%"});
-
+					
+					// Sanitization of message
+					var element = document.createElement('div');
+					element.innerText = msg;
+					msg = element.innerHTML;
+					
 					$('#messages').append($('<li>').html( '<span class="Sender">' + sender + '</span>'  + ": " + msg  + '<span class="Time">'  + time + '</span>' ));
-
 				});
 
 				socket.on('question', function(sender, questionMsg, questionID, date){
-					var question = $('<li>').text(sender + ": " +questionMsg);
+					var dt = new Date(date);
+					var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+					
+					// Sanitization of message
+					var element = document.createElement('div');
+					element.innerText = questionMsg;
+					questionMsg = element.innerHTML;
+					
+					var question = $('<li>').html( '<span class="Sender">' + sender + '</span>'  + ": " + questionMsg  + '<span class="Time">'  + time + '</span>' );
 					question.css({"background-color":"yellow", "font-size": "120%"});
 					question.attr({id: 'question' +questionID});
 					var upvoteButton = $('<input/>').attr({id: 'upvote' +questionID, type: 'button', name:'Upvote', value:('\u25B2') });
