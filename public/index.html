@@ -269,6 +269,8 @@ padding-right: 10px
 						return;
 					}
 					
+					socket.emit('name', name);
+					
 					//Check question
 					if (document.getElementById("questionCheck").checked) {
 
@@ -283,11 +285,11 @@ padding-right: 10px
 
 					else {
 						if (document.getElementById("anonCheck").checked) {
-							socket.emit('chat message', "Anonymous", $('#m').val());
+							socket.emit('chat message', true, $('#m').val());
 						}
 
 						else {
-							socket.emit('chat message', name, $('#m').val());
+							socket.emit('chat message', false, $('#m').val());
 						}
 					}
 

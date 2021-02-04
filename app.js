@@ -179,7 +179,6 @@ function appendLog(logInfo) {
 	   if (err) {
 		  return console.error(err);
 	   }
-	   console.log("info logged");
 	});
 }
 
