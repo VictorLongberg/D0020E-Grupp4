@@ -225,7 +225,12 @@
 				var socket = io();
 				$('form').submit(function(e) {
 					e.preventDefault();
-
+					
+					// If message box is empty don't send message
+					if (!$('#m').val()) {
+						return;
+					}
+					
 					//Check question
 					if (document.getElementById("questionCheck").checked) {
 
