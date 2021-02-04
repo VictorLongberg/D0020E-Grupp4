@@ -285,8 +285,8 @@ padding-right: 10px
 				socket.on('chat message', function(sender, msg){
 					var dt = new Date();
 					var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
-					$('#messages').append($('<li>').text(sender + ": " +msg " - " + time ));
-
+					//time.css({ "font-size": "120%"});
+					$('#messages').append($('<li>').text(sender + ": " + msg + " : " + time ));
 				});
 
 				socket.on('question', function(sender, questionMsg, questionID){
