@@ -192,24 +192,29 @@ io.on('connection', (socket) => {
 // Logging
 const dir = "./logs/sessionID";
 var fs = require("fs");
+var directoryFound = false;
 
 function appendLog(logInfo) {
-	
-	try {
-		if (!fs.existsSync(dir)) {
-			fs.mkdirSync(dir, { recursive: true });
-			console.log("Directory is created.");
-		} else {
-			console.log("Directory already exists.");
+	if (!directoryFound) {
+		try {
+			if (!fs.existsSync(dir)) {
+				fs.mkdirSync(dir, { recursive: true });
+				console.log("Log directory is created.");
+			} else {
+				console.log("Log directory already exists.");
+			}
+			directoryFound = true;
+			
+		} catch (err) {
+			console.log(err);
 		}
-	} catch (err) {
-		console.log(err);
 	}
 
 	fs.appendFile('logs/sessionID/log.txt', logInfo +"\n", function(err) {
-	   if (err) {
-		  return console.error(err);
-	   }
+		if (err) {
+			directoryFound = false;
+			return console.error(err);
+		}
 	});
 }
 
