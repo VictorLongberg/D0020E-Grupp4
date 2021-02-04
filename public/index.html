@@ -223,6 +223,9 @@
 		<script>
 			$(function () {
 				var socket = io();
+
+				socket.emit('name', name);
+
 				$('form').submit(function(e) {
 					e.preventDefault();
 

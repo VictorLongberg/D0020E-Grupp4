@@ -134,23 +134,19 @@ io.on('connection', (socket) => {
 		io.emit('chat message', name, msg);
 	});
 
-	socket.on('question', (isAnonymous, msg) => {
-		if (isAnonymous){
-			name = "Anonymous";
-		} else {
-			name = lecture_1.get_student_name(socket.request.session.id);
-		}
-		io.emit('question', name, msg);
-	});
-
 	socket.on('name', (name) => {
 		lecture_1.add_student(socket.request.session.id, name);
 		console.log(lecture_1.students);
 	});
 
-	socket.on('question', (sender, msg, questionID) => {
-		console.log(sender + ": <question> " + msg);
-		io.emit('question', sender, msg, questionCounter);
+	socket.on('question', (isAnonymous, msg, questionID) => {
+		if (isAnonymous){
+			name = "Anonymous";
+		} else {
+			name = lecture_1.get_student_name(socket.request.session.id);
+		}
+		console.log(name + ": <question> " + msg);
+		io.emit('question', name, msg, questionCounter);
 		questionCounter++;
 	});
 
