@@ -132,6 +132,7 @@ io.on('connection', (socket) => {
 			name = lecture_1.get_student_name(socket.request.session.id);
 		}
 		io.emit('chat message', name, msg);
+		appendLog("Chat by: " +name +":" +msg);
 	});
 
 	socket.on('name', (name) => {
@@ -156,6 +157,31 @@ io.on('connection', (socket) => {
 	});
 });
 
+// Logging
+const dir = "./logs/sessionID";
+var fs = require("fs");
+
+function appendLog(logInfo) {
+	
+	try {
+    // first check if directory already exists
+		if (!fs.existsSync(dir)) {
+			fs.mkdirSync(dir, { recursive: true });
+			console.log("Directory is created.");
+		} else {
+			console.log("Directory already exists.");
+		}
+	} catch (err) {
+		console.log(err);
+	}
+
+	fs.appendFile('logs/sessionID/log.txt', logInfo +"\n", function(err) {
+	   if (err) {
+		  return console.error(err);
+	   }
+	   console.log("info logged");
+	});
+}
 
 http.listen(port, () => {
 	console.log('Listening on 3000...');
