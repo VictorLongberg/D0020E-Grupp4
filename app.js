@@ -125,14 +125,30 @@ io.on('connection', (socket) => {
 		memberCounter--;
 	});
 
-	socket.on('chat message', (isAnonymous, msg) => {
+	socket.on('chat message', (isAnonymous, msg, date) => {
+		var date = new Date();
 		if (isAnonymous){
 			name = "Anonymous";
 		} else {
 			name = lecture_1.get_student_name(socket.request.session.id);
 		}
-		io.emit('chat message', name, msg);
-		appendLog("Chat by: " +name +":" +msg);
+		io.emit('chat message', name, msg, date.valueOf());
+		
+		var logInfo = "Chat by: " +name +":" +msg;
+		
+		if (date.getHours() < 10) {
+			logInfo += " - 0" +date.getHours();
+		} else {
+			logInfo += " - " +date.getHours();
+		}
+		
+		if (date.getMinutes() < 10) {
+			logInfo += ":0" +date.getMinutes();
+		} else {
+			logInfo += ":" +date.getMinutes();
+		}
+		
+		appendLog(logInfo);
 	});
 
 	socket.on('name', (name) => {
@@ -140,14 +156,30 @@ io.on('connection', (socket) => {
 		console.log(lecture_1.students);
 	});
 
-	socket.on('question', (isAnonymous, msg, questionID) => {
+	socket.on('question', (isAnonymous, msg) => {
+		var date = new Date();
 		if (isAnonymous){
 			name = "Anonymous";
 		} else {
 			name = lecture_1.get_student_name(socket.request.session.id);
 		}
-		console.log(name + ": <question> " + msg);
-		io.emit('question', name, msg, questionCounter);
+		io.emit('question', name, msg, questionCounter, date.valueOf());
+		
+		var logInfo = "Question by: " +name +":" +msg;
+		
+		if (date.getHours() < 10) {
+			logInfo += " - 0" +date.getHours();
+		} else {
+			logInfo += " - " +date.getHours();
+		}
+		
+		if (date.getMinutes() < 10) {
+			logInfo += ":0" +date.getMinutes();
+		} else {
+			logInfo += ":" +date.getMinutes();
+		}
+		
+		appendLog(logInfo);
 		questionCounter++;
 	});
 
@@ -164,7 +196,6 @@ var fs = require("fs");
 function appendLog(logInfo) {
 	
 	try {
-    // first check if directory already exists
 		if (!fs.existsSync(dir)) {
 			fs.mkdirSync(dir, { recursive: true });
 			console.log("Directory is created.");

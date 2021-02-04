@@ -275,11 +275,11 @@ padding-right: 10px
 					if (document.getElementById("questionCheck").checked) {
 
 						if (document.getElementById("anonCheck").checked) {
-							socket.emit('question', "Anonymous", $('#m').val(), 'ninja');
+							socket.emit('question', true, $('#m').val());
 						}
 
 						else {
-							socket.emit('question', name, $('#m').val(), 'ninja');
+							socket.emit('question', false, $('#m').val());
 						}
 					}
 
@@ -297,8 +297,8 @@ padding-right: 10px
 					return false;
 				});
 
-				socket.on('chat message', function(sender, msg){
-					var dt = new Date();
+				socket.on('chat message', function(sender, msg, date){
+					var dt = new Date(date);
 					var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
 					//time.css({ "font-size": "120%"});
 
@@ -306,7 +306,7 @@ padding-right: 10px
 
 				});
 
-				socket.on('question', function(sender, questionMsg, questionID){
+				socket.on('question', function(sender, questionMsg, questionID, date){
 					var question = $('<li>').text(sender + ": " +questionMsg);
 					question.css({"background-color":"yellow", "font-size": "120%"});
 					question.attr({id: 'question' +questionID});
