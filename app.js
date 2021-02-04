@@ -1,5 +1,9 @@
 // code from https://socket.io/get-started/chat/
-var app = require('express')();
+// code from https://socket.io/get-started/chat/
+
+//var app = require('express')();
+const express = require('express');
+const app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http)
 var session = require('express-session')
@@ -100,16 +104,25 @@ io.use((socket, next) => {
 	sessionMiddleware(socket.request, {}, next);
 });
 
+app.use(express.static('public'));
+
 app.get('/', (req, res) => {
-	res.sendFile(__dirname + '/client/index.html');
+	res.sendFile(__dirname + '/public/index.html');
 	console.log(req.session.id);
 	console.log(lecture_1.get_student_name(req.session.id));
 });
 
+var questionCounter = 0;
+var memberCounter = 0;
+
+
 io.on('connection', (socket) => {
+	memberCounter++;
+	console.log('user connected, total users: ' +memberCounter);
 
 	socket.on('disconnect', () => {
-		console.log('user disconnected');
+		console.log('user disconnected, total users: ' +memberCounter);
+		memberCounter--;
 	});
 
 	socket.on('chat message', (isAnonymous, msg) => {
@@ -133,7 +146,17 @@ io.on('connection', (socket) => {
 	socket.on('name', (name) => {
 		lecture_1.add_student(socket.request.session.id, name);
 		console.log(lecture_1.students);
+	});
 
+	socket.on('question', (sender, msg, questionID) => {
+		console.log(sender + ": <question> " + msg);
+		io.emit('question', sender, msg, questionCounter);
+		questionCounter++;
+	});
+
+	socket.on('upvote', (questionID, memberNum) => {
+		console.log('question ' +questionID +' was upvoted');
+		io.emit('upvote', questionID, memberCounter);
 	});
 });
 
