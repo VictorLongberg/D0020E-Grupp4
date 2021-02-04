@@ -248,6 +248,9 @@ padding-right: 10px
 		<script>
 			$(function () {
 				var socket = io();
+
+				socket.emit('name', name);
+
 				$('form').submit(function(e) {
 					e.preventDefault();
 
@@ -258,23 +261,18 @@ padding-right: 10px
 					
 					//Check question
 					if (document.getElementById("questionCheck").checked) {
-
 						if (document.getElementById("anonCheck").checked) {
-							socket.emit('question', "Anonymous", $('#m').val(), 'ninja');
-						}
-
-						else {
-							socket.emit('question', name, $('#m').val(), 'ninja');
+							socket.emit('question', true, $('#m').val());
+						} else {
+							socket.emit('question', false, $('#m').val());
 						}
 					}
 
 					else {
 						if (document.getElementById("anonCheck").checked) {
-							socket.emit('chat message', "Anonymous", $('#m').val());
-						}
-
-						else {
-							socket.emit('chat message', name, $('#m').val());
+							socket.emit('chat message', true, $('#m').val());
+						} else {
+							socket.emit('chat message', false, $('#m').val());
 						}
 					}
 
