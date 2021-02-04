@@ -1,29 +1,30 @@
 <!doctype html>
 <html>
-	<head>
-		 <link rel="stylesheet" href="css/bootstrap.min.css">
+
+<head>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<script>
-	//setname();
+		//setname();
 
-	var name = prompt("Enter nickname: ");	
+		var name = prompt("Enter nickname: ");
 
 
-	function setname () {
-		name = prompt("Change nickname: ");
-		while (name == "null" || !name || name.length > 30) {
-		name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
+		function setname() {
+			name = prompt("Change nickname: ");
+			while (name == "null" || !name || name.length > 30) {
+				name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
+			}
+			updateChatAs();
 		}
-		updateChatAs();		
-	}
 
 
-	while (name == "null" || !name || name.length > 30) {
-		name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
-	}
-	
-	function getName() {
-		return name;
-	}
+		while (name == "null" || !name || name.length > 30) {
+			name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
+		}
+
+		function getName() {
+			return name;
+		}
 	</script>
 
 	<style>
@@ -31,322 +32,364 @@
 			box-sizing: border-box;
 		}
 
-		body { font: 13px Helvetica, Arial; border: black 3px;}
-		#messages { list-style-type: none; margin: 0; padding: 0; }
-		#messages li { padding: 8px 10px; }
-		#messages li:nth-child(odd) { background: #eee;  border-bottom: black solid 1px;}
-		#messages li:nth-child(even) { background: lightblue;  border-bottom: black solid 1px;}
+		body {
+			font: 13px Helvetica, Arial;
+			border: black 3px;
+		}
 
-		.messages{
+		#messages {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+		}
+
+		#messages li {
+			padding: 8px 10px;
+		}
+
+		#messages li:nth-child(odd) {
+			background: #eee;
+			border-bottom: black solid 1px;
+		}
+
+		#messages li:nth-child(even) {
+			background: lightblue;
+			border-bottom: black solid 1px;
+		}
+
+		.messages {
 			height: 100%;
-			border:1px solid black;
-			position:relative;
+			border: 1px solid black;
+			position: relative;
 		}
 
 
 		.Time {
-		  font-family: "Comic Sans";
-		  float: right;
+			font-family: "Comic Sans";
+			float: right;
 		}
 
 		.Sender {
 			font-weight: bold;
 		}
 
+		/* Memes */
+		.clock {
+			width: 260px;
+			margin: 0 auto;
+			padding: 30px;
+			color: black;
+			background: #white;
+		}
 
+		.clock ul {
+			width: 250px;
+			margin: 0 auto;
+			padding: 0;
+			list-style: none;
+			text-align: center
+		}
 
-/* Memes */
-.clock {
-width: 260px;
-margin: 0 auto;
-padding: 30px;
-color: black;background:#white;
-}
-.clock ul {
-width: 250px;
-margin: 0 auto;
-padding: 0;
-list-style: none;
-text-align: center
-}
+		.clock ul li {
+			display: inline;
+			font-size: 3em;
+			text-align: center;
+			font-family: "Arial", Helvetica, sans-serif;
+			text-shadow: 0 2px 5px rgba(4, 247, 25, 0.568), 0 3px 6px rgba(4, 247, 25, 0.568), 0 4px 7px rgba(4, 247, 25, 0.568)c
+		}
 
-.clock ul li {
-display: inline;
-font-size: 3em;
-text-align: center;
-font-family: "Arial", Helvetica, sans-serif;
-text-shadow: 0 2px 5px rgba(4, 247, 25, 0.568), 0 3px 6px rgba(4, 247, 25, 0.568), 0 4px 7px rgba(4, 247, 25, 0.568)c
-}
-#Date { 
-font-family: 'Arial', Helvetica, sans-serif;
-font-size: 26px;
-text-align: center;
-text-shadow: 0 2px 5px rgba(4, 247, 25, 0.568), 0 3px 6pxrgba(4, 247, 25, 0.568);
-padding-bottom: 40px;
-}
+		#Date {
+			font-family: 'Arial', Helvetica, sans-serif;
+			font-size: 26px;
+			text-align: center;
+			text-shadow: 0 2px 5px rgba(4, 247, 25, 0.568), 0 3px 6pxrgba(4, 247, 25, 0.568);
+			padding-bottom: 40px;
+		}
 
-#point {
-position: relative;
--moz-animation: mymove 1s ease infinite;
--webkit-animation: mymove 1s ease infinite;
-padding-left: 10px;
-padding-right: 10px
-}
+		#point {
+			position: relative;
+			-moz-animation: mymove 1s ease infinite;
+			-webkit-animation: mymove 1s ease infinite;
+			padding-left: 10px;
+			padding-right: 10px
+		}
 
-/* Animasi Detik Kedap - Kedip */
-@-webkit-keyframes mymove 
-{
-0% {opacity:1.0; text-shadow:0 0 20px rgba(4, 247, 25, 0.568);}
-50% {opacity:0; text-shadow:none; }
-100% {opacity:1.0; text-shadow:0 0 20px rgba(4, 247, 25, 0.568); } 
-}
+		/* Animasi Detik Kedap - Kedip */
+		@-webkit-keyframes mymove {
+			0% {
+				opacity: 1.0;
+				text-shadow: 0 0 20px rgba(4, 247, 25, 0.568);
+			}
 
-@-moz-keyframes mymove 
-{
-0% {opacity:1.0; text-shadow:0 0 20px rgba(4, 247, 25, 0.568);}
-50% {opacity:0; text-shadow:none; }
-100% {opacity:1.0; text-shadow:0 0 20px rgba(4, 247, 25, 0.568); } 
-}
-/* Memes */
+			50% {
+				opacity: 0;
+				text-shadow: none;
+			}
 
+			100% {
+				opacity: 1.0;
+				text-shadow: 0 0 20px rgba(4, 247, 25, 0.568);
+			}
+		}
+
+		@-moz-keyframes mymove {
+			0% {
+				opacity: 1.0;
+				text-shadow: 0 0 20px rgba(4, 247, 25, 0.568);
+			}
+
+			50% {
+				opacity: 0;
+				text-shadow: none;
+			}
+
+			100% {
+				opacity: 1.0;
+				text-shadow: 0 0 20px rgba(4, 247, 25, 0.568);
+			}
+		}
+
+		/* Memes */
 
 	</style>
 
-		<title>Simple chat</title>
+	<title>Simple chat</title>
 
-	</head>
+</head>
 
-	<body>
-	
+<body>
 
+	<!-- Memes? -->
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+	<script>
+		$(document).ready(function () {
+			// Making 2 variable month and day
+			var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+			var dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
+			// make single object
+			var newDate = new Date();
+			// make current time
+			newDate.setDate(newDate.getDate());
+			// setting date and time
+			$('#Date').html(dayNames[newDate.getDay()] + " " + newDate.getDate() + ' ' + monthNames[newDate.getMonth()] + ' ' + newDate.getFullYear());
 
+			setInterval(function () {
+				// Create a newDate() object and extract the seconds of the current time on the visitor's
+				var seconds = new Date().getSeconds();
+				// Add a leading zero to seconds value
+				$("#sec").html((seconds < 10 ? "0" : "") + seconds);
+			}, 1000);
 
+			setInterval(function () {
+				// Create a newDate() object and extract the minutes of the current time on the visitor's
+				var minutes = new Date().getMinutes();
+				// Add a leading zero to the minutes value
+				$("#min").html((minutes < 10 ? "0" : "") + minutes);
+			}, 1000);
 
-		<!-- Memes? -->
-		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-		<script >
-		$(document).ready(function() {
-		// Making 2 variable month and day
-		var monthNames = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ]; 
-		var dayNames= ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
-		
-		// make single object
-		var newDate = new Date();
-		// make current time
-		newDate.setDate(newDate.getDate());
-		// setting date and time
-		$('#Date').html(dayNames[newDate.getDay()] + " " + newDate.getDate() + ' ' + monthNames[newDate.getMonth()] + ' ' + newDate.getFullYear());
-		
-		setInterval( function() {
-		// Create a newDate() object and extract the seconds of the current time on the visitor's
-		var seconds = new Date().getSeconds();
-		// Add a leading zero to seconds value
-		$("#sec").html(( seconds < 10 ? "0" : "" ) + seconds);
-		},1000);
-		
-		setInterval( function() {
-		// Create a newDate() object and extract the minutes of the current time on the visitor's
-		var minutes = new Date().getMinutes();
-		// Add a leading zero to the minutes value
-		$("#min").html(( minutes < 10 ? "0" : "" ) + minutes);
-		},1000);
-		
-		setInterval( function() {
-		// Create a newDate() object and extract the hours of the current time on the visitor's
-		var hours = new Date().getHours();
-		// Add a leading zero to the hours value
-		$("#hours").html(( hours < 10 ? "0" : "" ) + hours);
-		}, 1000); 
+			setInterval(function () {
+				// Create a newDate() object and extract the hours of the current time on the visitor's
+				var hours = new Date().getHours();
+				// Add a leading zero to the hours value
+				$("#hours").html((hours < 10 ? "0" : "") + hours);
+			}, 1000);
 		});
-		</script>
-		<div class="clock">
+	</script>
+	<div class="clock">
 		<div id="Date"></div>
 		<ul>
-		<li id="hours"></li>
-		<li id="point">:</li>
-		<li id="min"></li>
-		<li id="point">:</li>
-		<li id="sec"></li>
+			<li id="hours"></li>
+			<li id="point">:</li>
+			<li id="min"></li>
+			<li id="point">:</li>
+			<li id="sec"></li>
 		</ul>
+	</div>
+	<!-- Memes? -->
+
+
+	<div class="row">
+		<div class="col-6">
+			<h1>Video placeholder</h1>
+			<div class="embed-responsive embed-responsive-16by9">
+				<iframe width="560" height="315" src="https://www.youtube.com/embed/JPxfAYYo7NA" frameborder="0"
+					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+					allowfullscreen></iframe>
+			</div>
 		</div>
-		<!-- Memes? -->
+		<div class="col-6">
+			<div class="messages">
+				<ul id="messages"></ul>
+			</div>
+
+			<input type="checkbox" style="opacity: 0;" id="myCheckbox1" />
+			<label for="myCheckbox1"><img id="confusedPic" onclick="toggleConfused" style="size: 20px;"
+					src="https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png" /></label>
 
 
-			<div class="row">
-				<div class="col-6">
-					<h1>Video placeholder</h1>
-					<div class="embed-responsive embed-responsive-16by9">
-					  <iframe width="560" height="315" src="https://www.youtube.com/embed/JPxfAYYo7NA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+			<form action="">
+				<!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
+				<!--<div class="row">-->
+				<div class="row justify-content-between">
+					<div class="btn-group col-4 order-1" role="group">
+						Question
+						<label>
+							<input type="checkbox" id="questionCheck" onclick="updateChatAs()" />
+						</label>
+						Anonymous
+						<label>
+							<input type="checkbox" id="anonCheck" onclick="updateChatAs()" />
+						</label>
+					</div>
+					<div class="CurrentUser col-6" id="currentName">
+						Chatting as:
+						<label>
+							<input type="user" id="currentUser" />
+						</label>
+					</div>
+					<div class="ChangeCurrentUser">
+						<button type="button" onclick="setname()">DÄPP</button>
 					</div>
 				</div>
-				<div class="col-6">
-					<div class="messages">
-						<ul id="messages"></ul>
+				<div class="input-group mb-3 order-1">
+					<input type="text" class="form-control" id="m" aria-label="Recipient's username"
+						aria-describedby="button-addon2" autocomplete="off" />
+					<div class="input-group-append">
+						<button class="btn btn-secondary" id="button-addon2">Send</button>
 					</div>
-
-								<!--<input type="checkbox" id="myCheckbox1" />
-								<label for="myCheckbox1"><img src="https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png" /></label>-->
-							<form action="">  <!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
-								<!--<div class="row">-->
-									<div class="row justify-content-between">
-										<div class="btn-group col-4 order-1" role="group">
-											Question
-											<label>
-												<input type="checkbox" id="questionCheck" onclick="updateChatAs()" />
-											</label>
-											Anonymous
-											<label>
-												<input type="checkbox" id="anonCheck" onclick="updateChatAs()" />
-											</label>
-											</div>
-												<div class="CurrentUser col-6" id="currentName">
-													Chatting as:
-													<label>
-														<input type="user" id="currentUser" />
-													</label>
-												</div>
-											<div class="ChangeCurrentUser">
-												<button type="button" onclick="setname()">DÄPP</button>
-											</div>
-										</div>
-											<div class="input-group mb-3 order-1">
-												<input type="text" class="form-control" id="m" aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="off" />
-												<div class="input-group-append">
-    											<button class="btn btn-secondary" id="button-addon2">Send</button>
-  											</div>
-											</div>
-									</div>
-									
-					</div>
-				<!--</div>-->
-
-				<!---------------------------!!!!!!!!!!!!!!!!!!!!!--!!!!!!!-------FOR PONTUS TO PLACE -------------------------------------->
-
-				<script>
-				var confuseTimer;
-
-				function toggleConfused() {
-					// Become confused
-					if (document.getElementById('myCheckbox1').checked) {
-						$("#confusedPic").fadeTo(300, 0.2);
-						$('#messages').append($('<li>').text("You are confused!"));
-						confuseTimer = setTimeout(confuseTimerDone, 1000);
-					}
-
-					else {
-						$("#confusedPic").fadeTo(300, 1);
-						clearTimeout(confuseTimer);
-					}
-				}
-
-				function confuseTimerDone() {
-					$("#myCheckbox1").prop("checked", false);
-					toggleConfused();
-				}
-
-				function updateChatAs() {
-					var chatAsText = "";
-
-					if (document.getElementById('questionCheck').checked) {
-						chatAsText += 'Asking question as: ';
-					}
-
-					else {
-						chatAsText += 'Chatting as: ';
-					}
-
-					if (document.getElementById('anonCheck').checked) {
-						chatAsText += 'Anonymous';
-					}
-
-					else {
-						chatAsText += getName();
-					}
-
-					document.getElementById('currentName').innerHTML = chatAsText;
-				}
-
-				updateChatAs();
-
-				</script>
-			</form>
+				</div>
 		</div>
 
-		<script src="/socket.io/socket.io.js"></script>
-		<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-		<script>
-			$(function () {
-				var socket = io();
-				$('form').submit(function(e) {
-					e.preventDefault();
+	</div>
+	<!--</div>-->
 
-						// If message box is empty don't send message
-						if (!$('#m').val()) {
-						return;
-					}
-					
-					socket.emit('name', name);
-					
-					//Check question
-					if (document.getElementById("questionCheck").checked) {
 
-						if (document.getElementById("anonCheck").checked) {
-							socket.emit('question', true, $('#m').val());
-						}
+	<script>
+		var confuseTimer;
 
-						else {
-							socket.emit('question', false, $('#m').val());
-						}
+		function toggleConfused() {
+			// Become confused
+			if (document.getElementById('myCheckbox1').checked) {
+				$("#confusedPic").fadeTo(300, 0.2);
+				$('#messages').append($('<li>').text("You are confused!"));
+				confuseTimer = setTimeout(confuseTimerDone, 5000);
+			}
+
+			else {
+				$("#confusedPic").fadeTo(300, 1);
+				clearTimeout(confuseTimer);
+			}
+		}
+
+		function confuseTimerDone() {
+			$("#myCheckbox1").prop("checked", false);
+			toggleConfused();
+		}
+
+		function updateChatAs() {
+			var chatAsText = "";
+
+			if (document.getElementById('questionCheck').checked) {
+				chatAsText += 'Asking question as: ';
+			}
+
+			else {
+				chatAsText += 'Chatting as: ';
+			}
+
+			if (document.getElementById('anonCheck').checked) {
+				chatAsText += 'Anonymous';
+			}
+
+			else {
+				chatAsText += getName();
+			}
+
+			document.getElementById('currentName').innerHTML = chatAsText;
+		}
+
+		updateChatAs();
+
+	</script>
+	</form>
+	</div>
+
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script>
+		$(function () {
+			var socket = io();
+			$('form').submit(function (e) {
+				e.preventDefault();
+
+				// If message box is empty don't send message
+				if (!$('#m').val()) {
+					return;
+				}
+
+				socket.emit('name', name);
+
+				//Check question
+				if (document.getElementById("questionCheck").checked) {
+
+					if (document.getElementById("anonCheck").checked) {
+						socket.emit('question', true, $('#m').val());
 					}
 
 					else {
-						if (document.getElementById("anonCheck").checked) {
-							socket.emit('chat message', true, $('#m').val());
-						}
+						socket.emit('question', false, $('#m').val());
+					}
+				}
 
-						else {
-							socket.emit('chat message', false, $('#m').val());
-						}
+				else {
+					if (document.getElementById("anonCheck").checked) {
+						socket.emit('chat message', true, $('#m').val());
 					}
 
-					$('#m').val('');
-					return false;
-				});
-
-				socket.on('chat message', function(sender, msg, date){
-					var dt = new Date(date);
-					var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
-					//time.css({ "font-size": "120%"});
-
-					$('#messages').append($('<li>').html( '<span class="Sender">' + sender + '</span>'  + ": " + msg  + '<span class="Time">'  + time + '</span>' ));
-
-				});
-
-				socket.on('question', function(sender, questionMsg, questionID, date){
-					var question = $('<li>').text(sender + ": " +questionMsg);
-					question.css({"background-color":"yellow", "font-size": "120%"});
-					question.attr({id: 'question' +questionID});
-					var upvoteButton = $('<input/>').attr({id: 'upvote' +questionID, type: 'button', name:'Upvote', value:('\u25B2') });
-					$('#messages').append(question, upvoteButton);
-					$('#'+ 'upvote' +questionID).click(function() {
-						socket.emit('upvote', questionID);
-						$('#'+ 'upvote' +questionID).remove();
-					});
-				});
-
-				socket.on('upvote', function(questionID, memberNum) {
-					var fontsize = $('#'+'question'+questionID).css("font-size");
-					newFontsize = fontsize.split("px")[0] * (1 + 1 / memberNum);
-
-					if (newFontsize > 15.6 * 2) {
-						newFontsize = 15.6 * 2;
+					else {
+						socket.emit('chat message', false, $('#m').val());
 					}
+				}
 
-					$('#'+'question'+questionID).css("font-size", newFontsize);
+				$('#m').val('');
+				return false;
+			});
+
+			socket.on('chat message', function (sender, msg, date) {
+				var dt = new Date(date);
+				var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+				//time.css({ "font-size": "120%"});
+
+				$('#messages').append($('<li>').html('<span class="Sender">' + sender + '</span>' + ": " + msg + '<span class="Time">' + time + '</span>'));
+
+			});
+
+			socket.on('question', function (sender, questionMsg, questionID, date) {
+				var question = $('<li>').text(sender + ": " + questionMsg);
+				question.css({ "background-color": "yellow", "font-size": "120%" });
+				question.attr({ id: 'question' + questionID });
+				var upvoteButton = $('<input/>').attr({ id: 'upvote' + questionID, type: 'button', name: 'Upvote', value: ('\u25B2') });
+				$('#messages').append(question, upvoteButton);
+				$('#' + 'upvote' + questionID).click(function () {
+					socket.emit('upvote', questionID);
+					$('#' + 'upvote' + questionID).remove();
 				});
 			});
-		</script>
 
-	</body>
+			socket.on('upvote', function (questionID, memberNum) {
+				var fontsize = $('#' + 'question' + questionID).css("font-size");
+				newFontsize = fontsize.split("px")[0] * (1 + 1 / memberNum);
+
+				if (newFontsize > 15.6 * 2) {
+					newFontsize = 15.6 * 2;
+				}
+
+				$('#' + 'question' + questionID).css("font-size", newFontsize);
+			});
+		});
+	</script>
+
+</body>
+
 </html>
