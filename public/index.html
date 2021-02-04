@@ -24,97 +24,69 @@
 		#messages li { padding: 8px 10px; }
 		#messages li:nth-child(odd) { background: #eee;  border-bottom: black solid 1px;}
 		#messages li:nth-child(even) { background: lightblue;  border-bottom: black solid 1px;}
-		/*
-		.TextWindowBottom {
-			background: #000;
-			padding: 3px;
-			position: fixed;
-			bottom: 10px;
-			width: 100%;
-			margin-left: 0%;
-			right: 0px;
-		}
 
-		.TextWindowBottom input {
-			border: 0;
-			padding: 11px;
-			width: 79%;
-			margin-right: 0%;
-			margin-left: 2px;
-		}
-
-		.TextWindowBottom button {
-			width: 5%;
-		 	background: lightgray;
-			border: black;
-			padding: 12px;
-			float:right;
-		}
-
-		.thumbs-up-facebook {
-			width: 0%;
-			padding: 3px;
-			position: fixed;
-			bottom: 55px;
-			width: 100%;
-		}
-
-		.thumbs-up-facebook input[type="checkbox"] {
-    		opacity: 0;
-		}
-
-		img {
-			border: white solid 1px;
-			height: 50px;
-			width: 50px;
-			margin-top: 90%;
-		}
-
-
-		.checkboxes {
-			width: 4%;
-			background:lightgray;
-			border: none;
-			padding: 12px;
-			float: right;
-			position: relative;
-			display: block;
-			border-right: black;
-			margin-left: 1mm;
-			box-sizing: content-box;
-			padding-right: 0mm;
-		}
-
-		.checkboxes input {
-			position: absolute;
-			width: 10px;
-		}
-
-		.CurrentUser {
-			width: 6%;
-			background: lightgray;
-			border: none;
-			padding: 11px;
-			float: left;
-			position: relative;
-			display: block;
-			border-right: black;
-			margin-left: 0mm;
-			box-sizing: content-box;
-			padding-right: 0mm;
-		}
-
-		.OverlappingFix {  Ghetto lösning som ej är bra men nu overlappar inte chat med meddelande window
-			border: white 15px solid;
-			position: absolute;
-			max-width: 90%;
-			padding-bottom: 30px;
-		}*/
 		.messages{
 			height: 100%;
 			border:1px solid black;
 			position:relative;
 		}
+
+
+/* Memes */
+.clock {
+width: 260px;
+margin: 0 auto;
+padding: 30px;
+color: #FFF;background:#333;
+}
+.clock ul {
+width: 250px;
+margin: 0 auto;
+padding: 0;
+list-style: none;
+text-align: center
+}
+
+.clock ul li {
+display: inline;
+font-size: 3em;
+text-align: center;
+font-family: "Arial", Helvetica, sans-serif;
+text-shadow: 0 2px 5px #55c6ff, 0 3px 6px #55c6ff, 0 4px 7px #55c6ff
+}
+#Date { 
+font-family: 'Arial', Helvetica, sans-serif;
+font-size: 26px;
+text-align: center;
+text-shadow: 0 2px 5px #55c6ff, 0 3px 6px #55c6ff;
+padding-bottom: 40px;
+}
+
+#point {
+position: relative;
+-moz-animation: mymove 1s ease infinite;
+-webkit-animation: mymove 1s ease infinite;
+padding-left: 10px;
+padding-right: 10px
+}
+
+/* Animasi Detik Kedap - Kedip */
+@-webkit-keyframes mymove 
+{
+0% {opacity:1.0; text-shadow:0 0 20px #00c6ff;}
+50% {opacity:0; text-shadow:none; }
+100% {opacity:1.0; text-shadow:0 0 20px #00c6ff; } 
+}
+
+@-moz-keyframes mymove 
+{
+0% {opacity:1.0; text-shadow:0 0 20px #00c6ff;}
+50% {opacity:0; text-shadow:none; }
+100% {opacity:1.0; text-shadow:0 0 20px #00c6ff; } 
+}
+/* Memes */
+
+
 
 
 	</style>
@@ -124,6 +96,59 @@
 	</head>
 
 	<body>
+	
+		
+		<!-- Memes? -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script type="text/javascript">
+		$(document).ready(function() {
+		// Making 2 variable month and day
+		var monthNames = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ]; 
+		var dayNames= ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+		
+		// make single object
+		var newDate = new Date();
+		// make current time
+		newDate.setDate(newDate.getDate());
+		// setting date and time
+		$('#Date').html(dayNames[newDate.getDay()] + " " + newDate.getDate() + ' ' + monthNames[newDate.getMonth()] + ' ' + newDate.getFullYear());
+		
+		setInterval( function() {
+		// Create a newDate() object and extract the seconds of the current time on the visitor's
+		var seconds = new Date().getSeconds();
+		// Add a leading zero to seconds value
+		$("#sec").html(( seconds < 10 ? "0" : "" ) + seconds);
+		},1000);
+		
+		setInterval( function() {
+		// Create a newDate() object and extract the minutes of the current time on the visitor's
+		var minutes = new Date().getMinutes();
+		// Add a leading zero to the minutes value
+		$("#min").html(( minutes < 10 ? "0" : "" ) + minutes);
+		},1000);
+		
+		setInterval( function() {
+		// Create a newDate() object and extract the hours of the current time on the visitor's
+		var hours = new Date().getHours();
+		// Add a leading zero to the hours value
+		$("#hours").html(( hours < 10 ? "0" : "" ) + hours);
+		}, 1000); 
+		});
+		</script>
+		<div class="clock">
+		<div id="Date"></div>
+		<ul>
+		<li id="hours"></li>
+		<li id="point">:</li>
+		<li id="min"></li>
+		<li id="point">:</li>
+		<li id="sec"></li>
+		</ul>
+		</div>
+		<!-- Memes? -->
+
+
 			<div class="row">
 				<div class="col-6">
 					<h1>Video placeholder</h1>
@@ -225,9 +250,9 @@
 				var socket = io();
 				$('form').submit(function(e) {
 					e.preventDefault();
-					
-					// If message box is empty don't send message
-					if (!$('#m').val()) {
+
+						// If message box is empty don't send message
+						if (!$('#m').val()) {
 						return;
 					}
 					
@@ -256,8 +281,12 @@
 					$('#m').val('');
 					return false;
 				});
+
 				socket.on('chat message', function(sender, msg){
-					$('#messages').append($('<li>').text(sender + ": " +msg));
+					var dt = new Date();
+					var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+					$('#messages').append($('<li>').text(sender + ": " +msg " - " + time ));
+
 				});
 
 				socket.on('question', function(sender, questionMsg, questionID){
