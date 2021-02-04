@@ -19,18 +19,38 @@ class Lecture {
 		this.students = [];
 	}
 
+	get_student_by_id(id){
+		for (var i = 0; i < this.students.length; i++){
+			if (this.students[i].session_id == id){
+				return this.students[i];
+			}
+		}
+		return null;
+	}
+
+	student_exist(id){
+		if (this.get_student_by_id(id) == null){
+			return false;
+		}
+		return true;
+	}
+
 	add_student(id, name){
-		var stud = new Student(id, name);
-		this.students.push(stud);
+		var stud = this.get_student_by_id(id);
+		if (stud == null){
+			var stud = new Student(id, name);
+			this.students.push(stud);
+		} else {
+			stud.set_name(name);
+		}
 	}
 
 	get_student_name(id){
-		for (var i = 0; i < this.students.length; i++){
-			if (this.students[i].session_id == id){
-				return this.students[i].name;
-			}
+		var student = this.get_student_by_id(id);
+		if (student == null){
+			return "Unknown";
 		}
-		return "Unknown";
+		return student.get_name();
 	}
 }
 
@@ -48,8 +68,12 @@ class Student {
 		this.msg = [];
 	}
 
-	getName() {
+	get_name() {
 		return this.name;
+	}
+
+	set_name(name) {
+		this.name = name;
 	}
 }
 
@@ -107,8 +131,9 @@ io.on('connection', (socket) => {
 	});
 
 	socket.on('name', (name) => {
-		console.log('name', name);
 		lecture_1.add_student(socket.request.session.id, name);
+		console.log(lecture_1.students);
+
 	});
 });
 
