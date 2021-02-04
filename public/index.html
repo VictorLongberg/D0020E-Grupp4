@@ -3,8 +3,17 @@
 	<head>
 		 <link rel="stylesheet" href="css/bootstrap.min.css">
 	<script>
-	var name = prompt("Enter nickname: ");
-	
+	//setname();
+
+	var name = prompt("Enter nickname: ");	
+
+
+	function setname () {
+		name = prompt("Enter nickname: ");
+		updateChatAs();	
+	}
+
+
 	while (name == "null" || !name || name.length > 30) {
 		name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
 	}
@@ -166,7 +175,7 @@ padding-right: 10px
 				<div class="col-6">
 					<h1>Video placeholder</h1>
 					<div class="embed-responsive embed-responsive-16by9">
-					  <iframe width="560" height="315" src="https://www.youtube.com/embed/08fjqkLnBwM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+					  <iframe width="560" height="315" src="https://www.youtube.com/embed/JPxfAYYo7NA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 					</div>
 				</div>
 				<div class="col-6">
@@ -205,6 +214,7 @@ padding-right: 10px
 									</div>
 					</div>
 				<!--</div>-->
+				<button onclick="setname()">DÄPP</button>
 
 				<script>
 				var confuseTimer;
