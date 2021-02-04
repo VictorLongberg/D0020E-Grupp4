@@ -1,12 +1,17 @@
 // code from https://socket.io/get-started/chat/
 // code from https://socket.io/get-started/chat/
 
+// Outside requirements
 //var app = require('express')();
 const express = require('express');
 const app = express();
 var http = require('http').createServer(app);
-var io = require('socket.io')(http)
-var session = require('express-session')
+var io = require('socket.io')(http);
+var session = require('express-session');
+
+// Own requirements
+var student = require('./student.js');
+var lecture = require('./lecture.js');
 
 var sessionMiddleware = session({
   secret: '=very! ¤secret# "key/',
@@ -16,71 +21,6 @@ var sessionMiddleware = session({
 });
 
 const port = 3000
-
-/** Class representing a Lecture. */
-class Lecture {
-	constructor(){
-		this.students = [];
-	}
-
-	get_student_by_id(id){
-		for (var i = 0; i < this.students.length; i++){
-			if (this.students[i].session_id == id){
-				return this.students[i];
-			}
-		}
-		return null;
-	}
-
-	student_exist(id){
-		if (this.get_student_by_id(id) == null){
-			return false;
-		}
-		return true;
-	}
-
-	add_student(id, name){
-		var stud = this.get_student_by_id(id);
-		if (stud == null){
-			var stud = new Student(id, name);
-			this.students.push(stud);
-		} else {
-			stud.set_name(name);
-		}
-	}
-
-	get_student_name(id){
-		var student = this.get_student_by_id(id);
-		if (student == null){
-			return "Unknown";
-		}
-		return student.get_name();
-	}
-}
-
-/** Class representing a Student. */
-class Student {
-	/**
-	 * @param  {string} id id - Session-ID
-	 * @param  {string} name name - Name of student
-	 */
-	constructor(id, name) {
-		this.session_id = id;
-		this.name = name;
-		this.timeJoined = this.timeJoined;
-		//this.timeLeft = timeLeft;
-		this.msg = [];
-	}
-
-	get_name() {
-		return this.name;
-	}
-
-	set_name(name) {
-		this.name = name;
-	}
-}
-
 
 /** Class representing a Message. */
 class Message{
@@ -94,7 +34,7 @@ class Message{
 }
 
 
-const lecture_1 = new Lecture();
+const lecture_1 = new lecture.Lecture();
 
 
 //Sessions (experess-session)
