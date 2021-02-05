@@ -3,10 +3,23 @@
 	<head>
 		 <link rel="stylesheet" href="css/bootstrap.min.css">
 	<script>
-	var name = prompt("Enter nickname: ");
 	
-	while (name == "null" || !name || name.length > 30) {
+	var name = "error";	
+	
+	setname();
+
+	function setname () {
+		name = prompt("Set nickname: ");
+		while (name == "null" || !name || name.length > 30) {
 		name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
+		}
+		updateChatAs();		
+		
+		var element = document.createElement('div');
+		element.innerText = name;
+		name = element.innerHTML;
+		
+		updateChatAs();	
 	}
 	
 	function getName() {
@@ -24,97 +37,78 @@
 		#messages li { padding: 8px 10px; }
 		#messages li:nth-child(odd) { background: #eee;  border-bottom: black solid 1px;}
 		#messages li:nth-child(even) { background: lightblue;  border-bottom: black solid 1px;}
-		/*
-		.TextWindowBottom {
-			background: #000;
-			padding: 3px;
-			position: fixed;
-			bottom: 10px;
-			width: 100%;
-			margin-left: 0%;
-			right: 0px;
-		}
 
-		.TextWindowBottom input {
-			border: 0;
-			padding: 11px;
-			width: 79%;
-			margin-right: 0%;
-			margin-left: 2px;
-		}
-
-		.TextWindowBottom button {
-			width: 5%;
-		 	background: lightgray;
-			border: black;
-			padding: 12px;
-			float:right;
-		}
-
-		.thumbs-up-facebook {
-			width: 0%;
-			padding: 3px;
-			position: fixed;
-			bottom: 55px;
-			width: 100%;
-		}
-
-		.thumbs-up-facebook input[type="checkbox"] {
-    		opacity: 0;
-		}
-
-		img {
-			border: white solid 1px;
-			height: 50px;
-			width: 50px;
-			margin-top: 90%;
-		}
-
-
-		.checkboxes {
-			width: 4%;
-			background:lightgray;
-			border: none;
-			padding: 12px;
-			float: right;
-			position: relative;
-			display: block;
-			border-right: black;
-			margin-left: 1mm;
-			box-sizing: content-box;
-			padding-right: 0mm;
-		}
-
-		.checkboxes input {
-			position: absolute;
-			width: 10px;
-		}
-
-		.CurrentUser {
-			width: 6%;
-			background: lightgray;
-			border: none;
-			padding: 11px;
-			float: left;
-			position: relative;
-			display: block;
-			border-right: black;
-			margin-left: 0mm;
-			box-sizing: content-box;
-			padding-right: 0mm;
-		}
-
-		.OverlappingFix {  Ghetto lösning som ej är bra men nu overlappar inte chat med meddelande window
-			border: white 15px solid;
-			position: absolute;
-			max-width: 90%;
-			padding-bottom: 30px;
-		}*/
 		.messages{
 			height: 100%;
 			border:1px solid black;
 			position:relative;
 		}
+
+
+		.Time {
+		  font-family: "Comic Sans";
+		  float: right;
+		}
+
+		.Sender {
+			font-weight: bold;
+		}
+
+
+
+/* Memes */
+.clock {
+width: 260px;
+margin: 0 auto;
+padding: 30px;
+color: black;background:#white;
+}
+.clock ul {
+width: 250px;
+margin: 0 auto;
+padding: 0;
+list-style: none;
+text-align: center
+}
+
+.clock ul li {
+display: inline;
+font-size: 3em;
+text-align: center;
+font-family: "Arial", Helvetica, sans-serif;
+text-shadow: 0 2px 5px rgba(4, 247, 25, 0.568), 0 3px 6px rgba(4, 247, 25, 0.568), 0 4px 7px rgba(4, 247, 25, 0.568)c
+}
+#Date { 
+font-family: 'Arial', Helvetica, sans-serif;
+font-size: 26px;
+text-align: center;
+text-shadow: 0 2px 5px rgba(4, 247, 25, 0.568), 0 3px 6pxrgba(4, 247, 25, 0.568);
+padding-bottom: 40px;
+}
+
+#point {
+position: relative;
+-moz-animation: mymove 1s ease infinite;
+-webkit-animation: mymove 1s ease infinite;
+padding-left: 10px;
+padding-right: 10px
+}
+
+/* Animasi Detik Kedap - Kedip */
+@-webkit-keyframes mymove 
+{
+0% {opacity:1.0; text-shadow:0 0 20px rgba(4, 247, 25, 0.568);}
+50% {opacity:0; text-shadow:none; }
+100% {opacity:1.0; text-shadow:0 0 20px rgba(4, 247, 25, 0.568); } 
+}
+
+@-moz-keyframes mymove 
+{
+0% {opacity:1.0; text-shadow:0 0 20px rgba(4, 247, 25, 0.568);}
+50% {opacity:0; text-shadow:none; }
+100% {opacity:1.0; text-shadow:0 0 20px rgba(4, 247, 25, 0.568); } 
+}
+/* Memes */
 
 
 	</style>
@@ -124,11 +118,67 @@
 	</head>
 
 	<body>
+	
+
+
+
+
+
+		<!-- Memes? -->
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script >
+		$(document).ready(function() {
+		// Making 2 variable month and day
+		var monthNames = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ]; 
+		var dayNames= ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
+		
+		// make single object
+		var newDate = new Date();
+		// make current time
+		newDate.setDate(newDate.getDate());
+		// setting date and time
+		$('#Date').html(dayNames[newDate.getDay()] + " " + newDate.getDate() + ' ' + monthNames[newDate.getMonth()] + ' ' + newDate.getFullYear());
+		
+		setInterval( function() {
+		// Create a newDate() object and extract the seconds of the current time on the visitor's
+		var seconds = new Date().getSeconds();
+		// Add a leading zero to seconds value
+		$("#sec").html(( seconds < 10 ? "0" : "" ) + seconds);
+		},1000);
+		
+		setInterval( function() {
+		// Create a newDate() object and extract the minutes of the current time on the visitor's
+		var minutes = new Date().getMinutes();
+		// Add a leading zero to the minutes value
+		$("#min").html(( minutes < 10 ? "0" : "" ) + minutes);
+		},1000);
+		
+		setInterval( function() {
+		// Create a newDate() object and extract the hours of the current time on the visitor's
+		var hours = new Date().getHours();
+		// Add a leading zero to the hours value
+		$("#hours").html(( hours < 10 ? "0" : "" ) + hours);
+		}, 1000); 
+		});
+		</script>
+		<div class="clock">
+		<div id="Date"></div>
+		<ul>
+		<li id="hours"></li>
+		<li id="point">:</li>
+		<li id="min"></li>
+		<li id="point">:</li>
+		<li id="sec"></li>
+		</ul>
+		</div>
+		<!-- Memes? -->
+
+
 			<div class="row">
 				<div class="col-6">
 					<h1>Video placeholder</h1>
 					<div class="embed-responsive embed-responsive-16by9">
-					  <iframe width="560" height="315" src="https://www.youtube.com/embed/08fjqkLnBwM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+					  <iframe width="560" height="315" src="https://www.youtube.com/embed/JPxfAYYo7NA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 					</div>
 				</div>
 				<div class="col-6">
@@ -136,8 +186,7 @@
 						<ul id="messages"></ul>
 					</div>
 
-								<!--<input type="checkbox" id="myCheckbox1" />
-								<label for="myCheckbox1"><img src="https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png" /></label>-->
+								<img id="confusedPic" onclick="toggleConfused()" src="https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png" />
 							<form action="">  <!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
 								<!--<div class="row">-->
 									<div class="row justify-content-between">
@@ -157,6 +206,9 @@
 														<input type="user" id="currentUser" />
 													</label>
 												</div>
+											<div class="ChangeCurrentUser">
+												<button type="button" onclick="setname()">DÄPP</button>
+											</div>
 										</div>
 											<div class="input-group mb-3 order-1">
 												<input type="text" class="form-control" id="m" aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="off" />
@@ -165,21 +217,27 @@
   											</div>
 											</div>
 									</div>
+									
 					</div>
 				<!--</div>-->
 
+				<!---------------------------!!!!!!!!!!!!!!!!!!!!!--!!!!!!!-------FOR PONTUS TO PLACE -------------------------------------->
+
 				<script>
 				var confuseTimer;
-
+				var confusedBool = false;
+				
 				function toggleConfused() {
 					// Become confused
-					if (document.getElementById('myCheckbox1').checked) {
+					if (!confusedBool) {
+						confusedBool = true;
 						$("#confusedPic").fadeTo(300, 0.2);
 						$('#messages').append($('<li>').text("You are confused!"));
 						confuseTimer = setTimeout(confuseTimerDone, 1000);
 					}
 
 					else {
+						confusedBool = false;
 						$("#confusedPic").fadeTo(300, 1);
 						clearTimeout(confuseTimer);
 					}
@@ -223,17 +281,24 @@
 		<script>
 			$(function () {
 				var socket = io();
-
-				socket.emit('name', name);
-
 				$('form').submit(function(e) {
 					e.preventDefault();
 
+						// If message box is empty don't send message
+						if (!$('#m').val()) {
+						return;
+					}
+					
+					socket.emit('name', name); // Hitta ett sätt att emitta direkt då namn ändras uppe i setname() för att i framtiden kunna uppdatera deltagarlista med rätt namn
+					
 					//Check question
 					if (document.getElementById("questionCheck").checked) {
+
 						if (document.getElementById("anonCheck").checked) {
 							socket.emit('question', true, $('#m').val());
-						} else {
+						}
+
+						else {
 							socket.emit('question', false, $('#m').val());
 						}
 					}
@@ -241,7 +306,9 @@
 					else {
 						if (document.getElementById("anonCheck").checked) {
 							socket.emit('chat message', true, $('#m').val());
-						} else {
+						}
+
+						else {
 							socket.emit('chat message', false, $('#m').val());
 						}
 					}
@@ -249,12 +316,61 @@
 					$('#m').val('');
 					return false;
 				});
-				socket.on('chat message', function(sender, msg){
-					$('#messages').append($('<li>').text(sender + ": " +msg));
+
+				socket.on('chat message', function(sender, msg, date){
+					var dt = new Date(date);
+					var hourStamp = dt.getHours();
+					var minuteStamp = dt.getMinutes();
+					var secondStamp = dt.getSeconds();
+					
+					if (hourStamp < 10) {
+						hourStamp = "0" + hourStamp;
+					}
+					
+					if (minuteStamp < 10) {
+						minuteStamp = "0" + minuteStamp;
+					}
+					
+					if (secondStamp < 10) {
+						secondStamp = "0" + secondStamp;
+					}
+					
+					var timeStamp = hourStamp + ":" + minuteStamp + ":" + secondStamp;
+					
+					// Sanitization of message
+					var element = document.createElement('div');
+					element.innerText = msg;
+					msg = element.innerHTML;
+					
+					$('#messages').append($('<li>').html( '<span class="Sender">' + sender + '</span>'  + ": " + msg  + '<span class="Time">'  + timeStamp + '</span>' ));
 				});
 
-				socket.on('question', function(sender, questionMsg, questionID){
-					var question = $('<li>').text(sender + ": " +questionMsg);
+				socket.on('question', function(sender, questionMsg, questionID, date){
+					var dt = new Date(date);
+					var hourStamp = dt.getHours();
+					var minuteStamp = dt.getMinutes();
+					var secondStamp = dt.getSeconds();
+					
+					if (hourStamp < 10) {
+						hourStamp = "0" + hourStamp;
+					}
+					
+					if (minuteStamp < 10) {
+						minuteStamp = "0" + minuteStamp;
+					}
+					
+					if (secondStamp < 10) {
+						secondStamp = "0" + secondStamp;
+					}
+					
+					var timeStamp = hourStamp + ":" + minuteStamp + ":" + secondStamp;
+					
+					// Sanitization of message
+					var element = document.createElement('div');
+					element.innerText = questionMsg;
+					questionMsg = element.innerHTML;
+					
+					var question = $('<li>').html( '<span class="Sender">' + sender + '</span>'  + ": " + questionMsg  + '<span class="Time">'  + timeStamp + '</span>' );
 					question.css({"background-color":"yellow", "font-size": "120%"});
 					question.attr({id: 'question' +questionID});
 					var upvoteButton = $('<input/>').attr({id: 'upvote' +questionID, type: 'button', name:'Upvote', value:('\u25B2') });
