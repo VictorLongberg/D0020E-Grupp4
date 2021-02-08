@@ -15,6 +15,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "module": "^1.2.5",
+    "nodejs": "^0.0.0",
     "package.json": "^2.0.1",
     "randomcolor": "^0.6.2",
     "socket.io": "^3.0.3",
