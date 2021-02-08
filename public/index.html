@@ -154,6 +154,53 @@
 
 	</div>
 	<!--</div>-->
+	<script>
+	var confuseTimer;
+
+	function toggleConfused() {
+		// Become confused
+		if (document.getElementById('myCheckbox1').checked) {
+			$("#confusedPic").fadeTo(300, 0.2);
+			$('#messages').append($('<li>').text("You are confused!"));
+			confuseTimer = setTimeout(confuseTimerDone, 5000);
+		}
+
+		else {
+			$("#confusedPic").fadeTo(300, 1);
+			clearTimeout(confuseTimer);
+		}
+	}
+
+	function confuseTimerDone() {
+		$("#myCheckbox1").prop("checked", false);
+		toggleConfused();
+	}
+
+	function updateChatAs() {
+		var chatAsText = "";
+
+		if (document.getElementById('questionCheck').checked) {
+			chatAsText += 'Asking question as: ';
+		}
+
+		else {
+			chatAsText += 'Chatting as: ';
+		}
+
+		if (document.getElementById('anonCheck').checked) {
+			chatAsText += 'Anonymous';
+		}
+
+		else {
+			chatAsText += getName();
+		}
+
+		document.getElementById('currentName').innerHTML = chatAsText;
+	}
+
+	updateChatAs();
+
+	</script>
 
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -166,22 +213,8 @@
 				// If message box is empty don't send message
 				if (!$('#m').val()) {
 					return;
-			<script>
-			var confuseTimer;
-
-			function toggleConfused() {
-				// Become confused
-				if (document.getElementById('myCheckbox1').checked) {
-					$("#confusedPic").fadeTo(300, 0.2);
-					$('#messages').append($('<li>').text("You are confused!"));
-					confuseTimer = setTimeout(confuseTimerDone, 5000);
-				}
-
-				else {
-					$("#confusedPic").fadeTo(300, 1);
-					clearTimeout(confuseTimer);
-
 				socket.emit('name', name);
+
 
 				//Check question
 				if (document.getElementById("questionCheck").checked) {
