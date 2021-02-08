@@ -7,14 +7,21 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script>
-		setname();
-		function setname() {
+		setName();
+		function setName() {
 			name = prompt("Change nickname: ");
 			while (name == "null" || !name || name.length > 30) {
 				name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
 			}
-			updateChatAs();
+			
+			//Sanitizing
+			var element = document.createElement('div');
+			element.innerText = name;
+			name = element.innerHTML;
+			
+			updateChatAs();	
 		}
+		
 		function getName() {
 			return name;
 		}		
@@ -129,7 +136,7 @@
 							</button>
 							<input class="form-check-input" type="checkbox" id="anonCheck" onclick="updateChatAs()" />
 						</div>
-						<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="setname()">
+						<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="setName()">
 							Change name
 						</button>
 					</div>
@@ -229,14 +236,58 @@
 			);
 			socket.on('chat message', function (sender, msg, date) {
 				var dt = new Date(date);
-				var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
-				//time.css({ "font-size": "120%"});
+				var hourStamp = dt.getHours();
+				var minuteStamp = dt.getMinutes();
+				var secondStamp = dt.getSeconds();
+				
+				if (hourStamp < 10) {
+					hourStamp = "0" + hourStamp;
+				}
+				
+				if (minuteStamp < 10) {
+					minuteStamp = "0" + minuteStamp;
+				}
+				
+				if (secondStamp < 10) {
+					secondStamp = "0" + secondStamp;
+				}
+					
+				var timeStamp = hourStamp + ":" + minuteStamp + ":" + secondStamp;
+				
+				// Sanitizing
+				var element = document.createElement('div');
+				element.innerText = msg;
+				msg = element.innerHTML;
 
-				$('#messages').append($('<li>').html('<span class="Sender">' + sender + '</span>' + ": " + msg + '<span class="Time">' + time + '</span>'));
+				$('#messages').append($('<li>').html('<span class="Sender">' + sender + '</span>' + ": " + msg + '<span class="Time">' + timeStamp + '</span>'));
 			});
 
 			socket.on('question', function (sender, questionMsg, questionID, date) {
-				var question = $('<li>').text(sender + ": " + questionMsg);
+				var dt = new Date(date);
+				var hourStamp = dt.getHours();
+				var minuteStamp = dt.getMinutes();
+				var secondStamp = dt.getSeconds();
+				
+				if (hourStamp < 10) {
+					hourStamp = "0" + hourStamp;
+				}
+				
+				if (minuteStamp < 10) {
+					minuteStamp = "0" + minuteStamp;
+				}
+				
+				if (secondStamp < 10) {
+					secondStamp = "0" + secondStamp;
+				}
+				
+				var timeStamp = hourStamp + ":" + minuteStamp + ":" + secondStamp;
+				
+				// Sanitizing
+				var element = document.createElement('div');
+				element.innerText = questionMsg;
+				questionMsg = element.innerHTML;
+				
+				var question = $('<li>').html( '<span class="Sender">' + sender + '</span>'  + ": " + questionMsg  + '<span class="Time">'  + timeStamp + '</span>' );
 				question.css({ "background-color": "yellow", "font-size": "120%" });
 				question.attr({ id: 'question' + questionID });
 				var upvoteButton = $('<input/>').attr({ id: 'upvote' + questionID, type: 'button', name: 'Upvote', value: ('\u25B2') });
