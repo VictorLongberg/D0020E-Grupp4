@@ -36,6 +36,12 @@ class Message{
 
 const lecture_1 = new lecture.Lecture();
 
+//Sessions (experess-session)
+app.use(sessionMiddleware);
+
+io.use((socket, next) => {
+	sessionMiddleware(socket.request, {}, next);
+});
 
 //Sessions (experess-session)
 app.use(sessionMiddleware);
@@ -81,13 +87,13 @@ io.on('connection', (socket) => {
 		} else {
 			logInfo += " - " +date.getHours();
 		}
-		
+
 		if (date.getMinutes() < 10) {
 			logInfo += ":0" +date.getMinutes();
 		} else {
 			logInfo += ":" +date.getMinutes();
 		}
-		
+
 		appendLog(logInfo);
 	});
 
@@ -106,19 +112,19 @@ io.on('connection', (socket) => {
 		io.emit('question', name, msg, questionCounter, date.valueOf());
 		
 		var logInfo = "Question #" +questionCounter +" by: " +name +":" +msg;
-		
+
 		if (date.getHours() < 10) {
 			logInfo += " - 0" +date.getHours();
 		} else {
 			logInfo += " - " +date.getHours();
 		}
-		
+
 		if (date.getMinutes() < 10) {
 			logInfo += ":0" +date.getMinutes();
 		} else {
 			logInfo += ":" +date.getMinutes();
 		}
-		
+
 		appendLog(logInfo);
 		questionCounter++;
 	});
@@ -144,7 +150,6 @@ function appendLog(logInfo) {
 				console.log("Log directory already exists.");
 			}
 			directoryFound = true;
-			
 		} catch (err) {
 			console.log(err);
 		}

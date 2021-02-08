@@ -1,4 +1,3 @@
-
 /** Class representing a Student. */
 class Student {
 	/**

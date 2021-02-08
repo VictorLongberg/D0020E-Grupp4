@@ -1,0 +1,143 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font: 13px Helvetica, Arial;
+  border: black 3px;
+}
+/*
+Boostrap overwrites
+Skriver över lite bootstrap css för att få önskad funktion
+*/
+.container{
+  padding-right: 0;
+  padding-left: 0;
+  margin-left: auto;
+  margin-right: auto;
+  max-width:20000px;
+}
+.row{
+  padding-right: 0;
+  padding-left: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.img-fluid{
+  max-height: 352px;
+}
+
+#messages {
+  overflow-x: hidden;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+#messages li {
+  padding: 8px 5px;
+}
+#messages li:nth-child(odd) {
+  /*background: #eee;*/
+  /*border-bottom: black solid 1px;*/
+}
+#messages li:nth-child(even) {
+  /*background: rgb(0,67,144);*/
+  /*border-bottom: black solid 1px;*/
+  /*color: white;*/
+}
+
+.messages{
+  height: 250px;
+  /*width: 100%;*/
+  border:1px solid black;
+  position:relative;
+}
+
+.Time {
+  font-family: "Comic Sans"; /*??????????????????*/
+  float:right;
+}
+
+.Sender {
+  font-weight: bold;
+}
+
+.footer{
+  position: absolute;
+  bottom:0;
+  width: 100%;
+  height: 70;
+  line-height: auto;
+  background-color: rgb(3,32,64);
+}
+
+.reactionIcon{
+  width:20%;
+  height:20%;
+}
+
+/* Memes */
+.clock {
+  width: 260px;
+  margin: auto;
+  margin-bottom: 5px;
+  padding: 30px;
+  color: #FFF;
+  background:rgb(3,32,64);
+}
+.clock ul {
+  width: 250px;
+  /*margin: 0 auto;*/
+  padding: 0;
+  list-style: none;
+}
+
+.btn-secondary{
+  aria-pressed="true";
+}
+
+.btn-secondary:hover {
+  background-color: rgb(3,32,64);
+  text-decoration: none;
+}
+
+.clock ul li {
+  display: inline;
+  font-size: 3em;
+  text-align: center;
+  font-family: "Arial", Helvetica, sans-serif;
+  margin: 0 auto;
+  padding: 0;
+}
+
+#Date {
+  font-family: 'Arial', Helvetica, sans-serif;
+  font-size: 26px;
+  text-align: center;
+  padding-bottom: 40px;
+}
+
+#point {
+  position: relative;
+  -moz-animation: mymove 1s ease infinite;
+  -webkit-animation: mymove 1s ease infinite;
+  padding-left: 10px;
+  padding-right: 10px
+}
+
+/* Animasi Detik Kedap - Kedip */
+@-webkit-keyframes mymove
+{
+  0% {opacity:1.0; text-shadow:0 0 20px #00c6ff;}
+  50% {opacity:0; text-shadow:none; }
+  100% {opacity:1.0; text-shadow:0 0 20px #00c6ff; }
+}
+
+@-moz-keyframes mymove
+{
+  0% {opacity:1.0; text-shadow:0 0 20px #00c6ff;}
+  50% {opacity:0; text-shadow:none; }
+  100% {opacity:1.0; text-shadow:0 0 20px #00c6ff; }
+}
+/* Memes */

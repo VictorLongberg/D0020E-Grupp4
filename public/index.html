@@ -1,8 +1,11 @@
 <!doctype html>
 <html>
-
 <head>
 	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/main.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
 	<script>
 		//setname();
 
@@ -17,303 +20,140 @@
 			updateChatAs();
 		}
 
-
-		while (name == "null" || !name || name.length > 30) {
-			name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
-		}
-
 		function getName() {
 			return name;
 		}
 	</script>
 
-	<style>
-		* {
-			box-sizing: border-box;
-		}
-
-		body {
-			font: 13px Helvetica, Arial;
-			border: black 3px;
-		}
-
-		#messages {
-			list-style-type: none;
-			margin: 0;
-			padding: 0;
-		}
-
-		#messages li {
-			padding: 8px 10px;
-		}
-
-		#messages li:nth-child(odd) {
-			background: #eee;
-			border-bottom: black solid 1px;
-		}
-
-		#messages li:nth-child(even) {
-			background: lightblue;
-			border-bottom: black solid 1px;
-		}
-
-		.messages {
-			height: 100%;
-			border: 1px solid black;
-			position: relative;
-		}
-
-
-		.Time {
-			font-family: "Comic Sans";
-			float: right;
-		}
-
-		.Sender {
-			font-weight: bold;
-		}
-
-		/* Memes */
-		.clock {
-			width: 260px;
-			margin: 0 auto;
-			padding: 30px;
-			color: black;
-			background: #white;
-		}
-
-		.clock ul {
-			width: 250px;
-			margin: 0 auto;
-			padding: 0;
-			list-style: none;
-			text-align: center
-		}
-
-		.clock ul li {
-			display: inline;
-			font-size: 3em;
-			text-align: center;
-			font-family: "Arial", Helvetica, sans-serif;
-			text-shadow: 0 2px 5px rgba(4, 247, 25, 0.568), 0 3px 6px rgba(4, 247, 25, 0.568), 0 4px 7px rgba(4, 247, 25, 0.568)c
-		}
-
-		#Date {
-			font-family: 'Arial', Helvetica, sans-serif;
-			font-size: 26px;
-			text-align: center;
-			text-shadow: 0 2px 5px rgba(4, 247, 25, 0.568), 0 3px 6pxrgba(4, 247, 25, 0.568);
-			padding-bottom: 40px;
-		}
-
-		#point {
-			position: relative;
-			-moz-animation: mymove 1s ease infinite;
-			-webkit-animation: mymove 1s ease infinite;
-			padding-left: 10px;
-			padding-right: 10px
-		}
-
-		/* Animasi Detik Kedap - Kedip */
-		@-webkit-keyframes mymove {
-			0% {
-				opacity: 1.0;
-				text-shadow: 0 0 20px rgba(4, 247, 25, 0.568);
-			}
-
-			50% {
-				opacity: 0;
-				text-shadow: none;
-			}
-
-			100% {
-				opacity: 1.0;	
-				text-shadow: 0 0 20px rgba(4, 247, 25, 0.56	8);
-			}	
-		}
-
-		@-moz-keyframes mymove {
-			0% {
-				opacity: 1.0;
-				text-shadow: 0 0 20px rgba(4, 247, 25, 0.568);
-			}
-
-			50% {
-				opacity: 0;
-				text-shadow: none;
-			}
-
-			100% {
-				opacity: 1.0;
-				text-shadow: 0 0 20px rgba(4, 247, 25, 0.568);
-			}
-		}
-
-		/* Memes */
-
-	</style>
-
 	<title>Simple chat</title>
+	<link rel="icon" type="image/png" href="/images/favicon.png" />
 
 </head>
 
 <body>
-
 	<!-- Memes? -->
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 	<script>
-		$(document).ready(function () {
-			// Making 2 variable month and day
-			var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-			var dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+	$(document).ready(function () {
+		// Making 2 variable month and day
+		var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+		var dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
-			// make single object
-			var newDate = new Date();
-			// make current time
-			newDate.setDate(newDate.getDate());
-			// setting date and time
-			$('#Date').html(dayNames[newDate.getDay()] + " " + newDate.getDate() + ' ' + monthNames[newDate.getMonth()] + ' ' + newDate.getFullYear());
+		// make single object
+		var newDate = new Date();
+		// make current time
+		newDate.setDate(newDate.getDate());
+		// setting date and time
+		$('#Date').html(dayNames[newDate.getDay()] + " " + newDate.getDate() + ' ' + monthNames[newDate.getMonth()] + ' ' + newDate.getFullYear());
 
-			setInterval(function () {
-				// Create a newDate() object and extract the seconds of the current time on the visitor's
-				var seconds = new Date().getSeconds();
-				// Add a leading zero to seconds value
-				$("#sec").html((seconds < 10 ? "0" : "") + seconds);
-			}, 1000);
+		setInterval(function () {
+			// Create a newDate() object and extract the seconds of the current time on the visitor's
+			var seconds = new Date().getSeconds();
+			// Add a leading zero to seconds value
+			$("#sec").html((seconds < 10 ? "0" : "") + seconds);
+		}, 1000);
 
-			setInterval(function () {
-				// Create a newDate() object and extract the minutes of the current time on the visitor's
-				var minutes = new Date().getMinutes();
-				// Add a leading zero to the minutes value
-				$("#min").html((minutes < 10 ? "0" : "") + minutes);
-			}, 1000);
+		setInterval(function () {
+			// Create a newDate() object and extract the minutes of the current time on the visitor's
+			var minutes = new Date().getMinutes();
+			// Add a leading zero to the minutes value
+			$("#min").html((minutes < 10 ? "0" : "") + minutes);
+		}, 1000);
 
-			setInterval(function () {
-				// Create a newDate() object and extract the hours of the current time on the visitor's
-				var hours = new Date().getHours();
-				// Add a leading zero to the hours value
-				$("#hours").html((hours < 10 ? "0" : "") + hours);
-			}, 1000);
-		});
+		setInterval(function () {
+			// Create a newDate() object and extract the hours of the current time on the visitor's
+			var hours = new Date().getHours();
+			// Add a leading zero to the hours value
+			$("#hours").html((hours < 10 ? "0" : "") + hours);
+		}, 1000);
+	});
 	</script>
-	<div class="clock">
-		<div id="Date"></div>
-		<ul>
-			<li id="hours"></li>
-			<li id="point">:</li>
-			<li id="min"></li>
-			<li id="point">:</li>
-			<li id="sec"></li>
-		</ul>
-	</div>
-	<!-- Memes? -->
-
-
-	<div class="row">
-		<div class="col-6">
-			<h1>Video placeholder</h1>
-			<div class="embed-responsive embed-responsive-16by9">
-				<iframe width="560" height="315" src="https://www.youtube.com/embed/JPxfAYYo7NA" frameborder="0"
-					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-					allowfullscreen></iframe>
-			</div>
+	<div class="container">
+		<div class="clock">
+			<div id="Date"></div>
+			<ul>
+				<li id="hours"></li>
+				<li id="point">:</li>
+				<li id="min"></li>
+				<li id="point">:</li>
+				<li id="sec"></li>
+			</ul>
 		</div>
-		<div class="col-6">
-			<div class="messages">
-				<ul id="messages"></ul>
+		<!-- Memes? -->
+
+		<div class="row">
+
+			<div class="col-6">
+				<img src="/images/placeholder.jpg" class="img-fluid">
 			</div>
+			<div class="col-6">
+				<div class="messages overflow-auto">
+					<ul id="messages"></ul>
+				</div>
 
-			<input type="checkbox" style="opacity: 0;" id="myCheckbox1" />
-			<label for="myCheckbox1"><img id="confusedPic" onclick="toggleConfused" style="size: 20px;"
-					src="https://cdn-0.emojis.wiki/emoji-pics/facebook/thumbs-up-facebook.png" /></label>
+				<form action="">  <!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
 
-
-			<form action="">
-				<!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
-				<!--<div class="row">-->
-				<div class="row justify-content-between">
-					<div class="btn-group col-4 order-1" role="group">
-						Question
-						<label>
-							<input type="checkbox" id="questionCheck" onclick="updateChatAs()" />
-						</label>
-						Anonymous
-						<label>
-							<input type="checkbox" id="anonCheck" onclick="updateChatAs()" />
-						</label>
-					</div>
-					<div class="CurrentUser col-6" id="currentName">
+					<div class="CurrentUser float-left" id="currentName">
 						Chatting as:
 						<label>
 							<input type="user" id="currentUser" />
 						</label>
 					</div>
-					<div class="ChangeCurrentUser">
-						<button type="button" onclick="setname()">DÄPP</button>
-					</div>
-				</div>
-				<div class="input-group mb-3 order-1">
-					<input type="text" class="form-control" id="m" aria-label="Recipient's username"
-						aria-describedby="button-addon2" autocomplete="off" />
-					<div class="input-group-append">
-						<button class="btn btn-secondary" id="button-addon2">Send</button>
+					<div class="d-flex">
+						<div class="dropdown">
+							<button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								Reaction
+							</button>
+							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+								<a class="dropdown-item" href="#">
+									<img src="/images/confused.png" class="reactionIcon">
+								</a>
+								<a class="dropdown-item" href="#">
+									<img src="/images/confused.png" class="reactionIcon">
+								</a>
+								<a class="dropdown-item" href="#">
+									<img src="/images/confused.png" class="reactionIcon">
+								</a>
+							</div>
+						</div>
+
+						<div class="form-check form-switch ms-1">
+							<button type="button" class="btn btn-secondary btn-sm">
+								<label class="form-check-label" for="questionCheck">
+									Question
+								</label>
+							</button>
+							<input class="form-check-input" type="checkbox" id="questionCheck" onclick="updateChatAs()" />
+						</div>
+
+						<div class="form-check form-switch ms-1">
+							<button type="button" class="btn btn-secondary btn-sm">
+								<label class="form-check-label" for="anonCheck">
+									Anonymous
+								</label>
+							</button>
+							<input class="form-check-input" type="checkbox" id="anonCheck" onclick="updateChatAs()" />
+						</div>
+						<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="setname()">
+							Change name
+						</button>
 					</div>
 				</div>
 		</div>
 
+					<div class="input-group mb-3 order-1">
+						<input type="text" class="form-control" id="m" aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="off" />
+						<div class="input-group-append">
+							<button class="btn btn-secondary" id="button-addon2">
+								Send
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 	</div>
 	<!--</div>-->
-
-
-	<script>
-		var confuseTimer;
-
-		function toggleConfused() {
-			// Become confused
-			if (document.getElementById('myCheckbox1').checked) {
-				$("#confusedPic").fadeTo(300, 0.2);
-				$('#messages').append($('<li>').text("You are confused!"));
-				confuseTimer = setTimeout(confuseTimerDone, 5000);
-			}
-
-			else {
-				$("#confusedPic").fadeTo(300, 1);
-				clearTimeout(confuseTimer);
-			}
-		}
-
-		function confuseTimerDone() {
-			$("#myCheckbox1").prop("checked", false);
-			toggleConfused();
-		}
-
-		function updateChatAs() {
-			var chatAsText = "";
-
-			if (document.getElementById('questionCheck').checked) {
-				chatAsText += 'Asking question as: ';
-			}
-
-			else {
-				chatAsText += 'Chatting as: ';
-			}
-
-			if (document.getElementById('anonCheck').checked) {
-				chatAsText += 'Anonymous';
-			}
-
-			else {
-				chatAsText += getName();
-			}
-
-			document.getElementById('currentName').innerHTML = chatAsText;
-		}
-
-		updateChatAs();
-
-	</script>
-	</form>
-	</div>
 
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -326,7 +166,20 @@
 				// If message box is empty don't send message
 				if (!$('#m').val()) {
 					return;
+			<script>
+			var confuseTimer;
+
+			function toggleConfused() {
+				// Become confused
+				if (document.getElementById('myCheckbox1').checked) {
+					$("#confusedPic").fadeTo(300, 0.2);
+					$('#messages').append($('<li>').text("You are confused!"));
+					confuseTimer = setTimeout(confuseTimerDone, 5000);
 				}
+
+				else {
+					$("#confusedPic").fadeTo(300, 1);
+					clearTimeout(confuseTimer);
 
 				socket.emit('name', name);
 
