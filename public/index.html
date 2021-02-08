@@ -84,9 +84,6 @@
 					<ul id="messages"></ul>
 				</div>
 
-				<form action="">
-					<!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
-
 					<div class="CurrentUser float-left" id="currentName">
 						Chatting as:
 						<label>
@@ -138,19 +135,14 @@
 					</div>
 			</div>
 		</div>
-
-		<div class="input-group mb-3 order-1">
-			<input type="text" class="form-control" id="m" aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="off" />
-			<div class="input-group-append">
-			<button class="btn btn-secondary" id="button-addon2">Send</button>
-		  </div>
-	</div>
-	</div>
-
-	</div>
-</form>
-
-	<!--</div>-->
+		<form action=""> <!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
+			<div class="input-group mb-3 order-1">
+				<input type="text" class="form-control" id="m" aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="off">
+				<div class="input-group-append">
+				<button class="btn btn-secondary" id="button-addon2">Send</button>
+				</div>
+			</div>
+		</form>
 	<script>
 		var confuseTimer;
 
@@ -198,8 +190,6 @@
 		updateChatAs();
 
 	</script>
-</form>
-
 
 
 	<script src="/socket.io/socket.io.js"></script>
@@ -212,6 +202,9 @@
 				// If message box is empty don't send message
 				if (!$('#m').val()) {
 					return;
+				}
+					
+				else {
 					socket.emit('name', name);
 					//Check question
 					if (document.getElementById("questionCheck").checked) {
@@ -230,9 +223,7 @@
 							socket.emit('chat message', false, $('#m').val());
 						}
 					}
-
 					$('#m').val('');
-					return false;
 				}
 			}
 			);
@@ -241,7 +232,7 @@
 				var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
 				//time.css({ "font-size": "120%"});
 
-				$('#messages').append($('<li>').html('<span class="Sender">' + sender + '</span>' + ": " + msg + '<span class="Time">' + time + '</span>')); q
+				$('#messages').append($('<li>').html('<span class="Sender">' + sender + '</span>' + ": " + msg + '<span class="Time">' + time + '</span>'));
 			});
 
 			socket.on('question', function (sender, questionMsg, questionID, date) {
