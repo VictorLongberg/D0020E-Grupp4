@@ -36,6 +36,12 @@ class Message{
 
 const lecture_1 = new lecture.Lecture();
 
+//Sessions (experess-session)
+app.use(sessionMiddleware);
+
+io.use((socket, next) => {
+	sessionMiddleware(socket.request, {}, next);
+});
 
 //Sessions (experess-session)
 app.use(sessionMiddleware);
@@ -65,13 +71,30 @@ io.on('connection', (socket) => {
 		memberCounter--;
 	});
 
-	socket.on('chat message', (isAnonymous, msg) => {
+	socket.on('chat message', (isAnonymous, msg, date) => {
+		var date = new Date();
 		if (isAnonymous){
 			name = "Anonymous";
 		} else {
 			name = lecture_1.get_student_name(socket.request.session.id);
 		}
-		io.emit('chat message', name, msg);
+		io.emit('chat message', name, msg, date.valueOf());
+		
+		var logInfo = "Chat by: " +name +":" +msg;
+		
+		if (date.getHours() < 10) {
+			logInfo += " - 0" +date.getHours();
+		} else {
+			logInfo += " - " +date.getHours();
+		}
+
+		if (date.getMinutes() < 10) {
+			logInfo += ":0" +date.getMinutes();
+		} else {
+			logInfo += ":" +date.getMinutes();
+		}
+
+		appendLog(logInfo);
 	});
 
 	socket.on('name', (name) => {
@@ -79,14 +102,30 @@ io.on('connection', (socket) => {
 		console.log(lecture_1.students);
 	});
 
-	socket.on('question', (isAnonymous, msg, questionID) => {
+	socket.on('question', (isAnonymous, msg) => {
+		var date = new Date();
 		if (isAnonymous){
 			name = "Anonymous";
 		} else {
 			name = lecture_1.get_student_name(socket.request.session.id);
 		}
-		console.log(name + ": <question> " + msg);
-		io.emit('question', name, msg, questionCounter);
+		io.emit('question', name, msg, questionCounter, date.valueOf());
+		
+		var logInfo = "Question #" +questionCounter +" by: " +name +":" +msg;
+
+		if (date.getHours() < 10) {
+			logInfo += " - 0" +date.getHours();
+		} else {
+			logInfo += " - " +date.getHours();
+		}
+
+		if (date.getMinutes() < 10) {
+			logInfo += ":0" +date.getMinutes();
+		} else {
+			logInfo += ":" +date.getMinutes();
+		}
+
+		appendLog(logInfo);
 		questionCounter++;
 	});
 
@@ -96,6 +135,33 @@ io.on('connection', (socket) => {
 	});
 });
 
+// Logging
+const dir = "./logs/sessionID";
+var fs = require("fs");
+var directoryFound = false;
+
+function appendLog(logInfo) {
+	if (!directoryFound) {
+		try {
+			if (!fs.existsSync(dir)) {
+				fs.mkdirSync(dir, { recursive: true });
+				console.log("Log directory is created.");
+			} else {
+				console.log("Log directory already exists.");
+			}
+			directoryFound = true;
+		} catch (err) {
+			console.log(err);
+		}
+	}
+
+	fs.appendFile('logs/sessionID/log.txt', logInfo +"\n", function(err) {
+		if (err) {
+			directoryFound = false;
+			return console.error(err);
+		}
+	});
+}
 
 http.listen(port, () => {
 	console.log('Listening on 3000...');
