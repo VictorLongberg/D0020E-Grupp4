@@ -41,5 +41,6 @@ class queue {
 			}
 			ret.push(first);
 		}
+		return ret;
 	}
 }
