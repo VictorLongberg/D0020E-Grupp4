@@ -1,33 +1,31 @@
 <!doctype html>
 <html>
-
 <head>
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/main.css">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+
 	<script>
-		setName();
-		function setName() {
-			name = prompt("Change nickname: ");
-			while (name == "null" || !name || name.length > 30) {
-				name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
-			}
-			
-			//Sanitizing
-			var element = document.createElement('div');
-			element.innerText = name;
-			name = element.innerHTML;
-			
-			updateChatAs();	
-		}
-		
-		function getName() {
-			return name;
-		}		
+	var name = prompt("Enter nickname: ");
+
+	function setname () {
+		name = prompt("Enter nickname: ");
+		updateChatAs();
+	}
+
+	while (name == "null" || !name || name.length > 30) {
+		name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
+	}
+
+	function getName() {
+		return name;
+	}
 	</script>
+
 	<title>Simple chat</title>
 	<link rel="icon" type="image/png" href="/images/favicon.png" />
+
 </head>
 
 <body>
@@ -35,39 +33,39 @@
 	<script  type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 	<!--<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>-->
 	<script>
-		$(document).ready(function () {
-			// Making 2 variable month and day
-			var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-			var dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+	$(document).ready(function () {
+		// Making 2 variable month and day
+		var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+		var dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
-			// make single object
-			var newDate = new Date();
-			// make current time
-			newDate.setDate(newDate.getDate());
-			// setting date and time
-			$('#Date').html(dayNames[newDate.getDay()] + " " + newDate.getDate() + ' ' + monthNames[newDate.getMonth()] + ' ' + newDate.getFullYear());
+		// make single object
+		var newDate = new Date();
+		// make current time
+		newDate.setDate(newDate.getDate());
+		// setting date and time
+		$('#Date').html(dayNames[newDate.getDay()] + " " + newDate.getDate() + ' ' + monthNames[newDate.getMonth()] + ' ' + newDate.getFullYear());
 
-			setInterval(function () {
-				// Create a newDate() object and extract the seconds of the current time on the visitor's
-				var seconds = new Date().getSeconds();
-				// Add a leading zero to seconds value
-				$("#sec").html((seconds < 10 ? "0" : "") + seconds);
-			}, 1000);
+		setInterval(function () {
+			// Create a newDate() object and extract the seconds of the current time on the visitor's
+			var seconds = new Date().getSeconds();
+			// Add a leading zero to seconds value
+			$("#sec").html((seconds < 10 ? "0" : "") + seconds);
+		}, 1000);
 
-			setInterval(function () {
-				// Create a newDate() object and extract the minutes of the current time on the visitor's
-				var minutes = new Date().getMinutes();
-				// Add a leading zero to the minutes value
-				$("#min").html((minutes < 10 ? "0" : "") + minutes);
-			}, 1000);
+		setInterval(function () {
+			// Create a newDate() object and extract the minutes of the current time on the visitor's
+			var minutes = new Date().getMinutes();
+			// Add a leading zero to the minutes value
+			$("#min").html((minutes < 10 ? "0" : "") + minutes);
+		}, 1000);
 
-			setInterval(function () {
-				// Create a newDate() object and extract the hours of the current time on the visitor's
-				var hours = new Date().getHours();
-				// Add a leading zero to the hours value
-				$("#hours").html((hours < 10 ? "0" : "") + hours);
-			}, 1000);
-		});
+		setInterval(function () {
+			// Create a newDate() object and extract the hours of the current time on the visitor's
+			var hours = new Date().getHours();
+			// Add a leading zero to the hours value
+			$("#hours").html((hours < 10 ? "0" : "") + hours);
+		}, 1000);
+	});
 	</script>
 	<div class="container">
 		<div class="clock">
@@ -80,8 +78,8 @@
 				<li id="sec"></li>
 			</ul>
 		</div>
-	</div>
 		<!-- Memes? -->
+
 		<div class="row">
 
 			<div class="col-6">
@@ -92,18 +90,17 @@
 					<ul id="messages"></ul>
 				</div>
 
+				<form action="">  <!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
+
 					<div class="CurrentUser float-left" id="currentName">
 						Chatting as:
 						<label>
 							<input type="user" id="currentUser" />
 						</label>
 					</div>
-					
 					<div class="d-flex">
 						<div class="dropdown">
-							<button class="btn btn-secondary dropdown-toggle btn-sm" type="button"
-								id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-								aria-expanded="false">
+							<button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 								Reaction
 							</button>
 							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -125,8 +122,7 @@
 									Question
 								</label>
 							</button>
-							<input class="form-check-input" type="checkbox" id="questionCheck"
-								onclick="updateChatAs()" />
+							<input class="form-check-input" type="checkbox" id="questionCheck" onclick="updateChatAs()" />
 						</div>
 
 						<div class="form-check form-switch ms-1">
@@ -137,181 +133,156 @@
 							</button>
 							<input class="form-check-input" type="checkbox" id="anonCheck" onclick="updateChatAs()" />
 						</div>
-						<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="setName()">
+						<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="setname()">
 							Change name
 						</button>
 					</div>
-			</div>
-		</div>
-		<form action=""> <!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
-			<div class="input-group mb-3 order-1">
-				<input type="text" class="form-control" id="m" aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="off">
-				<div class="input-group-append">
-				<button class="btn btn-secondary" id="button-addon2">Send</button>
+
+					<div class="input-group mb-3 order-1">
+						<input type="text" class="form-control" id="m" aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="off" />
+						<div class="input-group-append">
+							<button class="btn btn-secondary" id="button-addon2">
+								Send
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
+
+
+
+			<script>
+			var confuseTimer;
+
+			function toggleConfused() {
+				// Become confused
+				if (document.getElementById('myCheckbox1').checked) {
+					$("#confusedPic").fadeTo(300, 0.2);
+					$('#messages').append($('<li>').text("You are confused!"));
+					confuseTimer = setTimeout(confuseTimerDone, 5000);
+				}
+
+				else {
+					$("#confusedPic").fadeTo(300, 1);
+					clearTimeout(confuseTimer);
+				}
+			}
+
+			function confuseTimerDone() {
+				$("#myCheckbox1").prop("checked", false);
+				toggleConfused();
+			}
+
+			function updateChatAs() {
+				var chatAsText = "";
+
+				if (document.getElementById('questionCheck').checked) {
+					chatAsText += 'Asking question as: ';
+				}
+
+				else {
+					chatAsText += 'Chatting as: ';
+				}
+
+				if (document.getElementById('anonCheck').checked) {
+					chatAsText += 'Anonymous';
+				}
+
+				else {
+					chatAsText += getName();
+				}
+
+				document.getElementById('currentName').innerHTML = chatAsText;
+			}
+
+			updateChatAs();
+
+			</script>
 		</form>
-	<script>
-		var confuseTimer;
-
-		function toggleConfused() {
-			// Become confused
-			if (document.getElementById('myCheckbox1').checked) {
-				$("#confusedPic").fadeTo(300, 0.2);
-				$('#messages').append($('<li>').text("You are confused!"));
-				confuseTimer = setTimeout(confuseTimerDone, 5000);
-			}
-
-			else {
-				$("#confusedPic").fadeTo(300, 1);
-				clearTimeout(confuseTimer);
-			}
-		}
-
-		function confuseTimerDone() {
-			$("#myCheckbox1").prop("checked", false);
-			toggleConfused();
-		}
-
-		function updateChatAs() {
-			var chatAsText = "";
-
-			if (document.getElementById('questionCheck').checked) {
-				chatAsText += 'Asking question as: ';
-			}
-
-			else {
-				chatAsText += 'Chatting as: ';
-			}
-
-			if (document.getElementById('anonCheck').checked) {
-				chatAsText += 'Anonymous';
-			}
-
-			else {
-				chatAsText += getName();
-			}
-
-			document.getElementById('currentName').innerHTML = chatAsText;
-		}
-
-		updateChatAs();
-
-	</script>
-
+	</div>
 
 	<script src="/socket.io/socket.io.js"></script>
+	<!--<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>-->
 	<script src="\js\bootstrap\bootstrap.bundle.js"></script>
 	<script>
-		$(function () {
-			var socket = io();
-			$('form').submit(function (e) {
-				e.preventDefault();
-				// If message box is empty don't send message
-				if (!$('#m').val()) {
-					return;
+	$(function () {
+		var socket = io();
+		$('form').submit(function (e) {
+			e.preventDefault();
+
+			// If message box is empty don't send message
+			if (!$('#m').val()) {
+				return;
+			}
+
+			socket.emit('name', name);
+
+			//Check question
+			if (document.getElementById("questionCheck").checked) {
+
+				if (document.getElementById("anonCheck").checked) {
+					socket.emit('question', true, $('#m').val());
 				}
-					
+
 				else {
-					socket.emit('name', name);
-					//Check question
-					if (document.getElementById("questionCheck").checked) {
-						if (document.getElementById("anonCheck").checked) {
-							socket.emit('question', true, $('#m').val());
-						}
-						else {
-							socket.emit('question', false, $('#m').val());
-						}
-					}
-					else {
-						if (document.getElementById("anonCheck").checked) {
-							socket.emit('chat message', true, $('#m').val());
-						}
-						else {
-							socket.emit('chat message', false, $('#m').val());
-						}
-					}
-					$('#m').val('');
+					socket.emit('question', false, $('#m').val());
 				}
 			}
-			);
-			socket.on('chat message', function (sender, msg, date) {
-				var dt = new Date(date);
-				var hourStamp = dt.getHours();
-				var minuteStamp = dt.getMinutes();
-				var secondStamp = dt.getSeconds();
-				
-				if (hourStamp < 10) {
-					hourStamp = "0" + hourStamp;
-				}
-				
-				if (minuteStamp < 10) {
-					minuteStamp = "0" + minuteStamp;
-				}
-				
-				if (secondStamp < 10) {
-					secondStamp = "0" + secondStamp;
-				}
-					
-				var timeStamp = hourStamp + ":" + minuteStamp + ":" + secondStamp;
-				
-				// Sanitizing
-				var element = document.createElement('div');
-				element.innerText = msg;
-				msg = element.innerHTML;
 
-				$('#messages').append($('<li>').html('<span class="Sender">' + sender + '</span>' + ": " + msg + '<span class="Time">' + timeStamp + '</span>'));
-			});
-
-			socket.on('question', function (sender, questionMsg, questionID, date) {
-				var dt = new Date(date);
-				var hourStamp = dt.getHours();
-				var minuteStamp = dt.getMinutes();
-				var secondStamp = dt.getSeconds();
-				
-				if (hourStamp < 10) {
-					hourStamp = "0" + hourStamp;
-				}
-				
-				if (minuteStamp < 10) {
-					minuteStamp = "0" + minuteStamp;
-				}
-				
-				if (secondStamp < 10) {
-					secondStamp = "0" + secondStamp;
-				}
-				
-				var timeStamp = hourStamp + ":" + minuteStamp + ":" + secondStamp;
-				
-				// Sanitizing
-				var element = document.createElement('div');
-				element.innerText = questionMsg;
-				questionMsg = element.innerHTML;
-				
-				var question = $('<li>').html( '<span class="Sender">' + sender + '</span>'  + ": " + questionMsg  + '<span class="Time">'  + timeStamp + '</span>' );
-				question.css({ "background-color": "yellow", "font-size": "120%" });
-				question.attr({ id: 'question' + questionID });
-				var upvoteButton = $('<input/>').attr({ id: 'upvote' + questionID, type: 'button', name: 'Upvote', value: ('\u25B2') });
-				$('#messages').append(question, upvoteButton);
-				$('#' + 'upvote' + questionID).click(function () {
-					socket.emit('upvote', questionID);
-					$('#' + 'upvote' + questionID).remove();
-				});
-			});
-
-			socket.on('upvote', function (questionID, memberNum) {
-				var fontsize = $('#' + 'question' + questionID).css("font-size");
-				newFontsize = fontsize.split("px")[0] * (1 + 1 / memberNum);
-
-				if (newFontsize > 15.6 * 2) {
-					newFontsize = 15.6 * 2;
+			else {
+				if (document.getElementById("anonCheck").checked) {
+					socket.emit('chat message', true, $('#m').val());
 				}
 
-				$('#' + 'question' + questionID).css("font-size", newFontsize);
+				else {
+					socket.emit('chat message', false, $('#m').val());
+				}
+			}
+
+			$('#m').val('');
+			return false;
+		});
+
+		socket.on('chat message', function (sender, msg, date) {
+			var dt = new Date(date);
+			var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+			//time.css({ "font-size": "120%"});
+
+			$('#messages').append($('<li>').html('<span class="Sender">' + sender + '</span>' + ": " + msg + '<span class="Time">' + time + '</span>'));
+
+		});
+
+		socket.on('question', function (sender, questionMsg, questionID, date) {
+			var question = $('<li>').text(sender + ": " + questionMsg);
+			question.css({ "background-color": "yellow", "font-size": "120%" });
+			question.attr({ id: 'question' + questionID });
+			var upvoteButton = $('<input/>').attr({ id: 'upvote' + questionID, type: 'button', name: 'Upvote', value: ('\u25B2') });
+			$('#messages').append(question, upvoteButton);
+			$('#' + 'upvote' + questionID).click(function () {
+				socket.emit('upvote', questionID);
+				$('#' + 'upvote' + questionID).remove();
 			});
 		});
+
+		socket.on('upvote', function (questionID, memberNum) {
+			var fontsize = $('#' + 'question' + questionID).css("font-size");
+			newFontsize = fontsize.split("px")[0] * (1 + 1 / memberNum);
+
+			if (newFontsize > 15.6 * 2) {
+				newFontsize = 15.6 * 2;
+			}
+
+			$('#' + 'question' + questionID).css("font-size", newFontsize);
+		});
+	});
 	</script>
+	<div class="footer">
+		<div role="main">
+			<a href="https://www.ltu.se/">
+				<img src="/images/ltulogga.png" class="align-middle" style="margin-top:5px; margin-bottom:5px; margin-left: 5px; height:65px; width:136px;">
+			</a>
+		</div>
+	</div>
 
 </body>
-
 </html>
