@@ -306,7 +306,7 @@
 			questionMsg = element.innerHTML;
 			
 			var question = $('<li>').html( '<span class="Sender">' + sender + '</span>'  + ": " + questionMsg  + '<span class="Time">'  + timeStamp + '</span>' );
-			question.css({ "background-color": "yellow", "font-size": "120%" });
+			question.css({ "background-color": "rgb(3,32,64)", "font-size": "120%", "color":"white"});
 			question.attr({ id: 'question' + questionID });
 			var upvoteButton = $('<input/>').attr({ id: 'upvote' + questionID, type: 'button', name: 'Upvote', value: ('\u25B2') });
 			$('#messages').append(question, upvoteButton);
