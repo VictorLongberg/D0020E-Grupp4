@@ -67,8 +67,8 @@ io.on('connection', (socket) => {
 	console.log('user connected, total users: ' +memberCounter);
 
 	socket.on('disconnect', () => {
-		console.log('user disconnected, total users: ' +memberCounter);
 		memberCounter--;
+		console.log('user disconnected, total users: ' +memberCounter);
 	});
 
 	socket.on('chat message', (isAnonymous, msg, date) => {
