@@ -33,6 +33,7 @@ Skriver över lite bootstrap css för att få önskad funktion
   list-style-type: none;
   margin: 0;
   padding: 0;
+  word-wrap: break-word;
 }
 #messages li {
   padding: 8px 5px;
