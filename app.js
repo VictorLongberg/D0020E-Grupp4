@@ -12,6 +12,7 @@ var session = require('express-session');
 // Own requirements
 var student = require('./student.js');
 var lecture = require('./lecture.js');
+var queue = require('./queue.js');
 
 var sessionMiddleware = session({
   secret: '=very! ¤secret# "key/',
@@ -35,13 +36,6 @@ class Message{
 
 
 const lecture_1 = new lecture.Lecture();
-
-//Sessions (experess-session)
-app.use(sessionMiddleware);
-
-io.use((socket, next) => {
-	sessionMiddleware(socket.request, {}, next);
-});
 
 //Sessions (experess-session)
 app.use(sessionMiddleware);
