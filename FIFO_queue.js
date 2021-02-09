@@ -50,6 +50,8 @@ class FIFO_queue {
 	}
 }
 
+module.exports = {FIFO_queue};
+
 function test() {
 	console.log("FIFO test");
 
@@ -68,4 +70,4 @@ function test() {
 	console.log(queue.remove_last());
 }
 
-test();
+//test();
