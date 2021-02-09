@@ -55,6 +55,7 @@ class queue {
 		}
 	}
 }
+module.exports = {queue};
 
 function test(){
 	console.log("queue test");
