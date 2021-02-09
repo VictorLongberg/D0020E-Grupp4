@@ -108,8 +108,9 @@
 								Reaction
 							</button>
 							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-								<a class="dropdown-item" href="#">
+								<a class="dropdown-item" href="#" id="confusedPic" onclick="toggleConfused()">
 									<img src="/images/confused.png" class="reactionIcon">
+									Confused - 0
 								</a>
 								<a class="dropdown-item" href="#">
 									<img src="/images/confused.png" class="reactionIcon">
@@ -137,7 +138,7 @@
 							</button>
 							<input class="form-check-input" type="checkbox" id="anonCheck" onclick="updateChatAs()" />
 						</div>
-						<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="setname()">
+						<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="setName()">
 							Change name
 						</button>
 					</div>
@@ -157,16 +158,20 @@
 
 			<script>
 			var confuseTimer;
+			var confuseBool = false;
 
 			function toggleConfused() {
 				// Become confused
-				if (document.getElementById('myCheckbox1').checked) {
+				if (!confuseBool) {
+					confuseBool = true;
 					$("#confusedPic").fadeTo(300, 0.2);
 					$('#messages').append($('<li>').text("You are confused!"));
-					confuseTimer = setTimeout(confuseTimerDone, 5000);
+					confuseTimer = setTimeout(confuseTimerDone, 3000);
 				}
 
 				else {
+					confuseBool = false;
+					$('#messages').append($('<li>').text("You are no longer confused."));
 					$("#confusedPic").fadeTo(300, 1);
 					clearTimeout(confuseTimer);
 				}
