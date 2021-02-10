@@ -31,6 +31,11 @@
 			q_name = prompt("queue to join");
 			socket.emit('join_queue', (q_name));
 		}
+
+		function pick_first() {
+			q_name = prompt("queue?");
+			socket.emit('get_first_queue', (q_name));
+		}
 		
 		function getName() {
 			return name;
@@ -166,6 +171,10 @@
 
 			<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="ask_join_queue()">
 				Join queue
+			</button>
+
+			<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="pick_first()">
+				pick first
 			</button>
 
 
@@ -337,6 +346,10 @@
 			}
 
 			$('#' + 'question' + questionID).css("font-size", newFontsize);
+		});
+
+		socket.on('picked_out', () => {
+			alert("Your turn!");
 		});
 	});
 	</script>

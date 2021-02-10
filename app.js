@@ -36,6 +36,7 @@ class Message{
 
 
 const lecture_1 = new lecture.Lecture();
+lecture_1.add_queue('test');
 
 //Sessions (experess-session)
 app.use(sessionMiddleware);
@@ -92,7 +93,8 @@ io.on('connection', (socket) => {
 	});
 
 	socket.on('name', (name) => {
-		lecture_1.add_student(socket.request.session.id, name);
+		console.log("add user", typeof socket);
+		lecture_1.add_student(socket.request.session.id, name, socket);
 		console.log(lecture_1.students);
 	});
 
@@ -131,15 +133,16 @@ io.on('connection', (socket) => {
 	socket.on('join_queue', (q_name) => {
 		var q = lecture_1.get_queue(q_name);
 		if (q != null){
-			q.add(socket.request.session.id);
+			q.add_student(socket.request.session.id);
 		}
 		console.log(q);
 	});
 
-	socket.on('get_fist_queue', (q_name) => {
+	socket.on('get_first_queue', (q_name) => {
 		var q = lecture_1.get_queue(q_name);
-		var stud = q.get_first();
+		var stud = lecture_1.get_student_by_id(q.get_first());
 		console.log(stud);
+		stud.socket.emit('picked_out');
 	});
 });
 

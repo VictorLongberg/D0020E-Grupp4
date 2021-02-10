@@ -24,10 +24,10 @@ class Lecture {
 		return true;
 	}
 
-	add_student(id, name){
+	add_student(id, name, socket){
 		var stud = this.get_student_by_id(id);
 		if (stud == null){
-			var stud = new student.Student(id, name);
+			var stud = new student.Student(id, name, socket);
 			this.students.push(stud);
 		} else {
 			stud.set_name(name);
