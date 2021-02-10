@@ -6,7 +6,12 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
+	<script src="/socket.io/socket.io.js"></script>
+	<!--<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>-->
+	<script src="\js\bootstrap\bootstrap.bundle.js"></script>
+
 	<script>
+		var socket = io();
 		setName();
 		function setName() {
 			name = prompt("Change nickname: ");
@@ -20,6 +25,11 @@
 			name = element.innerHTML;
 			
 			updateChatAs();	
+		}
+
+		function ask_join_queue() {
+			q_name = prompt("queue to join");
+			socket.emit('join_queue', (q_name));
 		}
 		
 		function getName() {
@@ -154,6 +164,11 @@
 				</div>
 			</div>
 
+			<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="ask_join_queue()">
+				Join queue
+			</button>
+
+
 
 
 			<script>
@@ -210,12 +225,8 @@
 		</form>
 	</div>
 
-	<script src="/socket.io/socket.io.js"></script>
-	<!--<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>-->
-	<script src="\js\bootstrap\bootstrap.bundle.js"></script>
 	<script>
 	$(function () {
-		var socket = io();
 		$('form').submit(function (e) {
 			e.preventDefault();
 
@@ -251,6 +262,7 @@
 			$('#m').val('');
 			return false;
 		});
+
 
 		socket.on('chat message', function (sender, msg, date) {
 			var dt = new Date(date);

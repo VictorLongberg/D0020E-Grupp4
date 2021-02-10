@@ -127,6 +127,20 @@ io.on('connection', (socket) => {
 		console.log('question ' +questionID +' was upvoted');
 		io.emit('upvote', questionID, memberCounter);
 	});
+
+	socket.on('join_queue', (q_name) => {
+		var q = lecture_1.get_queue(q_name);
+		if (q != null){
+			q.add(socket.request.session.id);
+		}
+		console.log(q);
+	});
+
+	socket.on('get_fist_queue', (q_name) => {
+		var q = lecture_1.get_queue(q_name);
+		var stud = q.get_first();
+		console.log(stud);
+	});
 });
 
 // Logging
