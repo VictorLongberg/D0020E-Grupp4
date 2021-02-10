@@ -5,8 +5,11 @@
 	<link rel="stylesheet" href="css/main.css">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-
+	
+	<script src="/socket.io/socket.io.js"></script>
 	<script>
+		var socket = io();
+		
 		setName();
 		function setName() {
 			name = prompt("Change nickname: ");
@@ -19,7 +22,8 @@
 			element.innerText = name;
 			name = element.innerHTML;
 			
-			updateChatAs();	
+			socket.emit('name', name);
+			updateChatAs();
 		}
 		
 		function getName() {
@@ -95,20 +99,30 @@
 				</div>
 
 				<form action="">  <!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
+
+					<div class="CurrentUser float-left" id="currentName">
+						Chatting as:
+						<label>
+							<span type="user" id="currentUser" />
+						</label>
+					</div>
 					<div class="d-flex">
 						<div class="dropdown">
 							<button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 								Reaction
 							</button>
 							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-								<a class="dropdown-item" href="#">
+								<a class="dropdown-item" href="#" id="confusedPic" onclick="toggleConfused()">
 									<img src="/images/confused.png" class="reactionIcon">
+									Confused - <span id="confusedCount">0</span>
 								</a>
 								<a class="dropdown-item" href="#">
 									<img src="/images/confused.png" class="reactionIcon">
+									Yes - <span id="yesCount">0</span>
 								</a>
 								<a class="dropdown-item" href="#">
 									<img src="/images/confused.png" class="reactionIcon">
+									No - <span id="noCount">0</span>
 								</a>
 							</div>
 						</div>
@@ -130,16 +144,11 @@
 							</button>
 							<input class="form-check-input" type="checkbox" id="anonCheck" onclick="updateChatAs()" />
 						</div>
-						<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="setname()">
+						<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="setName()">
 							Change name
 						</button>
 					</div>
-					<div class="CurrentUser float-left" id="currentName">
-						Chatting as:
-						<label>
-							<input type="user" id="currentUser" />
-						</label>
-					</div>
+
 					<div class="input-group mb-3 order-1">
 						<input type="text" class="form-control" id="m" aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="off" />
 						<div class="input-group-append">
@@ -148,32 +157,32 @@
 							</button>
 						</div>
 					</div>
-					
 				</div>
 			</div>
-
-
-
+			
 			<script>
-			var confuseTimer;
+			var confuseBool = false;
 
 			function toggleConfused() {
-				// Become confused
-				if (document.getElementById('myCheckbox1').checked) {
+				if (!confuseBool) {
+					confuseBool = true;
 					$("#confusedPic").fadeTo(300, 0.2);
 					$('#messages').append($('<li>').text("You are confused!"));
-					confuseTimer = setTimeout(confuseTimerDone, 5000);
+					socket.emit('reactConfused');
 				}
 
 				else {
-					$("#confusedPic").fadeTo(300, 1);
-					clearTimeout(confuseTimer);
+					confuseBool = false;
+					$('#messages').append($('<li>').text("You are no longer confused."));
+					document.getElementById("confusedPic").setAttribute("onclick", ""); 
+					setTimeout(confuseCoolDownDone, 3050);
+					socket.emit('removeConfused');
 				}
 			}
-
-			function confuseTimerDone() {
-				$("#myCheckbox1").prop("checked", false);
-				toggleConfused();
+			
+			function confuseCoolDownDone() {
+				$("#confusedPic").fadeTo(300, 1);
+				document.getElementById("confusedPic").setAttribute("onclick", "toggleConfused()"); 
 			}
 
 			function updateChatAs() {
@@ -203,13 +212,11 @@
 			</script>
 		</form>
 	</div>
-
-	<script src="/socket.io/socket.io.js"></script>
+	
 	<!--<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>-->
 	<script src="\js\bootstrap\bootstrap.bundle.js"></script>
 	<script>
 	$(function () {
-		var socket = io();
 		$('form').submit(function (e) {
 			e.preventDefault();
 
@@ -217,8 +224,6 @@
 			if (!$('#m').val()) {
 				return;
 			}
-
-			socket.emit('name', name);
 
 			//Check question
 			if (document.getElementById("questionCheck").checked) {
@@ -319,6 +324,16 @@
 			}
 
 			$('#' + 'question' + questionID).css("font-size", newFontsize);
+		});
+		
+		socket.on('toggleConfuse', function () {
+			if (confuseBool) {
+				toggleConfused();
+			}
+		});
+		
+		socket.on('updateConfused', function(confuseNum) {
+			$("#confusedCount").text(confuseNum);
 		});
 	});
 	</script>
