@@ -143,6 +143,7 @@ io.on('connection', (socket) => {
 		var stud = lecture_1.get_student_by_id(q.get_first());
 		console.log(stud);
 		stud.socket.emit('picked_out');
+	});
 	
 	socket.on('reactConfused', () => {
 		confuseCounter++;
