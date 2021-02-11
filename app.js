@@ -55,7 +55,7 @@ app.get('/', (req, res) => {
 
 var questionCounter = 0;
 var memberCounter = 0;
-
+var confuseCounter = 0;
 
 io.on('connection', (socket) => {
 	memberCounter++;
@@ -143,10 +143,26 @@ io.on('connection', (socket) => {
 		var stud = lecture_1.get_student_by_id(q.get_first());
 		console.log(stud);
 		stud.socket.emit('picked_out');
+	
+	socket.on('reactConfused', () => {
+		confuseCounter++;
+		io.emit('updateConfused', confuseCounter);
+		var id = socket.id;
+		setTimeout(confusedStop, 3000, id);
+	});
+	
+	socket.on('removeConfused', () => {
+		confuseCounter--;
+		io.emit('updateConfused', confuseCounter);
 	});
 });
 
-// Logging
+function confusedStop(id) {
+	io.to(id).emit("toggleConfuse");
+}
+
+
+// Logging (WILL PROBABLY BE HANDLED VIA DATABASE INSTEAD)
 const dir = "./logs/sessionID";
 var fs = require("fs");
 var directoryFound = false;
