@@ -54,7 +54,7 @@ app.get('/', (req, res) => {
 
 var questionCounter = 0;
 var memberCounter = 0;
-
+var confuseCounter = 0;
 
 io.on('connection', (socket) => {
 	memberCounter++;
@@ -127,9 +127,26 @@ io.on('connection', (socket) => {
 		console.log('question ' +questionID +' was upvoted');
 		io.emit('upvote', questionID, memberCounter);
 	});
+	
+	socket.on('reactConfused', () => {
+		confuseCounter++;
+		io.emit('updateConfused', confuseCounter);
+		var id = socket.id;
+		setTimeout(confusedStop, 3000, id);
+	});
+	
+	socket.on('removeConfused', () => {
+		confuseCounter--;
+		io.emit('updateConfused', confuseCounter);
+	});
 });
 
-// Logging
+function confusedStop(id) {
+	io.to(id).emit("toggleConfuse");
+}
+
+
+// Logging (WILL PROBABLY BE HANDLED VIA DATABASE INSTEAD)
 const dir = "./logs/sessionID";
 var fs = require("fs");
 var directoryFound = false;
