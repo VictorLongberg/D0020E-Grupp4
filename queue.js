@@ -1,6 +1,7 @@
 // queue system
 //
 var FIFO = require('./FIFO_queue.js');
+var student = require('./student.js');
 
 class queue {
 
@@ -12,11 +13,18 @@ class queue {
 
 	// update all clients with there position in the queue
 	update_positions() {
+		var n = 1;
+		var s = this.l_fifo_q.last;
+		while (s != null) {
+			s.value.socket.emit('update_queue_place', n);
+			n++;
+			s = s.prev;
+		}
 	}
 
 	// add a student to the queue and send the position in queue
-	add_student(id) {
-		this.l_fifo_q.add(id);
+	add_student(stud) {
+		this.l_fifo_q.add(stud);
 		this.update_positions();
 	}
 
