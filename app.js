@@ -142,7 +142,9 @@ io.on('connection', (socket) => {
 		var q = lecture_1.get_queue(q_name);
 		var stud = lecture_1.get_student_by_id(q.get_first());
 		console.log(stud);
-		stud.socket.emit('picked_out');
+		if (stud != null){
+			stud.socket.emit('picked_out');
+		});
 	});
 	
 	socket.on('reactConfused', () => {
