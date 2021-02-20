@@ -1,5 +1,4 @@
-// code from https://socket.io/get-started/chat/
-// code from https://socket.io/get-started/chat/
+// code from https://socket.io/get-started/chat/ now edited beyond rekognition
 
 // Outside requirements
 //var app = require('express')();
@@ -21,7 +20,7 @@ var sessionMiddleware = session({
   //cookie: { secure: true , maxAge : 60000}
 });
 
-const port = 3000
+const port = 3000;
 
 /** Class representing a Message. */
 class Message{
