@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/main.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<script src="/socket.io/socket.io.js"></script>
+    <script>
+		var socket = io();
+	</script>
+<body>   
+<h1>
+    Login Page
+</h1>
+<form action="/login" method="POST">
+    <label for="username">Email:</label>
+    <input type="text" placeholder="example@gmail.com" id="xyz" name="username">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password">
+    <button>Login</button>
+</form>
+<ul>
+    <li><a href="register.html">SignUp</a></li>
+</ul>
+
+
+</body>
+</html>

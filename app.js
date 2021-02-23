@@ -3,6 +3,7 @@
 
 // Outside requirements
 //var app = require('express')();
+var mongoose = require("mongoose");
 const express = require('express');
 const app = express();
 var http = require('http').createServer(app);
@@ -238,6 +239,46 @@ function appendLog(logInfo) {
 		}
 	});
 }
+
+//Login And Register Testing.
+
+var MongoClient = require('mongodb').MongoClient;
+const { Mongoose } = require('mongoose');
+//standart local mongodb url. Can be changed for relative url. 
+var url = "mongodb://localhost:27017/";
+
+//Skapar connection till databas mellan nodejs och innehåller ett värde i sig för att inte skapa ngt tomt blabla.
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("test");
+  var myobj = { Email: "Admin", Password: "Admin123" };
+ //await Email.createIndex({ login_email: 1 }, { unique: true }); Ska skapa en index för uniqa emails (fungear inte atm)
+  dbo.collection("login").insertOne(myobj, function(err, res) {
+    if (err) throw err;
+    console.log("1 document inserted");
+    db.close();
+  });
+}); 
+
+//Register forum för post från register.
+app.post("/public/register.html", function (req, res) { 
+		var ReginObj = {Email: req.body.email, Password: req.body.password};
+		dbo.collection("login").insertOne(ReginObj, function(err, res) {
+			if (err) res.send("A account with that email already exists");
+			else res.send("Succesfully inserted");
+			db.close();
+	}); 
+});
+
+
+//Login forum för post från register.
+app.post("/public/login.html", function (req, res) { 
+	dbo.collection("login").findOne({Email: req.body.email, Password: req.body.password}, function(err, res) {
+		if (err) res.send("A account with that email already exists");
+		elseres.redirect('public/index.html');
+		db.close();
+	}); 
+});
 
 http.listen(port, () => {
 	console.log('Listening on 3000...');
