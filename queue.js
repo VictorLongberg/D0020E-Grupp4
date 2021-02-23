@@ -18,7 +18,8 @@ class queue {
 		var s = this.l_fifo_q.last;
 		while (s != null) {
 			let sl = s.value.get_socketlist();
-			sl.foreach((i) => {
+			console.log("socket list:\n", sl);
+			sl.forEach((i) => {
 				i.emit('update_queue_place', n);
 			});
 			n++;

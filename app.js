@@ -94,7 +94,6 @@ io.on('connection', (socket) => {
 
 	socket.on('name', (name) => {
 		lecture_1.add_student(socket.request.session.id, name, socket);
-		console.log(lecture_1.students);
 	});
 
 	socket.on('question', (isAnonymous, msg) => {
@@ -134,7 +133,7 @@ io.on('connection', (socket) => {
 		if (q != null){
 			var stud = lecture_1.get_student_by_id(socket.request.session.id)
 			var n_ticket = new ticket.Ticket(0, stud, "test");
-			q.add_ticket();
+			q.add_ticket(n_ticket);
 		}
 		console.log(q);
 	});
@@ -143,10 +142,9 @@ io.on('connection', (socket) => {
 		var q = lecture_1.get_queue(q_name);
 		if (q != null) {
 			var tick = q.get_first();
-			console.log(tick);
 			if (tick != null) {
 				let sl = tick.get_socketlist();
-				sl.foreach((st) => {
+				sl.forEach((st) => {
 					st.emit('picked_out');
 					st.emit('update_queue_place', 'none');
 				});

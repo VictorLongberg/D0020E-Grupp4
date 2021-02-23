@@ -24,6 +24,11 @@ class Student {
 	get_socket() {
 		return this.socket;
 	}
+
+	// to distiguish from group
+	class_string() {
+		return "Student";
+	}
 }
 
 module.exports = {Student};

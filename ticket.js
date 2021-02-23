@@ -16,7 +16,8 @@ class Ticket {
 
 	get_socketlist() {
 		var ret = [];
-		if (typeof(this.entity) == "student") {
+		console.log("entity type:", this.entity.class_string());
+		if (this.entity.class_string() == "Student") {
 			ret.push(this.entity.get_socket());
 		} else {
 			// unsuported
