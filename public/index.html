@@ -28,7 +28,10 @@
 
 		function ask_join_queue() {
 			q_name = prompt("queue to join");
-			socket.emit('join_queue', (q_name));
+			message = prompt("message");
+			console.log("message");
+			console.log(message);
+			socket.emit('join_queue', q_name, message);
 		}
 
 		function pick_first() {
