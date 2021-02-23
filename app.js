@@ -9,6 +9,12 @@ var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var session = require('express-session');
 
+//db
+const MongoClient = require('mongodb').MongoClient;
+const uri = "mongodb+srv://Elie:Elie123@cluster0.fhfjx.mongodb.net/mydb?retryWrites=true&w=majority"; //https://cloud.mongodb.com/v2/6020afbf25845140b0c65d17#metrics/replicaSet/6020b097ea48a608bd83ea68/explorer/mydb/Chat/find
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+
 // Own requirements
 var student = require('./student.js');
 var lecture = require('./lecture.js');
@@ -22,6 +28,8 @@ var sessionMiddleware = session({
 });
 
 const port = 3000
+var url = 'mongodb://localhost:27017/mydb';
+
 
 /** Class representing a Message. */
 class Message{
@@ -88,6 +96,35 @@ io.on('connection', (socket) => {
 			logInfo += ":" +date.getMinutes();
 		}
 
+
+		client.connect(err => {
+			var dbo = client.db("mydb");
+
+			//Check if user already has commented
+			dbo.collection("Chat").findOne({ id: socket.request.session.id }, { projection: { _id: 0, id: 1, name:1 } }, function (err, result) {
+				if(result==null){//New user
+					var object = {
+						roomId:"Inget", 
+						id:socket.request.session.id, 
+						name:name, 
+						date:date, 
+						message:[{ message: msg, date: date }]
+					};
+					
+					dbo.collection("Chat").insertOne(object, function(err, res) {
+					console.log("Inserted message to Database.");
+					});
+
+				}else{//Old user
+					dbo.collection("Chat").update(
+						{ id:socket.request.session.id },
+						{ $push: {message:[{ message: msg, date: date }]}},
+					);
+				}
+			});
+			client.close();
+		});
+
 		appendLog(logInfo);
 	});
 
@@ -118,7 +155,22 @@ io.on('connection', (socket) => {
 		} else {
 			logInfo += ":" +date.getMinutes();
 		}
-
+		
+		var object = {
+			roomId:"Inget", 
+			id:questionCounter, 
+			name:name,
+			question:msg, 
+			date:date, 
+			upvote:0
+		};
+		client.connect(err => {
+			var dbo = client.db("mydb");
+			dbo.collection("Question").insertOne(object, function(err, res) {
+			console.log("Inserted question to Database.");
+			});
+		client.close();
+		});
 		appendLog(logInfo);
 		questionCounter++;
 	});
@@ -126,6 +178,15 @@ io.on('connection', (socket) => {
 	socket.on('upvote', (questionID, memberNum) => {
 		console.log('question ' +questionID +' was upvoted');
 		io.emit('upvote', questionID, memberCounter);
+
+		var upvote = 0;
+		client.connect(err => {
+			var dbo = client.db("mydb");
+			dbo.collection("Question").updateOne({id:questionID},{$inc:{upvote:1}},function(err,res) {
+				console.log("Updated upvotes in Database");
+			});
+		client.close();
+		});
 	});
 	
 	socket.on('reactConfused', () => {
@@ -139,6 +200,7 @@ io.on('connection', (socket) => {
 		confuseCounter--;
 		io.emit('updateConfused', confuseCounter);
 	});
+	
 });
 
 function confusedStop(id) {
@@ -147,6 +209,9 @@ function confusedStop(id) {
 
 
 // Logging (WILL PROBABLY BE HANDLED VIA DATABASE INSTEAD)
+		
+
+// Logging
 const dir = "./logs/sessionID";
 var fs = require("fs");
 var directoryFound = false;
