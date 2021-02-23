@@ -130,12 +130,13 @@ io.on('connection', (socket) => {
 
 	socket.on('join_queue', (q_name, message) => {
 		var q = lecture_1.get_queue(q_name);
-		console.log("parameters:", q_name, message);
+		//console.log("parameters:", q_name, message);
 		if (q != null){
 			var stud = lecture_1.get_student_by_id(socket.request.session.id)
 			var n_ticket = new ticket.Ticket(0, stud, message);
 			q.add_ticket(n_ticket);
 			console.log("added ticket:\n", n_ticket);
+			console.log("json queue:\n", q.to_json());
 		}
 	});
 

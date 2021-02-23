@@ -66,6 +66,28 @@ class queue {
 			ret.push(first);
 		}
 	}
+
+	to_json() {
+		var arr = this.l_fifo_q.to_array();
+		var ret = [];
+
+		//console.log(arr, arr.length);
+
+		for (var i = 0; i < arr.length; i++){
+			console.log(arr[i].entity.class_string());
+			if (arr[i].entity.class_string() == "Student"){
+				var ent = {
+					name: arr[i].entity.name,
+					message: arr[i].message
+				}
+				ret.push(ent);
+			} else {
+				console.log("not inplemented");
+			}
+		}
+
+		return JSON.stringify(ret);
+	}
 }
 module.exports = {queue};
 
