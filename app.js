@@ -12,6 +12,7 @@ var session = require('express-session');
 var student = require('./student.js');
 var lecture = require('./lecture.js');
 var queue = require('./queue.js');
+var ticket = require('./ticket.js');
 
 var sessionMiddleware = session({
   secret: '=very! ¤secret# "key/',
@@ -131,7 +132,9 @@ io.on('connection', (socket) => {
 	socket.on('join_queue', (q_name) => {
 		var q = lecture_1.get_queue(q_name);
 		if (q != null){
-			q.add_student(lecture_1.get_student_by_id(socket.request.session.id));
+			var stud = lecture_1.get_student_by_id(socket.request.session.id)
+			var n_ticket = new ticket.Ticket(0, stud, "test");
+			q.add_ticket();
 		}
 		console.log(q);
 	});
@@ -139,11 +142,14 @@ io.on('connection', (socket) => {
 	socket.on('get_first_queue', (q_name) => {
 		var q = lecture_1.get_queue(q_name);
 		if (q != null) {
-			var stud = q.get_first();
-			console.log(stud);
-			if (stud != null) {
-				stud.socket.emit('picked_out');
-				stud.socket.emit('update_queue_place', 'none');
+			var tick = q.get_first();
+			console.log(tick);
+			if (tick != null) {
+				let sl = tick.get_socketlist();
+				sl.foreach((st) => {
+					st.emit('picked_out');
+					st.emit('update_queue_place', 'none');
+				});
 			}
 		}
 	});

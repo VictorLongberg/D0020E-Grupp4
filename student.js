@@ -20,6 +20,10 @@ class Student {
 	set_name(name) {
 		this.name = name;
 	}
+
+	get_socket() {
+		return this.socket;
+	}
 }
 
 module.exports = {Student};
