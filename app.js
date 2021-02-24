@@ -8,6 +8,7 @@ const app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var session = require('express-session');
+var bodyParser = require("body-parser");
 
 //db
 const MongoClient = require('mongodb').MongoClient;
@@ -210,11 +211,12 @@ io.on('connection', (socket) => {
 		io.emit('updateConfused', confuseCounter);
 	});
 	
-
+	const bodyParser = require('body-parser');
+	app.use(bodyParser.urlencoded({ extended: true }));
 
 	client.connect(err => {
-		var dbo = client.db("mydb");
 
+		var dbo = client.db("mydb");
 		app.post("/public/register.html", function (req, res) { 
 			var ReginObj = {Email: req.body.email, Password: req.body.password};
 			//var ReginObj = { Email: "Admin", Password: "Admin123" };
@@ -235,8 +237,7 @@ io.on('connection', (socket) => {
 });
 
 });
-
-	
+ 
 
 function confusedStop(id) {
 	io.to(id).emit("toggleConfuse");
