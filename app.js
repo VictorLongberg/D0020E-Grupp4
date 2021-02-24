@@ -54,6 +54,14 @@ io.use((socket, next) => {
 });
 
 app.use(express.static('public'));
+// Funkar inte av ngn anledning
+app.get("/register", function (req, res) {
+	res.sendFile(__dirname + "/public/register.html");
+  });
+// Funkar inte av ngn anledning
+app.get('/login', (req, res) => {
+	res.sendFile(__dirname + '/public/login.html');
+});
 
 app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/public/index.html');
@@ -242,7 +250,6 @@ function appendLog(logInfo) {
 
 //Login And Register Testing.
 
-var MongoClient = require('mongodb').MongoClient;
 const { Mongoose } = require('mongoose');
 //standart local mongodb url. Can be changed for relative url. 
 var url = "mongodb://localhost:27017/";
