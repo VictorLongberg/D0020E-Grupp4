@@ -55,12 +55,12 @@ io.use((socket, next) => {
 });
 
 app.use(express.static('public'));
-// Funkar inte av ngn anledning
+
 app.get("/register", function (req, res) {
 	res.sendFile(__dirname + "/public/register.html");
   });
-// Funkar inte av ngn anledning
-app.get('/login', (req, res) => {
+
+  app.get('/login', (req, res) => {
 	res.sendFile(__dirname + '/public/login.html');
 });
 
@@ -69,6 +69,49 @@ app.get('/', (req, res) => {
 	console.log(req.session.id);
 	console.log(lecture_1.get_student_name(req.session.id));
 });
+
+
+client.connect(err => {
+	//console.log("apa");
+	var dbo = client.db("mydb");
+	app.use(bodyParser.json()); // for parsing application/json
+	
+	app.post("/register", async function (req, res)  { 
+		var reginObj = {Email: req.body.email, Password: req.body.password};
+		console.log(reginObj);
+		//var ReginObj = { Email: "Admin", Password: "Admin123" };
+		dbo.collection("login").insertOne(reginObj, function(err, res) {
+			if (err) throw err;
+			console.log("1 user and password inserted!");
+			client.close();
+		});
+	}); 
+
+	app.post("/login", function (req, res) { 
+		console.log("apa");
+		var email = {Email: req.body.email};
+		var password = {Password: req.body.password};
+
+		dbo.collection("login").findOne({email}, function(err, res) {
+			if (err) res.send("A account with that email already exists");
+			dbo.collection("login").findOne({password}, function(err, res) {
+				if (err) res.send("A account with that email already exists");
+				res.redirect('public/index.html');
+				client.close();
+			});
+			client.close();
+		});
+	});	
+});
+
+
+/*
+
+	if (err) res.send("A account with that email already exists");
+			 res.redirect('public/index.html');
+			client.close();
+*/
+
 
 var questionCounter = 0;
 var memberCounter = 0;
@@ -210,31 +253,6 @@ io.on('connection', (socket) => {
 		confuseCounter--;
 		io.emit('updateConfused', confuseCounter);
 	});
-	
-	const bodyParser = require('body-parser');
-	app.use(bodyParser.urlencoded({ extended: true }));
-
-	client.connect(err => {
-
-		var dbo = client.db("mydb");
-		app.post("/public/register.html", function (req, res) { 
-			var ReginObj = {Email: req.body.email, Password: req.body.password};
-			//var ReginObj = { Email: "Admin", Password: "Admin123" };
-			dbo.collection("login").insertOne(ReginObj, function(err, res) {
-				if (err) throw err;
-				console.log("1 user and password inserted!");
-				client.close();
-			});
-		}); 
-
-	app.post("/public/login.html", function (req, res) { 
-		dbo.collection("login").findOne({Email: req.body.email, Password: req.body.password}, function(err, res) {
-			if (err) res.send("A account with that email already exists");
-			else res.redirect('public/index.html');
-			client.close();
-		});
-	});	
-});
 
 });
  

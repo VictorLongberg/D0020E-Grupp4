@@ -5,26 +5,48 @@
 	<link rel="stylesheet" href="css/main.css">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	
-	<script src="/socket.io/socket.io.js"></script>
-    <script>
-		var socket = io();
-	</script>
 <body>   
 <h1>
     Login Page
 </h1>
-<form action="/login" method="POST">
-    <label for="username">Email:</label>
-    <input type="text" placeholder="example@gmail.com" id="xyz" name="username">
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password">
-    <button>Login</button>
+<form id="login">
+    <input type="text" autocomplete="off" id="email" placeholder="Example@gmail.com" />
+    <input type="password" autocomplete="off" id="password" placeholder="Password" />
+    <input type="submit" value="Submit Form" />
 </form>
 <ul>
     <li><a href="register.html">SignUp</a></li>
 </ul>
+<script>
+    const form = document.getElementById('login')
+    form.addEventListener('submit', login)
 
+    async function login(event) {
+        event.preventDefault()
+        const email = document.getElementById('email').value
+        const password = document.getElementById('password').value
+
+        const result = await fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email,
+                password
+            })
+        }).then((res) => res.json())
+
+        if (result.status === 'ok') {
+            // everythign went fine
+            console.log('Got the token: ', result.data)
+            localStorage.setItem('token', result.data)
+            alert('Success')
+        } else {
+            alert(result.error)
+        }
+    }
+</script>
 
 </body>
 </html>

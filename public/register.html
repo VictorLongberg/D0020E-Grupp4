@@ -5,26 +5,46 @@
 	<link rel="stylesheet" href="css/main.css">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	
-	<script src="/socket.io/socket.io.js"></script>
-    <script>
-		var socket = io();
-	</script>
 <body> 
 <h1>
-    SignUp Page
+    Registration: 
 </h1>
-<form action=" " method="POST">
-    <label for="email">Email:</label>
-    <input type="text" id="email" name="email">
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password">
-    <button>Submit</button>
+<form id="reg-form">
+    <input type="text" autocomplete="off" id="email" placeholder="Example@gmail.com" />
+    <input type="password" autocomplete="off" id="password" placeholder="Password" />
+    <input type="submit" value="Submit Form" />
 </form>
 <ul>
     <li><a href="login.html">login</a></li>
 </ul>
+<script>
+    const form = document.getElementById('reg-form')
+    form.addEventListener('submit', registerUser)
 
+    async function registerUser(event) {
+        event.preventDefault()
+        const email = document.getElementById('email').value    
+        const password = document.getElementById('password').value;
+      
+        const result = await fetch('/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email,
+                password
+            })
+        }).then((res) => res.json())
+
+        if (result.status === 'ok') {
+            // everythign went fine
+            alert('Success')
+        } else {
+            alert(result.error)
+        }
+    }
+</script>
 
 </body>
 </html>
