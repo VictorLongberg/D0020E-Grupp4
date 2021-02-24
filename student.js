@@ -4,12 +4,13 @@ class Student {
 	 * @param  {string} id id - Session-ID
 	 * @param  {string} name name - Name of student
 	 */
-	constructor(id, name) {
+	constructor(id, name, socket) {
 		this.session_id = id;
 		this.name = name;
 		this.timeJoined = this.timeJoined;
 		//this.timeLeft = timeLeft;
 		this.msg = [];
+		this.socket = socket; // for the socket a student is connected thru
 	}
 
 	get_name() {
@@ -18,6 +19,15 @@ class Student {
 
 	set_name(name) {
 		this.name = name;
+	}
+
+	get_socket() {
+		return this.socket;
+	}
+
+	// to distiguish from group
+	class_string() {
+		return "Student";
 	}
 }
 
