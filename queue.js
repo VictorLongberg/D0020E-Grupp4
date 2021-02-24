@@ -1,6 +1,8 @@
 // queue system
 //
 var FIFO = require('./FIFO_queue.js');
+var student = require('./student.js');
+var ticket = require('./ticket.js');
 
 class queue {
 
@@ -12,11 +14,21 @@ class queue {
 
 	// update all clients with there position in the queue
 	update_positions() {
+		var n = 1;
+		var s = this.l_fifo_q.last;
+		while (s != null) {
+			let sl = s.value.get_socketlist();
+			sl.forEach((i) => {
+				i.emit('update_queue_place', n);
+			});
+			n++;
+			s = s.prev;
+		}
 	}
 
 	// add a student to the queue and send the position in queue
-	add_student(id) {
-		this.l_fifo_q.add(id);
+	add_ticket(ticket) {
+		this.l_fifo_q.add(ticket);
 		this.update_positions();
 	}
 
@@ -54,6 +66,28 @@ class queue {
 			ret.push(first);
 		}
 	}
+
+	to_json() {
+		var arr = this.l_fifo_q.to_array();
+		var ret = [];
+
+		//console.log(arr, arr.length);
+
+		for (var i = 0; i < arr.length; i++){
+			console.log(arr[i].entity.class_string());
+			if (arr[i].entity.class_string() == "Student"){
+				var ent = {
+					name: arr[i].entity.name,
+					message: arr[i].message
+				}
+				ret.push(ent);
+			} else {
+				console.log("not inplemented");
+			}
+		}
+
+		return JSON.stringify(ret);
+	}
 }
 module.exports = {queue};
 
@@ -62,30 +96,15 @@ function test(){
 
 	var q = new queue('test', null);
 
-	q.add_student('1');
-	q.add_student('2');
-	q.add_student('3');
+	q.add_ticket('1');
+	q.add_ticket('2');
+	q.add_ticket('3');
 
 	console.log(q);
 
 	console.log(q.get_first());
 	console.log(q.get_first());
 	console.log(q.get_first());
-
-	q.add_student('1');
-	q.add_student('2');
-	q.add_student('3');
-
-	console.log(q.get_n_first(2));
-	console.log(q.get_first());
-	console.log(q.get_first());
-
-	q.add_student('1');
-	q.add_student('2');
-	q.add_student('3');
-
-	console.log(q.get_all());
-	console.log(q.get_all());
 }
 
 //test();
