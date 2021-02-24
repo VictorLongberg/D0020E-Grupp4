@@ -3,7 +3,6 @@
 
 // Outside requirements
 //var app = require('express')();
-var mongoose = require("mongoose");
 const express = require('express');
 const app = express();
 var http = require('http').createServer(app);
@@ -15,6 +14,9 @@ const MongoClient = require('mongodb').MongoClient;
 const uri = "mongodb+srv://Elie:Elie123@cluster0.fhfjx.mongodb.net/mydb?retryWrites=true&w=majority"; //https://cloud.mongodb.com/v2/6020afbf25845140b0c65d17#metrics/replicaSet/6020b097ea48a608bd83ea68/explorer/mydb/Chat/find
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
+const { Mongoose } = require('mongoose');
+//var url = "mongodb://localhost:27017/";
+var url = 'mongodb://localhost:27017/mydb';
 
 // Own requirements
 var student = require('./student.js');
@@ -29,8 +31,6 @@ var sessionMiddleware = session({
 });
 
 const port = 3000
-var url = 'mongodb://localhost:27017/mydb';
-
 
 /** Class representing a Message. */
 class Message{
@@ -210,7 +210,33 @@ io.on('connection', (socket) => {
 		io.emit('updateConfused', confuseCounter);
 	});
 	
+
+
+	client.connect(err => {
+		var dbo = client.db("mydb");
+
+		app.post("/public/register.html", function (req, res) { 
+			var ReginObj = {Email: req.body.email, Password: req.body.password};
+			//var ReginObj = { Email: "Admin", Password: "Admin123" };
+			dbo.collection("login").insertOne(ReginObj, function(err, res) {
+				if (err) throw err;
+				console.log("1 user and password inserted!");
+				client.close();
+			});
+		}); 
+
+	app.post("/public/login.html", function (req, res) { 
+		dbo.collection("login").findOne({Email: req.body.email, Password: req.body.password}, function(err, res) {
+			if (err) res.send("A account with that email already exists");
+			else res.redirect('public/index.html');
+			client.close();
+		});
+	});	
 });
+
+});
+
+	
 
 function confusedStop(id) {
 	io.to(id).emit("toggleConfuse");
@@ -248,44 +274,6 @@ function appendLog(logInfo) {
 	});
 }
 
-//Login And Register Testing.
-
-const { Mongoose } = require('mongoose');
-//standart local mongodb url. Can be changed for relative url. 
-var url = "mongodb://localhost:27017/";
-
-//Skapar connection till databas mellan nodejs och innehåller ett värde i sig för att inte skapa ngt tomt blabla.
-MongoClient.connect(url, function(err, db) {
-  if (err) throw err;
-  var dbo = db.db("test");
-  var myobj = { Email: "Admin", Password: "Admin123" };
- //await Email.createIndex({ login_email: 1 }, { unique: true }); Ska skapa en index för uniqa emails (fungear inte atm)
-  dbo.collection("login").insertOne(myobj, function(err, res) {
-    if (err) throw err;
-    console.log("1 document inserted");
-    db.close();
-  });
-}); 
-
-//Register forum för post från register.
-app.post("/public/register.html", function (req, res) { 
-		var ReginObj = {Email: req.body.email, Password: req.body.password};
-		dbo.collection("login").insertOne(ReginObj, function(err, res) {
-			if (err) res.send("A account with that email already exists");
-			else res.send("Succesfully inserted");
-			db.close();
-	}); 
-});
-
-
-//Login forum för post från register.
-app.post("/public/login.html", function (req, res) { 
-	dbo.collection("login").findOne({Email: req.body.email, Password: req.body.password}, function(err, res) {
-		if (err) res.send("A account with that email already exists");
-		elseres.redirect('public/index.html');
-		db.close();
-	}); 
-});
 
 http.listen(port, () => {
 	console.log('Listening on 3000...');
