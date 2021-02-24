@@ -304,14 +304,22 @@
 			element.innerText = questionMsg;
 			questionMsg = element.innerHTML;
 			
-			var question = $('<li>').html( '<span class="Sender">' + sender + '</span>'  + ": " + questionMsg  + '<span class="Time">'  + timeStamp + '</span>' );
+			var question = $('<li>').html( '<span class="Sender">' + sender + '</span>'  + ": " + questionMsg
+			
+			// Timestamp
+			+ '<span class="Time">'  + timeStamp + '</span>'
+			
+			// Upvote button after question
+			+ '<br> <input id="upvote' + questionID +'" type="button" name="Upvote" value="\u25B2" \>');
+			
 			question.css({ "background-color": "rgb(3,32,64)", "font-size": "120%", "color":"white"});
 			question.attr({ id: 'question' + questionID });
-			var upvoteButton = $('<input/>').attr({ id: 'upvote' + questionID, type: 'button', name: 'Upvote', value: ('\u25B2') });
-			$('#messages').append(question, upvoteButton);
-			$('#' + 'upvote' + questionID).click(function () {
+			$('#messages').append(question);
+			
+			// Upvote function
+			$('#upvote' + questionID).click(function () {
 				socket.emit('upvote', questionID);
-				$('#' + 'upvote' + questionID).remove();
+				$('#upvote' + questionID).remove();
 			});
 		});
 
@@ -324,6 +332,13 @@
 			}
 
 			$('#' + 'question' + questionID).css("font-size", newFontsize);
+		});
+		
+		socket.on('answer', function (questionID) {
+			var fontsize = $('#' + 'question' + questionID).css("font-size");
+			newFontsize = "120%";
+			$('#' + 'question' + questionID).css({"font-size":newFontsize, "background-color":"green"});
+			$('#upvote' + questionID).remove();
 		});
 		
 		socket.on('toggleConfuse', function () {
