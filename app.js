@@ -55,9 +55,11 @@ io.use((socket, next) => {
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
-	res.sendFile(__dirname + '/public/index.html');
-	console.log(req.session.id);
-	console.log(lecture_1.get_student_name(req.session.id));
+	res.sendFile(__dirname + '/public/indexStudent.html');
+});
+
+app.get('/Teacher', (req, res) => {
+	res.sendFile(__dirname + '/public/indexTeacher.html');
 });
 
 var questionCounter = 0;
@@ -172,6 +174,11 @@ io.on('connection', (socket) => {
 				});
 			}
 		}
+	});
+	
+	socket.on('answer', (questionID) => {
+		console.log('question ' +questionID +' was answered');
+		io.emit('answer', questionID);
 	});
 	
 	socket.on('reactConfused', () => {
