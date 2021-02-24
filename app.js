@@ -12,6 +12,7 @@ var session = require('express-session');
 // Own requirements
 var student = require('./student.js');
 var lecture = require('./lecture.js');
+var queue = require('./queue.js');
 
 var sessionMiddleware = session({
   secret: '=very! ¤secret# "key/',
@@ -36,7 +37,6 @@ class Message{
 
 const lecture_1 = new lecture.Lecture();
 
-
 //Sessions (experess-session)
 app.use(sessionMiddleware);
 
@@ -54,15 +54,15 @@ app.get('/', (req, res) => {
 
 var questionCounter = 0;
 var memberCounter = 0;
-
+var confuseCounter = 0;
 
 io.on('connection', (socket) => {
 	memberCounter++;
 	console.log('user connected, total users: ' +memberCounter);
 
 	socket.on('disconnect', () => {
-		console.log('user disconnected, total users: ' +memberCounter);
 		memberCounter--;
+		console.log('user disconnected, total users: ' +memberCounter);
 	});
 
 	socket.on('chat message', (isAnonymous, msg, date) => {
@@ -73,9 +73,9 @@ io.on('connection', (socket) => {
 			name = lecture_1.get_student_name(socket.request.session.id);
 		}
 		io.emit('chat message', name, msg, date.valueOf());
-
+		
 		var logInfo = "Chat by: " +name +":" +msg;
-
+		
 		if (date.getHours() < 10) {
 			logInfo += " - 0" +date.getHours();
 		} else {
@@ -104,7 +104,7 @@ io.on('connection', (socket) => {
 			name = lecture_1.get_student_name(socket.request.session.id);
 		}
 		io.emit('question', name, msg, questionCounter, date.valueOf());
-
+		
 		var logInfo = "Question #" +questionCounter +" by: " +name +":" +msg;
 
 		if (date.getHours() < 10) {
@@ -127,9 +127,26 @@ io.on('connection', (socket) => {
 		console.log('question ' +questionID +' was upvoted');
 		io.emit('upvote', questionID, memberCounter);
 	});
+	
+	socket.on('reactConfused', () => {
+		confuseCounter++;
+		io.emit('updateConfused', confuseCounter);
+		var id = socket.id;
+		setTimeout(confusedStop, 3000, id);
+	});
+	
+	socket.on('removeConfused', () => {
+		confuseCounter--;
+		io.emit('updateConfused', confuseCounter);
+	});
 });
 
-// Logging
+function confusedStop(id) {
+	io.to(id).emit("toggleConfuse");
+}
+
+
+// Logging (WILL PROBABLY BE HANDLED VIA DATABASE INSTEAD)
 const dir = "./logs/sessionID";
 var fs = require("fs");
 var directoryFound = false;
@@ -144,7 +161,6 @@ function appendLog(logInfo) {
 				console.log("Log directory already exists.");
 			}
 			directoryFound = true;
-
 		} catch (err) {
 			console.log(err);
 		}

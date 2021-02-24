@@ -6,21 +6,29 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
+	<script src="/socket.io/socket.io.js"></script>
 	<script>
-	var name = prompt("Enter nickname: ");
+		var socket = io();
 
-	function setname () {
-		name = prompt("Enter nickname: ");
-		updateChatAs();
-	}
+		setName();
+		function setName() {
+			name = prompt("Change nickname: ");
+			while (name == "null" || !name || name.length > 30) {
+				name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
+			}
 
-	while (name == "null" || !name || name.length > 30) {
-		name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
-	}
+			//Sanitizing
+			var element = document.createElement('div');
+			element.innerText = name;
+			name = element.innerHTML;
 
-	function getName() {
-		return name;
-	}
+			socket.emit('name', name);
+			updateChatAs();
+		}
+
+		function getName() {
+			return name;
+		}
 	</script>
 
 	<title>Simple chat</title>
@@ -68,7 +76,7 @@
 	});
 	</script>
 	<div class="container">
-		<div class="clock">
+		<div class="clock d-none d-lg-block">
 			<div id="Date"></div>
 			<ul>
 				<li id="hours"></li>
@@ -82,36 +90,47 @@
 
 		<div class="row">
 
-			<div class="col-6">
-				<img src="/images/placeholder.jpg" class="img-fluid">
+			<div class="col-6 d-flex">
+				<div class="dropdown">
+				<button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownQueue" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					Queues <span class="badge badge-light">x</span>
+				</button>
+				<div class="dropdown-menu" aria-labelledby="dropdownQueue">
+					<a href="#">Testkö 1: </a>Number ahead of you
+					<br>
+					<a href="#">Testkö 2: </a>Number ahead of you
+					<br>
+					<a href="#">Testkö 3: </a>Number ahead of you
+				</div>
 			</div>
+			<div>
+			<p>You are in queue: X</p>
+		</div>
+		</div>
+
 			<div class="col-6">
 				<div class="messages overflow-auto">
 					<ul id="messages"></ul>
 				</div>
 
 				<form action="">  <!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
-
-					<div class="CurrentUser float-left" id="currentName">
-						Chatting as:
-						<label>
-							<input type="user" id="currentUser" />
-						</label>
-					</div>
 					<div class="d-flex">
 						<div class="dropdown">
 							<button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 								Reaction
 							</button>
 							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-								<a class="dropdown-item" href="#">
+								<a class="dropdown-item" href="#" id="confusedPic" onclick="toggleConfused()">
 									<img src="/images/confused.png" class="reactionIcon">
+									Confused - <span id="confusedCount">0</span>
 								</a>
 								<a class="dropdown-item" href="#">
 									<img src="/images/confused.png" class="reactionIcon">
+									Yes - <span id="yesCount">0</span>
 								</a>
 								<a class="dropdown-item" href="#">
 									<img src="/images/confused.png" class="reactionIcon">
+									No - <span id="noCount">0</span>
 								</a>
 							</div>
 						</div>
@@ -133,9 +152,16 @@
 							</button>
 							<input class="form-check-input" type="checkbox" id="anonCheck" onclick="updateChatAs()" />
 						</div>
-						<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="setname()">
+						<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="setName()">
 							Change name
 						</button>
+				</div>
+
+					<div class="CurrentUser float-left" id="currentName">
+						Chatting as:
+						<label>
+							<input type="user" id="currentUser" />
+						</label>
 					</div>
 
 					<div class="input-group mb-3 order-1">
@@ -149,28 +175,29 @@
 				</div>
 			</div>
 
-
-
 			<script>
-			var confuseTimer;
+			var confuseBool = false;
 
 			function toggleConfused() {
-				// Become confused
-				if (document.getElementById('myCheckbox1').checked) {
+				if (!confuseBool) {
+					confuseBool = true;
 					$("#confusedPic").fadeTo(300, 0.2);
 					$('#messages').append($('<li>').text("You are confused!"));
-					confuseTimer = setTimeout(confuseTimerDone, 5000);
+					socket.emit('reactConfused');
 				}
 
 				else {
-					$("#confusedPic").fadeTo(300, 1);
-					clearTimeout(confuseTimer);
+					confuseBool = false;
+					$('#messages').append($('<li>').text("You are no longer confused."));
+					document.getElementById("confusedPic").setAttribute("onclick", "");
+					setTimeout(confuseCoolDownDone, 3050);
+					socket.emit('removeConfused');
 				}
 			}
 
-			function confuseTimerDone() {
-				$("#myCheckbox1").prop("checked", false);
-				toggleConfused();
+			function confuseCoolDownDone() {
+				$("#confusedPic").fadeTo(300, 1);
+				document.getElementById("confusedPic").setAttribute("onclick", "toggleConfused()");
 			}
 
 			function updateChatAs() {
@@ -201,12 +228,10 @@
 		</form>
 	</div>
 
-	<script src="/socket.io/socket.io.js"></script>
 	<!--<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>-->
 	<script src="\js\bootstrap\bootstrap.bundle.js"></script>
 	<script>
 	$(function () {
-		var socket = io();
 		$('form').submit(function (e) {
 			e.preventDefault();
 
@@ -214,8 +239,6 @@
 			if (!$('#m').val()) {
 				return;
 			}
-
-			socket.emit('name', name);
 
 			//Check question
 			if (document.getElementById("questionCheck").checked) {
@@ -245,15 +268,58 @@
 
 		socket.on('chat message', function (sender, msg, date) {
 			var dt = new Date(date);
-			var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
-			//time.css({ "font-size": "120%"});
+			var hourStamp = dt.getHours();
+			var minuteStamp = dt.getMinutes();
+			var secondStamp = dt.getSeconds();
 
-			$('#messages').append($('<li>').html('<span class="Sender">' + sender + '</span>' + ": " + msg + '<span class="Time">' + time + '</span>'));
+			if (hourStamp < 10) {
+				hourStamp = "0" + hourStamp;
+			}
 
+			if (minuteStamp < 10) {
+				minuteStamp = "0" + minuteStamp;
+			}
+
+			if (secondStamp < 10) {
+				secondStamp = "0" + secondStamp;
+			}
+
+			var timeStamp = hourStamp + ":" + minuteStamp + ":" + secondStamp;
+
+			// Sanitizing
+			var element = document.createElement('div');
+			element.innerText = msg;
+			msg = element.innerHTML;
+
+			$('#messages').append($('<li>').html('<span class="Sender">' + sender + '</span>' + ": " + msg + '<span class="Time">' + timeStamp + '</span>'));
 		});
 
 		socket.on('question', function (sender, questionMsg, questionID, date) {
-			var question = $('<li>').text(sender + ": " + questionMsg);
+			var dt = new Date(date);
+			var hourStamp = dt.getHours();
+			var minuteStamp = dt.getMinutes();
+			var secondStamp = dt.getSeconds();
+
+			if (hourStamp < 10) {
+				hourStamp = "0" + hourStamp;
+			}
+
+			if (minuteStamp < 10) {
+				minuteStamp = "0" + minuteStamp;
+			}
+
+			if (secondStamp < 10) {
+				secondStamp = "0" + secondStamp;
+			}
+
+			var timeStamp = hourStamp + ":" + minuteStamp + ":" + secondStamp;
+
+			// Sanitizing
+			var element = document.createElement('div');
+			element.innerText = questionMsg;
+			questionMsg = element.innerHTML;
+
+			var question = $('<li>').html( '<span class="Sender">' + sender + '</span>'  + ": " + questionMsg  + '<span class="Time">'  + timeStamp + '</span>' );
 			question.css({ "background-color": "rgb(3,32,64)", "font-size": "120%", "color":"white"});
 			question.attr({ id: 'question' + questionID });
 			var upvoteButton = $('<input/>').attr({ id: 'upvote' + questionID, type: 'button', name: 'Upvote', value: ('\u25B2') });
@@ -274,9 +340,19 @@
 
 			$('#' + 'question' + questionID).css("font-size", newFontsize);
 		});
+
+		socket.on('toggleConfuse', function () {
+			if (confuseBool) {
+				toggleConfused();
+			}
+		});
+
+		socket.on('updateConfused', function(confuseNum) {
+			$("#confusedCount").text(confuseNum);
+		});
 	});
 	</script>
-	<div class="footer">
+	<div class="footer d-none d-lg-block">
 		<div role="main">
 			<a href="https://www.ltu.se/">
 				<img src="/images/ltulogga.png" class="align-middle" style="margin-top:5px; margin-bottom:5px; margin-left: 5px; height:65px; width:136px;">
