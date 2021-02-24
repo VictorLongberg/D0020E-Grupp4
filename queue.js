@@ -69,18 +69,21 @@ class queue {
 
 	to_json() {
 		var arr = this.l_fifo_q.to_array();
-		var ret = [];
+		var ret = {
+			qname: this.name,
+			rarr: []
+		};
 
 		//console.log(arr, arr.length);
 
 		for (var i = 0; i < arr.length; i++){
-			console.log(arr[i].entity.class_string());
 			if (arr[i].entity.class_string() == "Student"){
 				var ent = {
+					type: "Student",
 					name: arr[i].entity.name,
 					message: arr[i].message
 				}
-				ret.push(ent);
+				ret.rarr.push(ent);
 			} else {
 				console.log("not inplemented");
 			}
