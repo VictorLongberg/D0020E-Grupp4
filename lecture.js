@@ -51,6 +51,7 @@ class Lecture {
 		return null;
 	}
 
+
 	add_queue(name){
 		var queue_e = this.get_queue(name);
 		if (queue_e == null){
@@ -69,6 +70,15 @@ class Lecture {
 		}
 		return;
 	}
+
+	get_queue_json() {
+		var ret = [];
+		for (var i = 0; i < this.queues.length; i++){
+			ret.push(this.queues[i].name);
+		}
+		return ret;
+	}
+
 }
 
 module.exports = {Lecture};

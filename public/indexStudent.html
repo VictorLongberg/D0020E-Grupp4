@@ -204,10 +204,10 @@
 				
 				// Spawn new queues
 				for (i = 0; i < queues.length; i++) {
-					var queueElement = $('<li>').html("<b>" +queues[i].name +"</b>" +
+					var queueElement = $('<li>').html("<b>" +queues[i] +"</b>" +
 					
 					// Join queue button
-					"<input type='button' onclick='askJoinQueue(\"" +queues[i].name +"\")' value='Join queue' />"
+					"<input type='button' onclick='askJoinQueue(\"" +queues[i] +"\")' value='Join queue' />"
 					
 					);
 					

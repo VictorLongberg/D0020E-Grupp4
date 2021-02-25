@@ -217,13 +217,13 @@
 				
 				// Spawn new queues
 				for (i = 0; i < queues.length; i++) {
-					var queueElement = $('<li>').html("<b>" +queues[i].name +"</b>"
+					var queueElement = $('<li>').html("<b>" +queues[i]+"</b>"
 					
 					// Pick first in queue button
-					+ "<input type='button' onclick='pickFirst(\"" +queues[i].name +"\")' value='Pick first in queue' />"
+					+ "<input type='button' onclick='pickFirst(\"" +queues[i]+"\")' value='Pick first in queue' />"
 					
 					// Remove queue button
-					+ "<br> <input type='button' onclick='removeQueue(\"" +queues[i].name +"\")' value='Remove queue' />"
+					+ "<br> <input type='button' onclick='removeQueue(\"" +queues[i]+"\")' value='Remove queue' />"
 					
 					);
 					
