@@ -356,6 +356,25 @@
 		socket.on('updateConfused', function(confuseNum) {
 			$("#confusedCount").text(confuseNum);
 		});
+
+
+		socket.on('updateQueue', function(json_queue) {
+			console.log("Update queue json:", json_queue);
+
+			// code to update queue from JSON object goes here
+			//
+			// JSON structure
+			//	{
+			// 		qname: (queue name)
+			// 		rarr: [  <== array of tickets
+			//		{ (ticket)
+			//			type: (type of entity "Student" or "Group"
+			//			name/names: (name(s) of people names if Group)
+			//			message: (message of ticket)
+			//		}
+			//		]
+			//	}
+		});
 	});
 	</script>
 	<div class="footer">
