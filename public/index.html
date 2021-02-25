@@ -8,27 +8,57 @@
 
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
-		var socket = io();
+	var socket = io();
+	var q_count = 0;
 
-		setName();
-		function setName() {
-			name = prompt("Change nickname: ");
-			while (name == "null" || !name || name.length > 30) {
-				name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
-			}
-
-			//Sanitizing
-			var element = document.createElement('div');
-			element.innerText = name;
-			name = element.innerHTML;
-
-			socket.emit('name', name);
-			updateChatAs();
+	setName();
+	function setName() {
+		name = prompt("Change nickname: ");
+		while (name == "null" || !name || name.length > 30) {
+			name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
 		}
 
-		function getName() {
-			return name;
+		//Sanitizing
+		var element = document.createElement('div');
+		element.innerText = name;
+		name = element.innerHTML;
+
+		socket.emit('name', name);
+		updateChatAs();
+	}
+
+	function new_queue(){
+		q_count +=1;
+		q_name = prompt("Name for the queue: ");
+		while (q_name == "null" || !q_name || q_name.length > 30) {
+			qname = prompt("Please enter valid queue name (MAX 30 CHARACTERS) : ");
 		}
+		$("#queue_count").text(q_count);
+		$('#queues').append($('<li>').html(q_name
+		+ '<button type="button" class="btn btn-secondary btn-sm align-middle" onclick="ask_join_queue(q_name)">Join queue'
+		+	'<span class="badge badge-light align-middle" id="queue_place">0</span></button>'
+		+ '<br>'
+		+ '<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="pick_first()">pick first</button>'
+		));
+		socket.emit('new_queue',q_name);
+	}
+
+	function ask_join_queue(q_name) {
+		/*q_name = prompt("queue to join");*/
+		message = prompt("message");
+		console.log("message");
+		console.log(message);
+		socket.emit('join_queue', q_name, message);
+	}
+
+	function pick_first() {
+		q_name = prompt("queue?");
+		socket.emit('get_first_queue', (q_name));
+	}
+
+	function getName() {
+		return name;
+	}
 	</script>
 
 	<title>Simple chat</title>
@@ -90,23 +120,20 @@
 
 		<div class="row">
 
-			<div class="col-6 d-flex">
-				<div class="dropdown">
-				<button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownQueue" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					Queues <span class="badge badge-light">x</span>
+			<div class="col-6">
+				<button type="button" class="btn btn-secondary" onclick="new_queue()">
+					Create new queue
 				</button>
-				<div class="dropdown-menu" aria-labelledby="dropdownQueue">
-					<a href="#">Testkö 1: </a>Number ahead of you
-					<br>
-					<a href="#">Testkö 2: </a>Number ahead of you
-					<br>
-					<a href="#">Testkö 3: </a>Number ahead of you
+				<!-- Varje rad i listan med köer-->
+				<div class="dropdown">
+					<button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownQueue" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Queues <span class="badge badge-light" id="queue_count">0</span>
+					</button>
+					<div class="dropdown-menu" aria-labelledby="dropdownQueue">
+						<ul style="list-style:none;" id="queues"></ul>
+					</div>
 				</div>
 			</div>
-			<div>
-			<p>You are in queue: X</p>
-		</div>
-		</div>
 
 			<div class="col-6">
 				<div class="messages overflow-auto">
@@ -155,7 +182,7 @@
 						<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="setName()">
 							Change name
 						</button>
-				</div>
+					</div>
 
 					<div class="CurrentUser float-left" id="currentName">
 						Chatting as:
@@ -174,6 +201,8 @@
 					</div>
 				</div>
 			</div>
+
+
 
 			<script>
 			var confuseBool = false;
@@ -341,6 +370,18 @@
 			$('#' + 'question' + questionID).css("font-size", newFontsize);
 		});
 
+		socket.on('picked_out', () => {
+			alert("Your turn!");
+		});
+
+		socket.on('update_queue_place', function(place) {
+			$("#queue_place").text(place);
+		});
+
+		socket.on('update_queue_count', function(place) {
+			$("#queue_count").text(place);
+		});
+
 		socket.on('toggleConfuse', function () {
 			if (confuseBool) {
 				toggleConfused();
@@ -351,14 +392,15 @@
 			$("#confusedCount").text(confuseNum);
 		});
 	});
-	</script>
-	<div class="footer d-none d-lg-block">
-		<div role="main">
-			<a href="https://www.ltu.se/">
-				<img src="/images/ltulogga.png" class="align-middle" style="margin-top:5px; margin-bottom:5px; margin-left: 5px; height:65px; width:136px;">
-			</a>
-		</div>
+</script>
+
+<div class="footer">
+	<div role="main">
+		<a href="https://www.ltu.se/">
+			<img src="/images/ltulogga.png" class="align-middle" style="margin-top:5px; margin-bottom:5px; margin-left: 5px; height:65px; width:136px;">
+		</a>
 	</div>
+</div>
 
 </body>
 </html>
