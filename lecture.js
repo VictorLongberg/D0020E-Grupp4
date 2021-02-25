@@ -6,6 +6,7 @@ class Lecture {
 	constructor(){
 		this.students = [];
 		this.queues = [];
+		this.groups = [];
 	}
 
 	get_student_by_id(id){
