@@ -2,12 +2,12 @@
 
 // Outside requirements
 //var app = require('express')();
-const express = require('express');
-const app = express();
-var http = require('http').createServer(app);
-var io = require('socket.io')(http);
-var session = require('express-session');
-var bodyParser = require("body-parser");
+const express	= require('express');
+const app 		= express();
+var http 		= require('http').createServer(app);
+var io 			= require('socket.io')(http);
+var session   	= require('express-session');
+var bodyParser 	= require("body-parser");
 
 //db
 const MongoClient = require('mongodb').MongoClient;
@@ -60,6 +60,7 @@ app.use(express.static('public'));
 
 app.get("/register", function (req, res) {
 	res.sendFile(__dirname + "/public/register.html");
+	//res.redirect('https://www.google.com');
   });
 
   app.get('/login', (req, res) => {
@@ -72,36 +73,77 @@ app.get('/', (req, res) => {
 	console.log(lecture_1.get_student_name(req.session.id));
 });
 
-//Loggin och Logout
+
+function relocation() {
+	response.writeHead(307,{Location: 'http://localhost:3000/login.html/'});
+	response.end();
+}
+
+//Login och Logout
 client.connect(err => {
-	//console.log("apa");
 	var dbo = client.db("mydb");
 	app.use(bodyParser.json()); // for parsing application/json		
-	
 
-	app.post("/register", async function (req, res)  { 
+	//Register
+	app.post("/register", async function (req, res, next)  { 
 		var reginObj = {Email: req.body.email, Password: req.body.password};
 		console.log(reginObj);
-		try {
-			const result = await dbo.collection("login").insertOne(reginObj);
-			console.log("banan" + result);
-			//client.close();
-
-		} catch (error) {
-			console.log("apa" + error);
-			//client.close();
-		}  
-
+			try {
+				const result = await dbo.collection("login").insertOne(reginObj);
+				console.log("banan" + result);
+				return  res.redirect('https://www.google.com');
+				//client.close();	
+			} catch (error) {
+				console.log("apa" + error);
+				//client.close();	
+				return  res.redirect('https://www.google.com');
+		}
 	}); 
-
-	app.post("/login", function (req, res) { 
-		console.log("apa");
+	/****************************************************************
+	app.post("/register",  function (req, res)  { 
+		if (err) throw err;
 		var reginObj = {Email: req.body.email, Password: req.body.password};
-		dbo.collection("login").findOne({reginObj}, function(err, res) {
-				if (err) res.send("A account with that email already exists");
-				res.redirect('public/index.html');
+		dbo.collection("login").insertOne(reginObj);
+		//res.redirect('https://www.google.com');
+		  //await res.redirect(302, '/');
+		  //client.close();		
+	});
+	****************************************************************/
+
+
+	//login
+	app.post("/login", async function (req, res, next) { 
+		//console.log("apa");
+		var reginObj = {Email: req.body.email, Password: req.body.password};
+		console.log(reginObj);
+		/**************************************************************************************************************
+		try {
+			const result = await dbo.collection("login").findOne(reginObj);
+			const id = result._id; 
+			//res.cookie("twsession", id);
+			console.log("Äpplepaj" + id);
+			res.redirect(302, "/register");
+			next();
+			//client.close();
+			//return;
+		} catch (error) {
+			console.log("Frukost" + error);
+			//client.close();
+		} 
+		*/
+		//var reginObj = {Email: req.body.email, Password: req.body.password};
+		/*
+		dbo.collection("login").findOne({reginObj}, function(err, res, next) {
+				if (err) throw(err);
+				const result = await dbo.collection("login").findOne(reginObj);
+				const id = result._id; 
+				res.cookie("twsession", id);
+				res.redirect(302, '/');
+				next(); 
 				client.close();		
 		});
+		**************************************************************************************************************/
+
 	});	
 });
 
@@ -259,6 +301,7 @@ function confusedStop(id) {
 // Logging
 const dir = "./logs/sessionID";
 var fs = require("fs");
+const { response } = require('express');
 var directoryFound = false;
 
 function appendLog(logInfo) {

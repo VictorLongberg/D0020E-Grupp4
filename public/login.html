@@ -19,9 +19,9 @@
 </ul>
 <script>
     const form = document.getElementById('login')
-    form.addEventListener('submit', login)
+    form.addEventListener('submit', loginUser)
 
-    async function login(event) {
+    async function loginUser(event) {
         event.preventDefault()
         const email = document.getElementById('email').value
         const password = document.getElementById('password').value
