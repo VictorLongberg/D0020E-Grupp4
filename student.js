@@ -17,6 +17,10 @@ class Student {
 		return this.name;
 	}
 
+	get_id() {
+		return this.session_id;
+	}
+
 	set_name(name) {
 		this.name = name;
 	}
