@@ -176,6 +176,20 @@ io.on('connection', (socket) => {
 		}
 	});
 	
+	socket.on('createQueue', (q_name) => {
+		var q = lecture_1.add_queue(q_name);
+		io.emit('updateQueues', lecture_1.queues);
+	});
+	
+	socket.on('removeQueue', (q_name) => {
+		var q = lecture_1.remove_queue(q_name);
+		io.emit('updateQueues', lecture_1.queues);
+	});
+	
+	socket.on('updateQueues', () => {
+		io.emit('updateQueues', lecture_1.queues);
+	});
+	
 	socket.on('answer', (questionID) => {
 		console.log('question ' +questionID +' was answered');
 		io.emit('answer', questionID);
