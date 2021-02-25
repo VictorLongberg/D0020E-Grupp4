@@ -10,7 +10,10 @@
 	<script>
 		var socket = io();
 		
-		setName();
+		if (!name) {
+			setName();
+		}
+		
 		function setName() {
 			name = prompt("Change nickname: ");
 			while (name == "null" || !name || name.length > 30) {
@@ -24,19 +27,6 @@
 			
 			socket.emit('name', name);
 			updateChatAs();
-		}
-
-		function ask_join_queue() {
-			q_name = prompt("queue to join");
-			message = prompt("message");
-			console.log("message");
-			console.log(message);
-			socket.emit('join_queue', q_name, message);
-		}
-
-		function pick_first() {
-			q_name = prompt("queue?");
-			socket.emit('get_first_queue', (q_name));
 		}
 		
 		function getName() {
@@ -173,17 +163,62 @@
 				</div>
 			</div>
 
-			<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="ask_join_queue()">
-				Join queue
-			</button>
-
-			<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="pick_first()">
-				pick first
-			</button>
-
 			place in queue - <span id="queue_place">0</span>
+			
+			<div class="col-3">
+				<ul id="queues">
+					<li style="display: block; background-color: rgb(3,32,64); color: white; text-align: center; padding: 16px; text-decoration: none;">
+					test1
+					</li>
+					
+					<li style="display: block; background-color: rgb(3,32,64); color: white; text-align: center; padding: 16px; text-decoration: none;">
+					test2
+					</li>
+					
+					<li style="display: block; background-color: rgb(3,32,64); color: white; text-align: center; padding: 16px; text-decoration: none;">
+					test3
+					</li>
+				</ul>
+			</div>
 
 			<script>
+			// --- Queues ---
+			function askJoinQueue(qName) {
+				message = prompt("Join with message:");
+				console.log("message");
+				console.log(message);
+				socket.emit('join_queue', qName, message);
+			}
+			
+			function updateQueues() {
+				socket.emit('updateQueues');
+			}
+			updateQueues();
+			
+			socket.on('updateQueues', function(queues) {
+				// Clear queues tab
+				var queueLength = document.getElementById("queues").children.length;
+				for (i = 0; i < queueLength; i++) {
+					document.getElementById("queues").children[0].remove();
+				}
+				
+				// Spawn new queues
+				for (i = 0; i < queues.length; i++) {
+					var queueElement = $('<li>').html("<b>" +queues[i].name +"</b>" +
+					
+					// Join queue button
+					"<input type='button' onclick='askJoinQueue(\"" +queues[i].name +"\")' value='Join queue' />"
+					
+					);
+					
+					// placeholder CSS
+					queueElement.css({"display":"block", "background-color":"rgb(3,32,64)", "color":"white", "text-align":"center", "padding":"16px", "text-decoration":"none"});
+					
+					$("#queues").append(queueElement);
+				}
+			});
+			
+			// --- Reactions ---
 			var confuseBool = false;
 
 			function toggleConfused() {
