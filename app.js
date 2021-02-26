@@ -2,13 +2,13 @@
 
 // Outside requirements
 //var app = require('express')();
-const express	= require('express');
-const app 		= express();
-var http 		= require('http').createServer(app);
-var io 			= require('socket.io')(http);
-var session   	= require('express-session');
-var bodyParser 	= require("body-parser");
-
+const express		= require('express');
+const app 			= express();
+var http 			= require('http').createServer(app);
+var io 				= require('socket.io')(http);
+var session   		= require('express-session');
+var bodyParser 		= require("body-parser");
+var cookieParser 	= require('cookie-parser');
 //db
 const MongoClient = require('mongodb').MongoClient;
 const url = "mongodb+srv://Elie:Elie123@cluster0.fhfjx.mongodb.net/mydb?retryWrites=true&w=majority"; //https://cloud.mongodb.com/v2/6020afbf25845140b0c65d17#metrics/replicaSet/6020b097ea48a608bd83ea68/explorer/mydb/Chat/find
@@ -30,9 +30,7 @@ var sessionMiddleware = session({
   //cookie: { secure: true , maxAge : 60000}
 });
 
-
 const port = 3000;
-
 
 /** Class representing a Message. */
 class Message{
@@ -44,7 +42,6 @@ class Message{
 		this.upvote = this.upvote;
 	}
 }
-
 
 const lecture_1 = new lecture.Lecture();
 lecture_1.add_queue('test');
@@ -60,93 +57,103 @@ app.use(express.static('public'));
 
 app.get("/register", function (req, res) {
 	res.sendFile(__dirname + "/public/register.html");
-	//res.redirect('https://www.google.com');
-  });
+});
 
   app.get('/login', (req, res) => {
 	res.sendFile(__dirname + '/public/login.html');
 });
 
-app.get('/', (req, res) => {
-	res.sendFile(__dirname + '/public/index.html');
+app.get('/student', (req, res) => {
+	res.sendFile(__dirname + '/public/indexStudent.html');
 	console.log(req.session.id);
 	console.log(lecture_1.get_student_name(req.session.id));
 });
 
-
-function relocation() {
-	response.writeHead(307,{Location: 'http://localhost:3000/login.html/'});
-	response.end();
-}
-
-//Login och Logout
-client.connect(err => {
-	var dbo = client.db("mydb");
-	app.use(bodyParser.json()); // for parsing application/json		
-
-	//Register
-	app.post("/register", async function (req, res, next)  { 
-		var reginObj = {Email: req.body.email, Password: req.body.password};
-		console.log(reginObj);
-			try {
-				const result = await dbo.collection("login").insertOne(reginObj);
-				console.log("banan" + result);
-				return  res.redirect('https://www.google.com');
-				//client.close();	
-			} catch (error) {
-				console.log("apa" + error);
-				//client.close();	
-				return  res.redirect('https://www.google.com');
-		}
-	}); 
-	/****************************************************************
-	app.post("/register",  function (req, res)  { 
-		if (err) throw err;
-		var reginObj = {Email: req.body.email, Password: req.body.password};
-		dbo.collection("login").insertOne(reginObj);
-		//res.redirect('https://www.google.com');
-		  //await res.redirect(302, '/');
-		  //client.close();		
-	});
-	****************************************************************/
-
-
-	//login
-	app.post("/login", async function (req, res, next) { 
-		//console.log("apa");
-		var reginObj = {Email: req.body.email, Password: req.body.password};
-		console.log(reginObj);
-		/**************************************************************************************************************
+app.get('/teacher', (req, res) => {
+	res.sendFile(__dirname + '/public/indexTeacher.html');
+	//console.log(req.cookies.name);'
+	const kakan = get_cookies(req)["tss"];
+	client.connect( async  err => {	
+			const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
+			var dbo = client.db("mydb");
+			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
+			checkLogin = await dbo.collection("login").findOne({_id: kakan});
 		try {
-			const result = await dbo.collection("login").findOne(reginObj);
-			const id = result._id; 
-			//res.cookie("twsession", id);
-			console.log("Äpplepaj" + id);
-			res.redirect(302, "/register");
-			next();
-			//client.close();
-			//return;
+			if ( checkLogin != null ){
+					res.header("Set-Cookie", "tss=" + checkLogin._id);
+					//res.header("Cookie", "tss=" +  checkLogin._id);
+					res.redirect("/teacher");
+			} else { res.status(400)}
 		} catch (error) {
-			console.log("Frukost" + error);
-			//client.close();
-		} 
-		*/
-		//var reginObj = {Email: req.body.email, Password: req.body.password};
-		/*
-		dbo.collection("login").findOne({reginObj}, function(err, res, next) {
-				if (err) throw(err);
-				const result = await dbo.collection("login").findOne(reginObj);
-				const id = result._id; 
-				res.cookie("twsession", id);
-				res.redirect(302, '/');
-				next(); 
-				client.close();		
-		});
-		**************************************************************************************************************/
-
+			console.log(err); 
+		} finally {
+			await client.close(); 		
+		}
 	});	
 });
 
+//Login&Register stuff. 
+app.use(bodyParser.json()); // for parsing application/json	
+app.use(express.json());
+app.use(cookieParser()); 
+
+var get_cookies = function(request) {
+	var cookies = {};
+	request.headers && request.headers.cookie.split(';').forEach(function(cookie) {
+	  var parts = cookie.match(/(.*?)=(.*)$/)
+	  cookies[ parts[1].trim() ] = (parts[2] || '').trim();
+	});
+	return cookies;
+};
+
+
+//Login.
+app.post("/login",  function (req, res )  { 
+	var checkLogin = null; 
+	//connectar till databasen för att titta utifall vi kan hitta email. 
+	client.connect( async  err => {	
+			const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
+			var dbo = client.db("mydb");
+			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
+			checkLogin = await dbo.collection("login").findOne({email: req.body.email, password: req.body.password});
+		try {
+			if ( checkLogin != null ){
+					res.header("Set-Cookie", "tss=" + checkLogin._id);
+					//res.header("Cookie", "tss=" +  checkLogin._id);
+					res.redirect("/teacher");
+			} else { res.status(400).send({message: 'This is an error!'}); }
+		} catch (error) {
+			console.log(err); 
+		} finally {
+			await client.close(); 		
+		}
+	});	
+});
+
+//Registering.
+app.post("/register",  function (req, res )  { 
+	//formdatan från register sparad i emailpass. 
+	var emailpass = {email: req.body.email, password: req.body.password};
+	var checkNull = null; 
+	//connectar till databasen för att titta utifall vi kan hitta email. 
+	client.connect( async  err => {	
+			const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
+			var dbo = client.db("mydb");
+			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
+			checkNull = await dbo.collection("login").findOne({email: req.body.email});
+		try {
+			if ( checkNull == null ){
+					const insertdata = await dbo.collection("login").insertOne(emailpass);
+					console.log("banan" + insertdata);
+					res.redirect("/login");
+			} else { res.status(400).send({message: 'This is an error!'}); }
+		} catch (error) {
+			console.log(err); 
+		} finally {
+			await client.close(); 		
+		}
+	});	
+});
 
 var questionCounter = 0;
 var memberCounter = 0;
@@ -289,6 +296,8 @@ io.on('connection', (socket) => {
 
 });
  
+
+
 
 function confusedStop(id) {
 	io.to(id).emit("toggleConfuse");
@@ -577,6 +586,7 @@ async function updateConfused(roomId, id, date) {
     } catch (err) {
 
         console.log(err);
+
     } finally {
 
         client.close();

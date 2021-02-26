@@ -9,42 +9,62 @@
 <h1>
     Registration: 
 </h1>
-<form id="reg-form">
-    <input type="text" autocomplete="off" id="email" placeholder="Example@gmail.com" />
-    <input type="password" autocomplete="off" id="password" placeholder="Password" />
+<form id="reg-form" method="POST">
+    <input type="text" autocomplete="off" id="email" placeholder="Example@gmail.com" minlength="6" maxlength="69" />
+    <input type="password"  id="password" placeholder="Password" minlength="6" maxlength="69" />
+    <input type="password"  id="confirmpassword" placeholder="Confirm Password" minlength="6" maxlength="69" />
     <input type="submit" value="Submit Form" />
 </form>
 <ul>
-    <li><a href="login.html">login</a></li>
+    <li><a href="/login">login</a></li>
 </ul>
 <script>
     const form = document.getElementById('reg-form')
     form.addEventListener('submit', registerUser)
 
-    async function registerUser(event) {
+     function registerUser(event) {
         event.preventDefault()
-        const email = document.getElementById('email').value    
+        const inputmail = document.getElementById('email').value 
+        var email = inputmail.toLowerCase();    
         const password = document.getElementById('password').value;
-      
-        const result = await fetch('/register', {
+        const confirmpassword = document.getElementById('confirmpassword').value;
+
+        if ( inputmail.length == 0  || password.length == 0) {
+            alert("Empty Fields Please enter email & password correctly!")
+            return; 
+        }
+
+        if ( confirmpassword != password ){
+            alert("Passwords dont match")
+            return; 
+        }
+
+        const result =  fetch('/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
+            body: JSON.stringify({ 
                 email,
-                password
+                password,
+                confirmpassword
             })
-        }).then((res) => res.json())
-
-        if (result.status === 'ok') {
-            // everythign went fine
-            alert('Success')
-        } else {
-            alert(result.error)
+        }).then(res => {
+        // HTTP 301 response
+        // HOW CAN I FOLLOW THE HTTP REDIRECT RESPONSE?
+        if (res.redirected) {
+            window.location.href = res.url;
+        } if (res.status = 400 && res.status!= 200) {
+            alert("Email already in use!");
         }
+    })
+    .catch(function(err) {
+        alert("Test err");
+        console.info(err + " url: " + url);
+    });
     }
 </script>
+
 
 </body>
 </html>
