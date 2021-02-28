@@ -141,7 +141,7 @@ io.on('connection', (socket) => {
 		var q = lecture_1.get_queue(q_name);
 		//console.log("parameters:", q_name, message);
 		if (q != null){
-			var stud = lecture_1.get_student_by_id(socket.request.session.id)
+			var stud = lecture_1.get_student_by_id(socket.request.session.id);
 			var n_ticket = new ticket.Ticket(0, stud, message);
 			q.add_ticket(n_ticket);
 			console.log("added ticket:\n", n_ticket);
@@ -164,10 +164,59 @@ io.on('connection', (socket) => {
 				let sl = tick.get_socketlist();
 				sl.forEach((st) => {
 					st.emit('picked_out');
-					st.emit('update_queue_place', 'none');
+          if(q.l_fifo_q.last == null){
+            st.emit('update_queue_information',0,'none','none');
+          }
+					//st.emit('update_queue_information', 'none');
 				});
+        //q.update_positions();
 			}
 		}
+	});
+
+  socket.on('get_queue_position', () => {
+		var queues = lecture_1.get_all_queues();
+    if(queues.length != 0){
+      queues.forEach((queue) => {
+        var n = 1;
+    		var s = queue.l_fifo_q.last;
+        var qName = queue.name;
+        //console.log(s);
+    		while (s != null) {
+    			let sl = s.value.get_socketlist();
+    			sl.forEach((i) => {
+            var message = s.value.message;
+            var studid = i.request.session.id;
+            console.log("socket id: " + socket.request.session.id);
+            console.log("studid: " + studid);
+            if(socket.request.session.id == studid){
+              socket.emit('update_queue_information', n, qName, message);
+            }
+    			});
+    			n++;
+    			s = s.prev;
+    		}
+      });
+    }
+	});
+
+	socket.on('createQueue', (q_name) => {
+		var q = lecture_1.add_queue(q_name);
+		io.emit('updateQueues', lecture_1.get_queue_json());
+	});
+
+	socket.on('removeQueue', (q_name) => {
+		var q = lecture_1.remove_queue(q_name);
+		io.emit('updateQueues', lecture_1.get_queue_json());
+	});
+
+	socket.on('updateQueues', () => {
+		io.emit('updateQueues', lecture_1.get_queue_json());
+	});
+
+	socket.on('answer', (questionID) => {
+		console.log('question ' +questionID +' was answered');
+		io.emit('answer', questionID);
 	});
 
 	socket.on('reactConfused', () => {

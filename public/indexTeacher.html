@@ -8,57 +8,26 @@
 
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
-	var socket = io();
-	var q_count = 0;
+		var socket = io();
 
-	setName();
-	function setName() {
-		name = prompt("Change nickname: ");
-		while (name == "null" || !name || name.length > 30) {
-			name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
+		function setName() {
+			name = prompt("Change nickname: ");
+			while (name == "null" || !name || name.length > 30) {
+				name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
+			}
+
+			//Sanitizing
+			var element = document.createElement('div');
+			element.innerText = name;
+			name = element.innerHTML;
+
+			socket.emit('name', name);
+			updateChatAs();
 		}
 
-		//Sanitizing
-		var element = document.createElement('div');
-		element.innerText = name;
-		name = element.innerHTML;
-
-		socket.emit('name', name);
-		updateChatAs();
-	}
-
-	function new_queue(){
-		q_count +=1;
-		q_name = prompt("Name for the queue: ");
-		while (q_name == "null" || !q_name || q_name.length > 30) {
-			qname = prompt("Please enter valid queue name (MAX 30 CHARACTERS) : ");
+		function getName() {
+			return name;
 		}
-		$("#queue_count").text(q_count);
-		$('#queues').append($('<li>').html(q_name
-		+ '<button type="button" class="btn btn-secondary btn-sm align-middle" onclick="ask_join_queue(q_name)">Join queue'
-		+	'<span class="badge badge-light align-middle" id="queue_place">0</span></button>'
-		+ '<br>'
-		+ '<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="pick_first()">pick first</button>'
-		));
-		socket.emit('new_queue',q_name);
-	}
-
-	function ask_join_queue(q_name) {
-		/*q_name = prompt("queue to join");*/
-		message = prompt("message");
-		console.log("message");
-		console.log(message);
-		socket.emit('join_queue', q_name, message);
-	}
-
-	function pick_first() {
-		q_name = prompt("queue?");
-		socket.emit('get_first_queue', (q_name));
-	}
-
-	function getName() {
-		return name;
-	}
 	</script>
 
 	<title>Simple chat</title>
@@ -106,7 +75,7 @@
 	});
 	</script>
 	<div class="container">
-		<div class="clock d-none d-lg-block">
+		<div class="clock">
 			<div id="Date"></div>
 			<ul>
 				<li id="hours"></li>
@@ -121,20 +90,8 @@
 		<div class="row">
 
 			<div class="col-6">
-				<button type="button" class="btn btn-secondary" onclick="new_queue()">
-					Create new queue
-				</button>
-				<!-- Varje rad i listan med köer-->
-				<div class="dropdown">
-					<button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownQueue" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						Queues <span class="badge badge-light" id="queue_count">0</span>
-					</button>
-					<div class="dropdown-menu" aria-labelledby="dropdownQueue">
-						<ul style="list-style:none;" id="queues"></ul>
-					</div>
-				</div>
-			</div>
 
+			</div>
 			<div class="col-6">
 				<div class="messages overflow-auto">
 					<ul id="messages"></ul>
@@ -144,18 +101,18 @@
 					<div class="d-flex">
 						<div class="dropdown">
 							<button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								Reaction
+								Reactions
 							</button>
 							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-								<a class="dropdown-item" href="#" id="confusedPic" onclick="toggleConfused()">
+								<a disabled class="dropdown-item" href="#" id="confusedPic">
 									<img src="/images/confused.png" class="reactionIcon">
 									Confused - <span id="confusedCount">0</span>
 								</a>
-								<a class="dropdown-item" href="#">
+								<a disabled class="dropdown-item" href="#">
 									<img src="/images/confused.png" class="reactionIcon">
 									Yes - <span id="yesCount">0</span>
 								</a>
-								<a class="dropdown-item" href="#">
+								<a disabled class="dropdown-item" href="#">
 									<img src="/images/confused.png" class="reactionIcon">
 									No - <span id="noCount">0</span>
 								</a>
@@ -163,21 +120,21 @@
 						</div>
 
 						<div class="form-check form-switch ms-1">
-							<button type="button" class="btn btn-secondary btn-sm">
+							<button disabled type="button" class="btn btn-secondary btn-sm">
 								<label class="form-check-label" for="questionCheck">
 									Question
 								</label>
 							</button>
-							<input class="form-check-input" type="checkbox" id="questionCheck" onclick="updateChatAs()" />
+							<input disabled class="form-check-input" type="checkbox" id="questionCheck" onclick="updateChatAs()" />
 						</div>
 
 						<div class="form-check form-switch ms-1">
-							<button type="button" class="btn btn-secondary btn-sm">
+							<button disabled type="button" class="btn btn-secondary btn-sm">
 								<label class="form-check-label" for="anonCheck">
 									Anonymous
 								</label>
 							</button>
-							<input class="form-check-input" type="checkbox" id="anonCheck" onclick="updateChatAs()" />
+							<input disabled class="form-check-input" type="checkbox" id="anonCheck" onclick="updateChatAs()" />
 						</div>
 						<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="setName()">
 							Change name
@@ -202,9 +159,82 @@
 				</div>
 			</div>
 
+			<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="createQueue()">
+				Create queue
+			</button>
 
+			<div class="col-3">
+			Queues:
+				<ul id="queues">
+					<li style="display: block; background-color: rgb(3,32,64); color: white; text-align: center; padding: 16px; text-decoration: none;">
+					test1
+					</li>
+
+					<li style="display: block; background-color: rgb(3,32,64); color: white; text-align: center; padding: 16px; text-decoration: none;">
+					test2
+					</li>
+
+					<li style="display: block; background-color: rgb(3,32,64); color: white; text-align: center; padding: 16px; text-decoration: none;">
+					test3
+					</li>
+				</ul>
+			</div>
 
 			<script>
+			// --- Queues ---
+			function pickFirst(qName) {
+				socket.emit('get_first_queue', (qName));
+			}
+
+			function createQueue() {
+				qName = prompt("Queue name?");
+
+				if (qName == "null" || !qName || qName.length > 30) {
+					alert("Invalid name");
+					return;
+				}
+
+				socket.emit('createQueue', (qName));
+			}
+
+			function removeQueue(qName) {
+				if (confirm("Remove queue " +qName +"?")) {
+					socket.emit('removeQueue', (qName));
+				}
+			}
+
+			function updateQueues() {
+				socket.emit('updateQueues');
+			}
+			updateQueues();
+
+			socket.on('updateQueues', function(queues) {
+				// Clear queues tab
+				var queueLength = document.getElementById("queues").children.length;
+				for (i = 0; i < queueLength; i++) {
+					document.getElementById("queues").children[0].remove();
+				}
+
+				// Spawn new queues
+				for (i = 0; i < queues.length; i++) {
+					var queueElement = $('<li>').html("<b>" +queues[i]+"</b>"
+
+					// Pick first in queue button
+					+ "<input type='button' onclick='pickFirst(\"" +queues[i]+"\")' value='Pick first in queue' />"
+
+					// Remove queue button
+					+ "<br> <input type='button' onclick='removeQueue(\"" +queues[i]+"\")' value='Remove queue' />"
+
+					);
+
+					// placeholder CSS
+					queueElement.css({"display":"block", "background-color":"rgb(3,32,64)", "color":"white", "text-align":"center", "padding":"16px", "text-decoration":"none"});
+
+					$("#queues").append(queueElement);
+				}
+			});
+
+			// --- Reactions ---
 			var confuseBool = false;
 
 			function toggleConfused() {
@@ -348,14 +378,29 @@
 			element.innerText = questionMsg;
 			questionMsg = element.innerHTML;
 
-			var question = $('<li>').html( '<span class="Sender">' + sender + '</span>'  + ": " + questionMsg  + '<span class="Time">'  + timeStamp + '</span>' );
+			var question = $('<li>').html( '<span class="Sender">' + sender + '</span>'  + ": " + questionMsg
+
+			// Timestamp
+			+ '<span class="Time">'  + timeStamp + '</span>'
+
+			// Upvote and answer button after question
+			+ '<br> <input id="upvote' + questionID +'" type="button" name="Upvote" value="\u25B2" \>'
+			+ '<input id="answer' + questionID +'" type="button" name="Answer" value="\&#10004"\>');
+
 			question.css({ "background-color": "rgb(3,32,64)", "font-size": "120%", "color":"white"});
 			question.attr({ id: 'question' + questionID });
-			var upvoteButton = $('<input/>').attr({ id: 'upvote' + questionID, type: 'button', name: 'Upvote', value: ('\u25B2') });
-			$('#messages').append(question, upvoteButton);
-			$('#' + 'upvote' + questionID).click(function () {
+			$('#messages').append(question);
+
+			// Upvote function
+			$('#upvote' + questionID).click(function () {
 				socket.emit('upvote', questionID);
-				$('#' + 'upvote' + questionID).remove();
+				$('#upvote' + questionID).remove();
+			});
+
+			// Answer function
+			$('#answer' + questionID).click(function () {
+				socket.emit('answer', questionID);
+				$('#answer' + questionID).remove();
 			});
 		});
 
@@ -370,16 +415,11 @@
 			$('#' + 'question' + questionID).css("font-size", newFontsize);
 		});
 
-		socket.on('picked_out', () => {
-			alert("Your turn!");
-		});
-
-		socket.on('update_queue_place', function(place) {
-			$("#queue_place").text(place);
-		});
-
-		socket.on('update_queue_count', function(place) {
-			$("#queue_count").text(place);
+		socket.on('answer', function (questionID) {
+			var fontsize = $('#' + 'question' + questionID).css("font-size");
+			newFontsize = "120%";
+			$('#' + 'question' + questionID).css({"font-size":newFontsize, "background-color":"green"});
+			$('#upvote' + questionID).remove();
 		});
 
 		socket.on('toggleConfuse', function () {
@@ -391,16 +431,34 @@
 		socket.on('updateConfused', function(confuseNum) {
 			$("#confusedCount").text(confuseNum);
 		});
-	});
-</script>
 
-<div class="footer">
-	<div role="main">
-		<a href="https://www.ltu.se/">
-			<img src="/images/ltulogga.png" class="align-middle" style="margin-top:5px; margin-bottom:5px; margin-left: 5px; height:65px; width:136px;">
-		</a>
+
+		socket.on('updateQueue', function(json_queue) {
+			console.log("Update queue json:", json_queue);
+
+			// code to update queue from JSON object goes here
+			//
+			// JSON structure
+			//	{
+			// 		qname: (queue name)
+			// 		rarr: [  <== array of tickets
+			//		{ (ticket)
+			//			type: (type of entity "Student" or "Group"
+			//			name/names: (name(s) of people names if Group)
+			//			message: (message of ticket)
+			//		}
+			//		]
+			//	}
+		});
+	});
+	</script>
+	<div class="footer">
+		<div role="main">
+			<a href="https://www.ltu.se/">
+				<img src="/images/ltulogga.png" class="align-middle" style="margin-top:5px; margin-bottom:5px; margin-left: 5px; height:65px; width:136px;">
+			</a>
+		</div>
 	</div>
-</div>
 
 </body>
 </html>

@@ -48,6 +48,19 @@ class FIFO_queue {
 		this.size -= 1;
 		return l.value;
 	}
+
+	to_array() {
+		var ret = [];
+
+		for (var cur = this.last; cur != null; cur = cur.prev) {
+			ret.push(cur.value);
+		}
+		return ret;
+	}
+
+	size_return(){
+		return this.size;
+	}
 }
 
 module.exports = {FIFO_queue};

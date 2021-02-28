@@ -25,9 +25,11 @@ class Lecture {
 	add_student(id, name){
 		var stud = this.get_student_by_id(id);
 		if (stud == null){
-			var stud = new student.Student(id, name);
+			console.log("hejsan");
+			var stud = new student.Student(id, name, socket);
 			this.students.push(stud);
 		} else {
+			stud.socket = socket;
 			stud.set_name(name);
 		}
 	}
@@ -39,6 +41,47 @@ class Lecture {
 		}
 		return student.get_name();
 	}
+
+	get_queue(name){
+		for (var i = 0; i < this.queues.length; i++){
+			if (this.queues[i].name == name){
+				return this.queues[i];
+			}
+		}
+		return null;
+	}
+
+	get_all_queues(){
+				return this.queues;
+	}
+
+	add_queue(name){
+		var queue_e = this.get_queue(name);
+		if (queue_e == null){
+			var q = new queue.queue(name);
+			this.queues.push(q);
+		} else {
+			return;
+		}
+	}
+
+	remove_queue(name){
+		for (var i = 0; i < this.queues.length; i++){
+			if (this.queues[i].name == name){
+				this.queues.splice(i, 1);
+			}
+		}
+		return;
+	}
+
+	get_queue_json() {
+		var ret = [];
+		for (var i = 0; i < this.queues.length; i++){
+			ret.push(this.queues[i].name);
+		}
+		return ret;
+	}
+
 }
 
 module.exports = {Lecture};
