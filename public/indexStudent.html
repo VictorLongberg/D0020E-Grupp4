@@ -183,11 +183,24 @@
 
 			<script>
 			// --- Queues ---
+			
+			var inQueue = false;
+			
 			function askJoinQueue(qName) {
+				if (inQueue) {
+					alert("You are already in a queue!");
+					return;
+				}
+				
+				inQueue = true;
 				message = prompt("Join with message:");
 				console.log("message");
 				console.log(message);
 				socket.emit('join_queue', qName, message);
+			}
+			
+			function exitQueue() {
+				inQueue = false;
 			}
 			
 			function updateQueues() {
@@ -404,6 +417,7 @@
 
 		socket.on('picked_out', () => {
 			alert("Your turn!");
+			inQueue = false;
 		});
 
 		socket.on('update_queue_place', function(place) {
