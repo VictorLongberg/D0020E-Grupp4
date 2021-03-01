@@ -36,6 +36,7 @@ class Message{
 
 
 const lecture_1 = new lecture.Lecture();
+lecture_1.add_queue('test');
 
 //Sessions (experess-session)
 app.use(sessionMiddleware);
@@ -47,9 +48,11 @@ io.use((socket, next) => {
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
-	res.sendFile(__dirname + '/public/index.html');
-	console.log(req.session.id);
-	console.log(lecture_1.get_student_name(req.session.id));
+	res.sendFile(__dirname + '/public/indexStudent.html');
+});
+
+app.get('/Teacher', (req, res) => {
+	res.sendFile(__dirname + '/public/indexTeacher.html');
 });
 
 var questionCounter = 0;

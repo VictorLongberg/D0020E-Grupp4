@@ -1,9 +1,12 @@
 var student = require('./student.js');
+var queue = require('./queue.js');
 
 /** Class representing a Lecture. */
 class Lecture {
 	constructor(){
 		this.students = [];
+		this.queues = [];
+		this.groups = [];
 	}
 
 	get_student_by_id(id){
@@ -22,14 +25,12 @@ class Lecture {
 		return true;
 	}
 
-	add_student(id, name){
+	add_student(id, name, socket){
 		var stud = this.get_student_by_id(id);
 		if (stud == null){
-			console.log("hejsan");
 			var stud = new student.Student(id, name, socket);
 			this.students.push(stud);
 		} else {
-			stud.socket = socket;
 			stud.set_name(name);
 		}
 	}
@@ -52,7 +53,7 @@ class Lecture {
 	}
 
 	get_all_queues(){
-				return this.queues;
+		return this.queues;
 	}
 
 	add_queue(name){
