@@ -1,0 +1,28 @@
+<h1>Lectures</h1>
+
+<h2>Chat from lecture ID: <%= lecture %></h2>
+<ul>
+    <% chat.forEach(function(i, index){ %>
+      <li>Name: <%= i.name %></li>
+      <ul>
+        <% i.message.forEach(function(e, indexTwo){ %>
+        <li>Message: <%= e.message %></li>
+        <li>Time: <%= e.date %></li>
+      <% }); %>
+      <br>
+    </ul>
+    <% }); %>
+</ul>
+<h2>Confusion from lecture</h2>
+<ul>
+    <% confused.forEach(function(i, index){ %>
+        <li> <%= i.id %> got confused <%= i.confusion.length %> time(s) during the lecture</li>
+        <ul>
+        <% i.confusion.forEach(function(j, indexTwo){ %>
+            <li><%= j.date %></li>
+        <% }); %>
+        <br>
+        </ul>
+    <% }); %>
+</ul>
+
