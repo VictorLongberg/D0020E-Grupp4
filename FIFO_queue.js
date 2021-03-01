@@ -57,6 +57,10 @@ class FIFO_queue {
 		}
 		return ret;
 	}
+
+	size_return(){
+		return this.size;
+	}
 }
 
 module.exports = {FIFO_queue};

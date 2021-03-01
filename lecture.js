@@ -52,6 +52,9 @@ class Lecture {
 		return null;
 	}
 
+	get_all_queues(){
+		return this.queues;
+	}
 
 	add_queue(name){
 		var queue_e = this.get_queue(name);

@@ -5,33 +5,35 @@
 	<link rel="stylesheet" href="css/main.css">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	
+
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
-		var socket = io();
-		
-		if (!name) {
-			setName();
+	var socket = io();
+	console.log(socket.id);
+
+	if (!name) {
+		setName();
+	}
+
+	function setName() {
+		name = prompt("Change nickname: ");
+		while (name == "null" || !name || name.length > 30) {
+			name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
 		}
-		
-		function setName() {
-			name = prompt("Change nickname: ");
-			while (name == "null" || !name || name.length > 30) {
-				name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
-			}
-			
-			//Sanitizing
-			var element = document.createElement('div');
-			element.innerText = name;
-			name = element.innerHTML;
-			
-			socket.emit('name', name);
-			updateChatAs();
-		}
-		
-		function getName() {
-			return name;
-		}
+
+		//Sanitizing
+		var element = document.createElement('div');
+		element.innerText = name;
+		name = element.innerHTML;
+
+		socket.emit('name', name);
+		updateChatAs();
+	}
+
+	function getName() {
+		return name;
+	}
+
 	</script>
 
 	<title>Simple chat</title>
@@ -79,353 +81,360 @@
 	});
 	</script>
 	<div class="container">
-		<div class="clock">
-			<div id="Date"></div>
-			<ul>
-				<li id="hours"></li>
-				<li id="point">:</li>
-				<li id="min"></li>
-				<li id="point">:</li>
-				<li id="sec"></li>
-			</ul>
+		<!--<div class="clock">
+		<div id="Date"></div>
+		<ul>
+		<li id="hours"></li>
+		<li id="point">:</li>
+		<li id="min"></li>
+		<li id="point">:</li>
+		<li id="sec"></li>
+	</ul>
+</div>-->
+<!-- Memes? -->
+
+<div class="row">
+
+	<div class="col-6">
+		<p>Place in <span id="queue_name">none</span>: <br><span id="queue_place">0</span></p>
+		<p>Message sent: <br><span id="queue_message">none</span></p>
+		<div class="dropdown" id="queue_dropdown">
+			<button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownQueue" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				Queues <span class="badge badge-light" id="queue_count">0</span>
+			</button>
+			<div class="dropdown-menu" aria-labelledby="dropdownQueue">
+				<ul style="list-style:none;" id="queues"></ul>
+			</div>
 		</div>
-		<!-- Memes? -->
-
-		<div class="row">
-
-			<div class="col-6">
-				<img src="/images/placeholder.jpg" class="img-fluid">
-			</div>
-			<div class="col-6">
-				<div class="messages overflow-auto">
-					<ul id="messages"></ul>
-				</div>
-
-				<form action="">  <!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
-					<div class="d-flex">
-						<div class="dropdown">
-							<button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								Reaction
-							</button>
-							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-								<a class="dropdown-item" href="#" id="confusedPic" onclick="toggleConfused()">
-									<img src="/images/confused.png" class="reactionIcon">
-									Confused - <span id="confusedCount">0</span>
-								</a>
-								<a class="dropdown-item" href="#">
-									<img src="/images/confused.png" class="reactionIcon">
-									Yes - <span id="yesCount">0</span>
-								</a>
-								<a class="dropdown-item" href="#">
-									<img src="/images/confused.png" class="reactionIcon">
-									No - <span id="noCount">0</span>
-								</a>
-							</div>
-						</div>
-
-						<div class="form-check form-switch ms-1">
-							<button type="button" class="btn btn-secondary btn-sm">
-								<label class="form-check-label" for="questionCheck">
-									Question
-								</label>
-							</button>
-							<input class="form-check-input" type="checkbox" id="questionCheck" onclick="updateChatAs()" />
-						</div>
-
-						<div class="form-check form-switch ms-1">
-							<button type="button" class="btn btn-secondary btn-sm">
-								<label class="form-check-label" for="anonCheck">
-									Anonymous
-								</label>
-							</button>
-							<input class="form-check-input" type="checkbox" id="anonCheck" onclick="updateChatAs()" />
-						</div>
-						<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="setName()">
-							Change name
-						</button>
-					</div>
-					
-					<div class="CurrentUser float-left" id="currentName">
-						Chatting as:
-						<label>
-							<input type="user" id="currentUser" />
-						</label>
-					</div>
-					
-					<div class="input-group mb-3 order-1">
-						<input type="text" class="form-control" id="m" aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="off" />
-						<div class="input-group-append">
-							<button class="btn btn-secondary" id="button-addon2">
-								Send
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			place in queue - <span id="queue_place">0</span>
-			
-			<div class="col-3">
-				<ul id="queues">
-					<li style="display: block; background-color: rgb(3,32,64); color: white; text-align: center; padding: 16px; text-decoration: none;">
-					test1
-					</li>
-					
-					<li style="display: block; background-color: rgb(3,32,64); color: white; text-align: center; padding: 16px; text-decoration: none;">
-					test2
-					</li>
-					
-					<li style="display: block; background-color: rgb(3,32,64); color: white; text-align: center; padding: 16px; text-decoration: none;">
-					test3
-					</li>
-				</ul>
-			</div>
-
-			<script>
-			// --- Queues ---
-			function askJoinQueue(qName) {
-				message = prompt("Join with message:");
-				console.log("message");
-				console.log(message);
-				socket.emit('join_queue', qName, message);
-			}
-			
-			function updateQueues() {
-				socket.emit('updateQueues');
-			}
-			updateQueues();
-			
-			socket.on('updateQueues', function(queues) {
-				// Clear queues tab
-				var queueLength = document.getElementById("queues").children.length;
-				for (i = 0; i < queueLength; i++) {
-					document.getElementById("queues").children[0].remove();
-				}
-				
-				// Spawn new queues
-				for (i = 0; i < queues.length; i++) {
-					var queueElement = $('<li>').html("<b>" +queues[i] +"</b>" +
-					
-					// Join queue button
-					"<input type='button' onclick='askJoinQueue(\"" +queues[i] +"\")' value='Join queue' />"
-					
-					);
-					
-					// placeholder CSS
-					queueElement.css({"display":"block", "background-color":"rgb(3,32,64)", "color":"white", "text-align":"center", "padding":"16px", "text-decoration":"none"});
-					
-					$("#queues").append(queueElement);
-				}
-			});
-			
-			// --- Reactions ---
-			var confuseBool = false;
-
-			function toggleConfused() {
-				if (!confuseBool) {
-					confuseBool = true;
-					$("#confusedPic").fadeTo(300, 0.2);
-					$('#messages').append($('<li>').text("You are confused!"));
-					socket.emit('reactConfused');
-				}
-
-				else {
-					confuseBool = false;
-					$('#messages').append($('<li>').text("You are no longer confused."));
-					document.getElementById("confusedPic").setAttribute("onclick", ""); 
-					setTimeout(confuseCoolDownDone, 3050);
-					socket.emit('removeConfused');
-				}
-			}
-			
-			function confuseCoolDownDone() {
-				$("#confusedPic").fadeTo(300, 1);
-				document.getElementById("confusedPic").setAttribute("onclick", "toggleConfused()"); 
-			}
-
-			function updateChatAs() {
-				var chatAsText = "";
-
-				if (document.getElementById('questionCheck').checked) {
-					chatAsText += 'Asking question as: ';
-				}
-
-				else {
-					chatAsText += 'Chatting as: ';
-				}
-
-				if (document.getElementById('anonCheck').checked) {
-					chatAsText += 'Anonymous';
-				}
-
-				else {
-					chatAsText += getName();
-				}
-
-				document.getElementById('currentName').innerHTML = chatAsText;
-			}
-
-			updateChatAs();
-
-			</script>
-		</form>
 	</div>
-	
-	<!--<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>-->
-	<script src="\js\bootstrap\bootstrap.bundle.js"></script>
+
+	<div class="col-6">
+		<div class="messages overflow-auto">
+			<ul id="messages"></ul>
+		</div>
+
+		<form action="">  <!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
+			<div>
+				<div class="dropdown d-inline-block">
+					<button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Reaction
+					</button>
+					<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+						<a class="dropdown-item" href="#" id="confusedPic" onclick="toggleConfused()">
+							<img src="/images/confused.png" class="reactionIcon">
+							Confused - <span id="confusedCount">0</span>
+						</a>
+						<a class="dropdown-item" href="#">
+							<img src="/images/confused.png" class="reactionIcon">
+							Yes - <span id="yesCount">0</span>
+						</a>
+						<a class="dropdown-item" href="#">
+							<img src="/images/confused.png" class="reactionIcon">
+							No - <span id="noCount">0</span>
+						</a>
+					</div>
+				</div>
+
+				<div class="form-check form-switch ms-1 d-inline-block">
+					<button type="button" class="btn btn-secondary btn-sm">
+						<label class="form-check-label" for="questionCheck">
+							Question
+						</label>
+					</button>
+					<input class="form-check-input" type="checkbox" id="questionCheck" onclick="updateChatAs()" />
+				</div>
+
+				<div class="form-check form-switch ms-1 d-inline-block">
+					<button type="button" class="btn btn-secondary btn-sm">
+						<label class="form-check-label" for="anonCheck">
+							Anonymous
+						</label>
+					</button>
+					<input class="form-check-input" type="checkbox" id="anonCheck" onclick="updateChatAs()" />
+				</div>
+				<div class="d-inline-block">
+					<button type="button" class="btn btn-secondary btn-sm" onclick="setName()">
+						Change name
+					</button>
+				</div>
+			</div>
+
+			<div class="CurrentUser float-left" id="currentName">
+				Chatting as:
+				<label>
+					<input type="user" id="currentUser" />
+				</label>
+			</div>
+
+			<div class="input-group mb-3 order-1">
+				<input type="text" class="form-control" id="m" aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="off" />
+				<div class="input-group-append">
+					<button class="btn btn-secondary" id="button-addon2">
+						Send
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<script>
-	$(function () {
-		$('form').submit(function (e) {
-			e.preventDefault();
+	updateQueues();
+	// --- Queues ---
+	function askJoinQueue(qName) {
+		message = prompt("Join with message:");
+		console.log("message");
+		console.log(message);
+		$("#queue_name").text(qName);
+		$("#queue_message").text(message);
+		socket.emit('join_queue', qName, message);
+		updateQueues();
+	}
 
-			// If message box is empty don't send message
-			if (!$('#m').val()) {
-				return;
-			}
+	function updateQueues() {
+		socket.emit('updateQueues');
+		//socket.emit('update_queue_place', 'none');
+	}
 
-			//Check question
-			if (document.getElementById("questionCheck").checked) {
+	socket.on('updateQueues', function(queues) {
+		var q_count = 0;
+		// Clear queues tab
+		var queueLength = document.getElementById("queues").children.length;
+		for (i = 0; i < queueLength; i++) {
+			document.getElementById("queues").children[0].remove();
+		}
 
-				if (document.getElementById("anonCheck").checked) {
-					socket.emit('question', true, $('#m').val());
-				}
+		// Spawn new queues
+		for (i = 0; i < queues.length; i++) {
+			var queue_counter = document.getElementById("queues").children.size;
+			var queueElement = $("<li>").html(queues[i] +": " +
 
-				else {
-					socket.emit('question', false, $('#m').val());
-				}
+			// Join queue button
+			"<button type='button' id='que_button' class='btn btn-secondary' onclick='askJoinQueue(\"" +queues[i] +"\")'>Join queue"+
+			"<span class='badge badge-light'>In Q: <span id='in_queue'>0</span></span></button>"
+
+		);
+		q_count =+ 1;
+
+		$("#queues").append(queueElement);
+		//Printing out the amount of people in the queue (does not work!!!!!)
+		console.log(queue_counter);
+		$("#in_queue").text(queue_counter);
+	}
+	$("#queue_count").text(q_count);
+});
+
+// --- Reactions ---
+var confuseBool = false;
+
+function toggleConfused() {
+	if (!confuseBool) {
+		confuseBool = true;
+		$("#confusedPic").fadeTo(300, 0.2);
+		$('#messages').append($('<li>').text("You are confused!"));
+		socket.emit('reactConfused');
+	}
+
+	else {
+		confuseBool = false;
+		$('#messages').append($('<li>').text("You are no longer confused."));
+		document.getElementById("confusedPic").setAttribute("onclick", "");
+		setTimeout(confuseCoolDownDone, 3050);
+		socket.emit('removeConfused');
+	}
+}
+
+function confuseCoolDownDone() {
+	$("#confusedPic").fadeTo(300, 1);
+	document.getElementById("confusedPic").setAttribute("onclick", "toggleConfused()");
+}
+
+function updateChatAs() {
+	var chatAsText = "";
+
+	if (document.getElementById('questionCheck').checked) {
+		chatAsText += 'Asking question as: ';
+	}
+
+	else {
+		chatAsText += 'Chatting as: ';
+	}
+
+	if (document.getElementById('anonCheck').checked) {
+		chatAsText += 'Anonymous';
+	}
+
+	else {
+		chatAsText += getName();
+	}
+
+	document.getElementById('currentName').innerHTML = chatAsText;
+}
+
+updateChatAs();
+
+</script>
+</form>
+</div>
+
+<!--<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>-->
+<script src="\js\bootstrap\bootstrap.bundle.js"></script>
+<script>
+$(function () {
+	$('form').submit(function (e) {
+		e.preventDefault();
+
+		// If message box is empty don't send message
+		if (!$('#m').val()) {
+			return;
+		}
+
+		//Check question
+		if (document.getElementById("questionCheck").checked) {
+
+			if (document.getElementById("anonCheck").checked) {
+				socket.emit('question', true, $('#m').val());
 			}
 
 			else {
-				if (document.getElementById("anonCheck").checked) {
-					socket.emit('chat message', true, $('#m').val());
-				}
+				socket.emit('question', false, $('#m').val());
+			}
+		}
 
-				else {
-					socket.emit('chat message', false, $('#m').val());
-				}
+		else {
+			if (document.getElementById("anonCheck").checked) {
+				socket.emit('chat message', true, $('#m').val());
 			}
 
-			$('#m').val('');
-			return false;
-		});
-
-
-		socket.on('chat message', function (sender, msg, date) {
-			var dt = new Date(date);
-			var hourStamp = dt.getHours();
-			var minuteStamp = dt.getMinutes();
-			var secondStamp = dt.getSeconds();
-			
-			if (hourStamp < 10) {
-				hourStamp = "0" + hourStamp;
+			else {
+				socket.emit('chat message', false, $('#m').val());
 			}
-			
-			if (minuteStamp < 10) {
-				minuteStamp = "0" + minuteStamp;
-			}
-			
-			if (secondStamp < 10) {
-				secondStamp = "0" + secondStamp;
-			}
-				
-			var timeStamp = hourStamp + ":" + minuteStamp + ":" + secondStamp;
-			
-			// Sanitizing
-			var element = document.createElement('div');
-			element.innerText = msg;
-			msg = element.innerHTML;
+		}
 
-			$('#messages').append($('<li>').html('<span class="Sender">' + sender + '</span>' + ": " + msg + '<span class="Time">' + timeStamp + '</span>'));
-		});
+		$('#m').val('');
+		return false;
+	});
 
-		socket.on('question', function (sender, questionMsg, questionID, date) {
-			var dt = new Date(date);
-			var hourStamp = dt.getHours();
-			var minuteStamp = dt.getMinutes();
-			var secondStamp = dt.getSeconds();
-			
-			if (hourStamp < 10) {
-				hourStamp = "0" + hourStamp;
-			}
-			
-			if (minuteStamp < 10) {
-				minuteStamp = "0" + minuteStamp;
-			}
-			
-			if (secondStamp < 10) {
-				secondStamp = "0" + secondStamp;
-			}
-			
-			var timeStamp = hourStamp + ":" + minuteStamp + ":" + secondStamp;
-			
-			// Sanitizing
-			var element = document.createElement('div');
-			element.innerText = questionMsg;
-			questionMsg = element.innerHTML;
-			
-			var question = $('<li>').html( '<span class="Sender">' + sender + '</span>'  + ": " + questionMsg
-			
-			// Timestamp
-			+ '<span class="Time">'  + timeStamp + '</span>'
-			
-			// Upvote button after question
-			+ '<br> <input id="upvote' + questionID +'" type="button" name="Upvote" value="\u25B2" \>');
-			
-			question.css({ "background-color": "rgb(3,32,64)", "font-size": "120%", "color":"white"});
-			question.attr({ id: 'question' + questionID });
-			$('#messages').append(question);
-			
-			// Upvote function
-			$('#upvote' + questionID).click(function () {
-				socket.emit('upvote', questionID);
-				$('#upvote' + questionID).remove();
-			});
-		});
 
-		socket.on('upvote', function (questionID, memberNum) {
-			var fontsize = $('#' + 'question' + questionID).css("font-size");
-			newFontsize = fontsize.split("px")[0] * (1 + 1 / memberNum);
+	socket.on('chat message', function (sender, msg, date) {
+		var dt = new Date(date);
+		var hourStamp = dt.getHours();
+		var minuteStamp = dt.getMinutes();
+		var secondStamp = dt.getSeconds();
 
-			if (newFontsize > 15.6 * 2) {
-				newFontsize = 15.6 * 2;
-			}
+		if (hourStamp < 10) {
+			hourStamp = "0" + hourStamp;
+		}
 
-			$('#' + 'question' + questionID).css("font-size", newFontsize);
-		});
+		if (minuteStamp < 10) {
+			minuteStamp = "0" + minuteStamp;
+		}
 
-		socket.on('picked_out', () => {
-			alert("Your turn!");
-		});
+		if (secondStamp < 10) {
+			secondStamp = "0" + secondStamp;
+		}
 
-		socket.on('update_queue_place', function(place) {
-			$("#queue_place").text(place);
-		});
-		
-		socket.on('answer', function (questionID) {
-			var fontsize = $('#' + 'question' + questionID).css("font-size");
-			newFontsize = "120%";
-			$('#' + 'question' + questionID).css({"font-size":newFontsize, "background-color":"green"});
+		var timeStamp = hourStamp + ":" + minuteStamp + ":" + secondStamp;
+
+		// Sanitizing
+		var element = document.createElement('div');
+		element.innerText = msg;
+		msg = element.innerHTML;
+
+		$('#messages').append($('<li>').html('<span class="Sender">' + sender + '</span>' + ": " + msg + '<span class="Time">' + timeStamp + '</span>'));
+	});
+
+	socket.on('question', function (sender, questionMsg, questionID, date) {
+		var dt = new Date(date);
+		var hourStamp = dt.getHours();
+		var minuteStamp = dt.getMinutes();
+		var secondStamp = dt.getSeconds();
+
+		if (hourStamp < 10) {
+			hourStamp = "0" + hourStamp;
+		}
+
+		if (minuteStamp < 10) {
+			minuteStamp = "0" + minuteStamp;
+		}
+
+		if (secondStamp < 10) {
+			secondStamp = "0" + secondStamp;
+		}
+
+		var timeStamp = hourStamp + ":" + minuteStamp + ":" + secondStamp;
+
+		// Sanitizing
+		var element = document.createElement('div');
+		element.innerText = questionMsg;
+		questionMsg = element.innerHTML;
+
+		var question = $('<li>').html( '<span class="Sender">' + sender + '</span>'  + ": " + questionMsg
+
+		// Timestamp
+		+ '<span class="Time">'  + timeStamp + '</span>'
+
+		// Upvote button after question
+		+ '<br> <input id="upvote' + questionID +'" type="button" name="Upvote" value="\u25B2" \>');
+
+		question.css({ "background-color": "rgb(3,32,64)", "font-size": "120%", "color":"white"});
+		question.attr({ id: 'question' + questionID });
+		$('#messages').append(question);
+
+		// Upvote function
+		$('#upvote' + questionID).click(function () {
+			socket.emit('upvote', questionID);
 			$('#upvote' + questionID).remove();
 		});
-		
-		socket.on('toggleConfuse', function () {
-			if (confuseBool) {
-				toggleConfused();
-			}
-		});
-		
-		socket.on('updateConfused', function(confuseNum) {
-			$("#confusedCount").text(confuseNum);
-		});
 	});
-	</script>
-	<div class="footer">
-		<div role="main">
-			<a href="https://www.ltu.se/">
-				<img src="/images/ltulogga.png" class="align-middle" style="margin-top:5px; margin-bottom:5px; margin-left: 5px; height:65px; width:136px;">
-			</a>
-		</div>
-	</div>
+
+	socket.on('upvote', function (questionID, memberNum) {
+		var fontsize = $('#' + 'question' + questionID).css("font-size");
+		newFontsize = fontsize.split("px")[0] * (1 + 1 / memberNum);
+
+		if (newFontsize > 15.6 * 2) {
+			newFontsize = 15.6 * 2;
+		}
+
+		$('#' + 'question' + questionID).css("font-size", newFontsize);
+	});
+
+	socket.on('picked_out', () => {
+		alert("Your turn!");
+	});
+
+	socket.on('update_queue_information', function(place, qName, message) {
+		console.log("Update_quque_place");
+		$("#queue_name").text(qName);
+		$("#queue_message").text(message);
+		$("#queue_place").text(place);
+	});
+
+	socket.on('answer', function (questionID) {
+		var fontsize = $('#' + 'question' + questionID).css("font-size");
+		newFontsize = "120%";
+		$('#' + 'question' + questionID).css({"font-size":newFontsize, "background-color":"green"});
+		$('#upvote' + questionID).remove();
+	});
+
+	socket.on('toggleConfuse', function () {
+		if (confuseBool) {
+			toggleConfused();
+		}
+	});
+
+	socket.on('updateConfused', function(confuseNum) {
+		$("#confusedCount").text(confuseNum);
+	});
+});
+</script>
+<!--<div class="footer">
+<div role="main">
+<a href="https://www.ltu.se/">
+<img src="/images/ltulogga.png" class="align-middle" style="margin-top:5px; margin-bottom:5px; margin-left: 5px; height:65px; width:136px;">
+</a>
+</div>
+</div>-->
+
 
 </body>
 </html>
