@@ -9,7 +9,7 @@
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
 	var socket = io();
-	console.log(socket.id);
+	//console.log(socket.id);
 
 	if (!name) {
 		setName();
@@ -179,11 +179,12 @@
 
 	<script>
 	updateQueues();
+												//Vart fan ska den här kallas? get_queue_position???
 	// --- Queues ---
 	function askJoinQueue(qName) {
 		message = prompt("Join with message:");
-		console.log("message");
-		console.log(message);
+		/*console.log("message");
+		console.log(message);*/
 		$("#queue_name").text(qName);
 		$("#queue_message").text(message);
 		socket.emit('join_queue', qName, message);
@@ -192,6 +193,7 @@
 
 	function updateQueues() {
 		socket.emit('updateQueues');
+		socket.emit('get_queue_position');
 		//socket.emit('update_queue_place', 'none');
 	}
 
@@ -217,9 +219,9 @@
 
 		$("#queues").append(queueElement);
 		//Printing out the amount of people in the queue (does not work!!!!!)
-		console.log(queue_counter);
-		$("#in_queue").text(queue_counter);
+		//console.log(queue_counter);
 	}
+	$("#in_queue").text(queue_counter);
 	$("#queue_count").text(q_count);
 });
 
@@ -403,7 +405,6 @@ $(function () {
 	});
 
 	socket.on('update_queue_information', function(place, qName, message) {
-		console.log("Update_quque_place");
 		$("#queue_name").text(qName);
 		$("#queue_message").text(message);
 		$("#queue_place").text(place);

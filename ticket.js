@@ -16,7 +16,7 @@ class Ticket {
 
 	get_socketlist() {
 		var ret = [];
-		//console.log("entity type:", this.entity.class_string());
+		console.log("entity type:", this.entity.class_string());
 		if (this.entity.class_string() == "Student") {
 			ret.push(this.entity.get_socket());
 		} else {
