@@ -72,6 +72,25 @@ class Lecture {
 		return;
 	}
 
+	get_group(name){
+		for (var i = 0; i < this.groups.length; i++){
+			if (this.groups[i].name == name){
+				return this.groups[i];
+			}
+		}
+		return null;
+	}
+
+	add_group(name){
+		var group_e = this.get_group(name);
+		if (group_e == null){
+			var q = new group.Group(name);
+			this.groups.push(q);
+		} else {
+			return;
+		}
+	}
+
 	get_queue_json() {
 		var ret = [];
 		for (var i = 0; i < this.queues.length; i++){

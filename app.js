@@ -191,7 +191,11 @@ io.on('connection', (socket) => {
 	socket.on('updateQueues', () => {
 		io.emit('updateQueues', lecture_1.get_queue_json());
 	});
-	
+
+	socket.on('createGroup', (g_name) => {
+		lecture_1.add_group(g_name);
+	});
+
 	socket.on('answer', (questionID) => {
 		console.log('question ' +questionID +' was answered');
 		io.emit('answer', questionID);
