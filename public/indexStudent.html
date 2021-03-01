@@ -202,6 +202,12 @@
 	}
 
 	function updateQueues() {
+		//Added a line-through the text if you already is in a queue
+		if(inQueue == true){
+			$("#que_button").css({"text-decoration":"line-through"});
+		}else{
+			$("#que_button").css({"text-decoration":"none"});
+		}
 		socket.emit('updateQueues');
 		socket.emit('get_queue_position');
 		//socket.emit('update_queue_place', 'none');

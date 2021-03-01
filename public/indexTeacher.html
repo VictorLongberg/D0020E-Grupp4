@@ -218,10 +218,10 @@
 			}
 
 			// Pick first in queue button
-			queueHTML += "<br> <button class='btn btn-secondary' type='button' onclick='pickFirst(\"" +jsonQueue.qname +"\")'>Pick first in queue</button>"
+			queueHTML += "<br> <button id='invert_buttons' class='btn btn-secondary' type='button' onclick='pickFirst(\"" +jsonQueue.qname +"\")'>Pick first in queue</button>"
 
 			// Remove queue button
-			+ "<br> <button class='btn btn-secondary' type='button' onclick='removeQueue(\"" +jsonQueue.qname +"\")'>Remove queue</button>";
+			+ "<br> <button id='invert_buttons' class='btn btn-secondary' type='button' onclick='removeQueue(\"" +jsonQueue.qname +"\")'>Remove queue</button>";
 
 			var queueElement = $('<li>').html(queueHTML);
 
