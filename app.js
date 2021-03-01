@@ -66,13 +66,29 @@ var questionCounter = 0;
 var memberCounter = 0;
 var confuseCounter = 0;
 
+var queuedStudents = [];
+
 io.on('connection', (socket) => {
 	memberCounter++;
 	console.log('user connected, total users: ' +memberCounter);
+	
+	// If reconnected student, update socket
+	if (lecture_1.get_student_by_id(socket.request.session.id)) { 					// false if null
+		lecture_1.get_student_by_id(socket.request.session.id).socket = socket;
+	}
 
 	socket.on('disconnect', () => {
 		memberCounter--;
 		console.log('user disconnected, total users: ' +memberCounter);
+		
+		// If disconnected person was in a queue, remove them (NEEDS SUPPORT FROM FIFO_QUEUE)
+		/* for (i = 0; i < queuedStudents.length; i++) {
+			if (queuedStudents[i] == socket.id) {
+				console.log("queuer disconnected: " +socket.id);
+				queuedStudents.splice(i, 1);
+				return;
+			}
+		} */
 	});
 
 	socket.on('chat message', (isAnonymous, msg, date) => {
@@ -154,19 +170,24 @@ io.on('connection', (socket) => {
 		//console.log("parameters:", q_name, message);
 		if (q != null){
 			var stud = lecture_1.get_student_by_id(socket.request.session.id);
-      console.log(stud);
+			
+			// Check if student already queued
+			for (i = 0; i < queuedStudents.length; i++) {
+				if (queuedStudents[i] == stud) {
+					console.log("already queued, denying " +stud.socket.id);
+					io.to(stud.socket.id).emit("deniedQueueJoin");
+					return;
+				}
+			}
+			
+			queuedStudents.push(stud);
+			
 			var n_ticket = new ticket.Ticket(0, stud, message);
 			q.add_ticket(n_ticket);
-			console.log("added ticket:\n", n_ticket);
-			console.log("json queue:\n", q.to_json());
+			//console.log("added ticket:\n", n_ticket);
+			//console.log("json queue:\n", q.to_json());
 		}
 	});
-
-  socket.on('new_queue', (q_name) => {
-    console.log("test");
-    console.log(q_name);
-    lecture_1.add_queue(q_name);
-  });
 
 	socket.on('get_first_queue', (q_name) => {
 		var q = lecture_1.get_queue(q_name);
@@ -177,13 +198,22 @@ io.on('connection', (socket) => {
 				let sl = tick.get_socketlist();
 				sl.forEach((st) => {
 					st.emit('picked_out');
-          if(q.l_fifo_q.last == null){
-            st.emit('update_queue_information',0,'none','none');
-          }
+					
+					// Remove picked out students from queuedStudents array
+					for (i = 0; i < queuedStudents.length; i++) {
+						if (queuedStudents[i].socket.id == st.id) {
+							queuedStudents.splice(i, 1);
+							break;
+						}
+					}
+					
+					if(q.l_fifo_q.last == null){
+						st.emit('update_queue_information',0,'none','none');
+					}
 				});
 			}
 		}
-    socket.emit('updateQueues', lecture_1.get_queue_json());
+		socket.emit('updateQueues', lecture_1.get_queue_json());
 	});
 
   socket.on('get_queue_position', () => {

@@ -190,8 +190,6 @@
 
 		inQueue = true;
 		message = prompt("Join with message:");
-		$("#queue_name").text(qName);
-		$("#queue_message").text(message);
 
 		socket.emit('join_queue', qName, message);
 		updateQueues();
@@ -212,7 +210,11 @@
 		socket.emit('get_queue_position');
 		//socket.emit('update_queue_place', 'none');
 	}
-
+	
+	socket.on('deniedQueueJoin', function() {
+		alert("Oops! You are already in a queue it seems...");
+	});
+	
 	socket.on('updateQueues', function(queues) {
 		// Clear queues tab
 		var queueLength = document.getElementById("queues").children.length;
