@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/main.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+<body>   
+<h1>
+    Login Page
+</h1>
+<form id="login" method="POST">
+    <input type="text" autocomplete="off" id="email" placeholder="Example@gmail.com" />
+    <input type="password" autocomplete="off" id="password" placeholder="Password" />
+    <input type="submit" value="Submit Form" />
+</form>
+<ul>
+    <li><a href="/register">SignUp</a></li>
+</ul>
+<script>
+    const form = document.getElementById('login')
+    form.addEventListener('submit', loginUser)
+
+     function loginUser(event) {
+        event.preventDefault()
+        const inputmail = document.getElementById('email').value 
+        var email = inputmail.toLowerCase();    
+        const password = document.getElementById('password').value;
+    
+        if ( inputmail.length == 0  || password.length == 0) {
+            alert("Empty Fields Please enter email & password correctly!")
+            return; 
+        }
+  
+        const result =  fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                email,
+                password
+            })
+        }).then(res => {
+        // HTTP 301 response
+        // HOW CAN I FOLLOW THE HTTP REDIRECT RESPONSE?
+        if (res.redirected) {
+            window.location.href = res.url;
+        } if (res.status = 400 && res.status!= 200) {
+            alert("Wrong Login input!");
+        }
+    })
+    .catch(function(err) {
+        alert("Test err");
+        console.info(err + " url: " + url);
+    });
+    }
+    
+</script>
+
+</body>
+</html>

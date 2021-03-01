@@ -2,23 +2,27 @@
 
 // Outside requirements
 //var app = require('express')();
-const express = require('express');
-const app = express();
-var http = require('http').createServer(app);
-var io = require('socket.io')(http);
-var session = require('express-session');
-
+const express		= require('express');
+const app 			= express();
+var http 			= require('http').createServer(app);
+var io 				= require('socket.io')(http);
+var session   		= require('express-session');
+var bodyParser 		= require("body-parser");
+var cookieParser 	= require('cookie-parser');
 //db
 const MongoClient = require('mongodb').MongoClient;
 const url = "mongodb+srv://Elie:Elie123@cluster0.fhfjx.mongodb.net/mydb?retryWrites=true&w=majority"; //https://cloud.mongodb.com/v2/6020afbf25845140b0c65d17#metrics/replicaSet/6020b097ea48a608bd83ea68/explorer/mydb/Chat/find
-//const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
 
+const { Mongoose } = require('mongoose');
+//var url = "mongodb://localhost:27017/";
 
 // Own requirements
 var student = require('./student.js');
 var lecture = require('./lecture.js');
 var queue = require('./queue.js');
 var ticket = require('./ticket.js');
+var teacker = require('./teacher.js');
 
 var sessionMiddleware = session({
   secret: '=very! ¤secret# "key/',
@@ -28,7 +32,6 @@ var sessionMiddleware = session({
 });
 
 const port = 3000;
-
 
 /** Class representing a Message. */
 class Message{
@@ -40,7 +43,6 @@ class Message{
 		this.upvote = this.upvote;
 	}
 }
-
 
 const lecture_1 = new lecture.Lecture();
 lecture_1.add_queue('test');
@@ -54,13 +56,131 @@ io.use((socket, next) => {
 
 app.use(express.static('public'));
 
-app.get('/', (req, res) => {
-	res.sendFile(__dirname + '/public/indexStudent.html');
+app.get("/register", function (req, res) {
+	res.sendFile(__dirname + "/public/register.html");
 });
 
-app.get('/Teacher', (req, res) => {
-	res.sendFile(__dirname + '/public/indexTeacher.html');
+app.get('/login', (req, res) => {
+	res.sendFile(__dirname + '/public/login.html');
 });
+
+app.set('view engine', 'ejs');
+app.get('/lecture', (req, res) => {
+	client.connect( async  err => {	
+		let lect = "Inget";
+		const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
+		var db = client.db("mydb");
+		chat = await db.collection("Chat").find({roomId:lect}).toArray();
+		confused = await db.collection("Confused").find({roomId:lect}).toArray();
+		try {
+			//console.log("213789373829412432");
+			//console.log(docs);
+			res.render('lecture', {
+				'chat':chat, 
+				'lecture':lect, 
+				'confused':confused
+			})
+		} catch (error) {
+			console.log(err); 
+		} finally {
+			await client.close(); 		
+		}
+	});	
+});
+
+app.get('/student', (req, res) => {
+	res.sendFile(__dirname + '/public/indexStudent.html');
+	console.log(req.session.id);
+	console.log(lecture_1.get_student_name(req.session.id));
+});
+
+app.get('/teacher', (req, res) => {
+	res.sendFile(__dirname + '/public/indexTeacher.html');
+	//console.log(req.cookies.name);'
+	const kakan = get_cookies(req)["tss"];
+	client.connect( async  err => {	
+			const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
+			var dbo = client.db("mydb");
+			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
+			checkLogin = await dbo.collection("login").findOne({_id: kakan});
+		try {
+			if ( checkLogin != null ){
+					res.header("Set-Cookie", "tss=" + checkLogin._id);
+					//res.header("Cookie", "tss=" +  checkLogin._id);
+					res.redirect("/teacher");
+			} else { res.status(400)}
+		} catch (error) {
+			console.log(err); 
+		} finally {
+			await client.close(); 		
+		}
+	});	
+});
+
+//Login&Register stuff. 
+app.use(bodyParser.json()); // for parsing application/json	
+app.use(express.json());
+app.use(cookieParser()); 
+
+var get_cookies = function(request) {
+	var cookies = {};
+	request.headers && request.headers.cookie.split(';').forEach(function(cookie) {
+	  var parts = cookie.match(/(.*?)=(.*)$/)
+	  cookies[ parts[1].trim() ] = (parts[2] || '').trim();
+	});
+	return cookies;
+};
+
+
+//Login.
+app.post("/login",  function (req, res )  { 
+	var checkLogin = null; 
+	//connectar till databasen för att titta utifall vi kan hitta email. 
+	client.connect( async  err => {	
+			const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
+			var dbo = client.db("mydb");
+			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
+			checkLogin = await dbo.collection("login").findOne({email: req.body.email, password: req.body.password});
+		try {
+			if ( checkLogin != null ){
+					res.header("Set-Cookie", "tss=" + checkLogin._id);
+					//res.header("Cookie", "tss=" +  checkLogin._id);
+					res.redirect("/teacher");
+			} else { res.status(400).send({message: 'This is an error!'}); }
+		} catch (error) {
+			console.log(err); 
+		} finally {
+			await client.close(); 		
+		}
+	});	
+});
+
+//Registering.
+app.post("/register",  function (req, res )  { 
+	//formdatan från register sparad i emailpass. 
+	var emailpass = {email: req.body.email, password: req.body.password};
+	var checkNull = null; 
+	//connectar till databasen för att titta utifall vi kan hitta email. 
+	client.connect( async  err => {	
+			const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
+			var dbo = client.db("mydb");
+			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
+			checkNull = await dbo.collection("login").findOne({email: req.body.email});
+		try {
+			if ( checkNull == null ){
+					const insertdata = await dbo.collection("login").insertOne(emailpass);
+					console.log("banan" + insertdata);
+					res.redirect("/login");
+			} else { res.status(400).send({message: 'This is an error!'}); }
+		} catch (error) {
+			console.log(err); 
+		} finally {
+			await client.close(); 		
+		}
+	});	
+});
+
+//Get data when logged in.
 
 var questionCounter = 0;
 var memberCounter = 0;
@@ -225,8 +345,11 @@ io.on('connection', (socket) => {
 		confuseCounter--;
 		io.emit('updateConfused', confuseCounter);
 	});
-	
+
 });
+ 
+
+
 
 function confusedStop(id) {
 	io.to(id).emit("toggleConfuse");
@@ -239,6 +362,7 @@ function confusedStop(id) {
 // Logging
 const dir = "./logs/sessionID";
 var fs = require("fs");
+const { response } = require('express');
 var directoryFound = false;
 
 function appendLog(logInfo) {
@@ -264,8 +388,10 @@ function appendLog(logInfo) {
 	});
 }
 
+
 http.listen(port, () => {
 	console.log('Listening on 3000...');
+
 });
 
 
@@ -512,6 +638,67 @@ async function updateConfused(roomId, id, date) {
     } catch (err) {
 
         console.log(err);
+
+    } finally {
+
+        client.close();
+    }
+}
+
+async function getDocument(coll) {
+
+    const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  })
+        .catch(err => { console.log(err); });
+
+    if (!client) {
+        return;
+    }
+
+    try {
+
+        const db = client.db("mydb");
+
+        let collection = db.collection(coll);
+
+		let res = await collection.find({});
+
+        return res;
+
+    } catch (err) {
+
+        console.log(err);
+
+    } finally {
+
+        client.close();
+    }
+}
+
+async function addLectureToDB(ownerMail) {
+
+    const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  })
+        .catch(err => { console.log(err); });
+
+    if (!client) {
+        return;
+    }
+
+    try {
+		var date = new Date();
+        const db = client.db("mydb");
+        let collection = db.collection('Lecture');
+		let object = {
+			ownerMail: ownerMail,
+			startDate : date,
+			endDate : null
+		};
+		let res = await collection.insertOne(object)
+        return res;
+
+    } catch (err) {
+
+        console.log(err);
+
     } finally {
 
         client.close();

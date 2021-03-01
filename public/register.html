@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/main.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+<body> 
+<h1>
+    Registration: 
+</h1>
+<form id="reg-form" method="POST">
+    <input type="text" autocomplete="off" id="email" placeholder="Example@gmail.com" minlength="6" maxlength="69" />
+    <input type="password"  id="password" placeholder="Password" minlength="6" maxlength="69" />
+    <input type="password"  id="confirmpassword" placeholder="Confirm Password" minlength="6" maxlength="69" />
+    <input type="submit" value="Submit Form" />
+</form>
+<ul>
+    <li><a href="/login">login</a></li>
+</ul>
+<script>
+    const form = document.getElementById('reg-form')
+    form.addEventListener('submit', registerUser)
+
+     function registerUser(event) {
+        event.preventDefault()
+        const inputmail = document.getElementById('email').value 
+        var email = inputmail.toLowerCase();    
+        const password = document.getElementById('password').value;
+        const confirmpassword = document.getElementById('confirmpassword').value;
+
+        if ( inputmail.length == 0  || password.length == 0) {
+            alert("Empty Fields Please enter email & password correctly!")
+            return; 
+        }
+
+        if ( confirmpassword != password ){
+            alert("Passwords dont match")
+            return; 
+        }
+
+        const result =  fetch('/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                email,
+                password,
+                confirmpassword
+            })
+        }).then(res => {
+        // HTTP 301 response
+        // HOW CAN I FOLLOW THE HTTP REDIRECT RESPONSE?
+        if (res.redirected) {
+            window.location.href = res.url;
+        } if (res.status = 400 && res.status!= 200) {
+            alert("Email already in use!");
+        }
+    })
+    .catch(function(err) {
+        alert("Test err");
+        console.info(err + " url: " + url);
+    });
+    }
+</script>
+
+
+</body>
+</html>
