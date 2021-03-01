@@ -178,17 +178,27 @@
 	</div>
 
 	<script>
+	var inQueue = false;
 	updateQueues();
-												//Vart fan ska den här kallas? get_queue_position???
+
 	// --- Queues ---
 	function askJoinQueue(qName) {
+		if (inQueue) {
+			alert("You are already in a queue!");
+			return;
+		}
+
+		inQueue = true;
 		message = prompt("Join with message:");
-		/*console.log("message");
-		console.log(message);*/
 		$("#queue_name").text(qName);
 		$("#queue_message").text(message);
+
 		socket.emit('join_queue', qName, message);
 		updateQueues();
+	}
+
+	function exitQueue() {
+		inQueue = false;
 	}
 
 	function updateQueues() {
@@ -198,7 +208,6 @@
 	}
 
 	socket.on('updateQueues', function(queues) {
-		var q_count = 0;
 		// Clear queues tab
 		var queueLength = document.getElementById("queues").children.length;
 		for (i = 0; i < queueLength; i++) {
@@ -206,23 +215,24 @@
 		}
 
 		// Spawn new queues
-		for (i = 0; i < queues.length; i++) {
-			var queue_counter = document.getElementById("queues").children.size;
-			var queueElement = $("<li>").html(queues[i] +": " +
+		var tempnum = queues.length;
+		for (i = 0; i < tempnum; i++) {
+			var jsonQueue = JSON.parse(queues[i]);
+			var inQueue_counter = jsonQueue.rarr.length;
+			//var queue_counter = document.getElementById("queues").children.size;
+			var queueElement = $("<li>").html(jsonQueue.qname +": " +
 
 			// Join queue button
-			"<button type='button' id='que_button' class='btn btn-secondary' onclick='askJoinQueue(\"" +queues[i] +"\")'>Join queue"+
-			"<span class='badge badge-light'>In Q: <span id='in_queue'>0</span></span></button>"
+			"<button type='button' id='que_button' class='btn btn-secondary' onclick='askJoinQueue(\"" +jsonQueue.qname +"\")'>Join queue"+
+			"<span class='badge badge-light'>In Q: <span id='in_queue'>"+inQueue_counter+"</span></span></button>"
 
 		);
-		q_count =+ 1;
 
 		$("#queues").append(queueElement);
 		//Printing out the amount of people in the queue (does not work!!!!!)
-		//console.log(queue_counter);
 	}
-	$("#in_queue").text(queue_counter);
-	$("#queue_count").text(q_count);
+	$("#queue_count").text(tempnum);
+	//$("#in_queue").text(queue_counter);
 });
 
 // --- Reactions ---
@@ -402,6 +412,7 @@ $(function () {
 
 	socket.on('picked_out', () => {
 		alert("Your turn!");
+		inQueue = false;
 	});
 
 	socket.on('update_queue_information', function(place, qName, message) {

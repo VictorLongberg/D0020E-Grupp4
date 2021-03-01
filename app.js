@@ -180,11 +180,10 @@ io.on('connection', (socket) => {
           if(q.l_fifo_q.last == null){
             st.emit('update_queue_information',0,'none','none');
           }
-					//st.emit('update_queue_information', 'none');
 				});
-        //q.update_positions();
 			}
 		}
+    socket.emit('updateQueues', lecture_1.get_queue_json());
 	});
 
   socket.on('get_queue_position', () => {
