@@ -20,7 +20,7 @@ class Ticket {
 		if (this.entity.class_string() == "Student") {
 			ret.push(this.entity.get_socket());
 		} else {
-			// unsuported
+			ret = this.entity.get_socket_list();
 		}
 
 		return ret;

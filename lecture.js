@@ -99,6 +99,17 @@ class Lecture {
 		}
 		return ret;
 	}
+
+	get_group_by_student_id(id) {
+		for (var i = 0; i < this.groups.length; i++){
+			for (var j = 0; j < this.groups[i].member_list.length; j++){
+				if (this.groups[i].member_list[j].get_id() == id){
+					return this.groups[i];
+				}
+			}
+		}
+		return null;
+	}
 }
 
 module.exports = {Lecture};

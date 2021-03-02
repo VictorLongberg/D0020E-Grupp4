@@ -84,8 +84,14 @@ class queue {
 					message: arr[i].message
 				}
 				ret.rarr.push(ent);
-			} else {
-				console.log("not inplemented");
+			} else if (arr[i].entity.class_string() == "Group"){
+				var ent = {
+					type: "Group",
+					name: arr[i].entity.name,
+					member_list: arr[i].entity.to_json().member_list,
+					message: arr[i].message
+				}
+				ret.rarr.push(ent);
 			}
 		}
 

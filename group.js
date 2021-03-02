@@ -38,6 +38,10 @@ class Group {
 
 		return ret;
 	}
+
+	class_string(){
+		return "Group";
+	}
 }
 
 module.exports = {Group};

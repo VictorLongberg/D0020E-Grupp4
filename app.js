@@ -232,6 +232,7 @@ io.on('connection', (socket) => {
 
 	socket.on('name', (name) => {
 		lecture_1.add_student(socket.request.session.id, name, socket);
+		console.log(lecture_1.students.length);
 	});
 
 	socket.on('question', (isAnonymous, msg) => {
@@ -274,9 +275,15 @@ io.on('connection', (socket) => {
 		console.log(q);
 		console.log("parameters:", q_name, message);
 		if (q != null){
-			var stud = lecture_1.get_student_by_id(socket.request.session.id);
-			console.log(stud);
-			var n_ticket = new ticket.Ticket(0, stud, message);
+			var id = socket.request.session.id;
+			var gr = lecture_1.get_group_by_student_id(id);
+			if (gr != null){
+				var n_ticket = new ticket.Ticket(0, gr, message);
+			} else {
+				var stud = lecture_1.get_student_by_id(id);
+				//console.log(stud);
+				var n_ticket = new ticket.Ticket(0, stud, message);
+			}
 			q.add_ticket(n_ticket);
 			console.log("added ticket:\n", n_ticket);
 			console.log("json queue:\n", q.to_json());
