@@ -8,7 +8,7 @@ class Group {
 
 	get_socket_list() {
 		var ret = [];
-		for (var i = 0; i < this.member_list.lenght; i++){
+		for (var i = 0; i < this.member_list.length; i++){
 			ret.push(this.member_list[i].get_socket());
 		}
 		return ret;
@@ -19,7 +19,7 @@ class Group {
 	}
 	
 	remove_student(id) {
-		for (var i = 0; i < this.member_list.lenght; i++){
+		for (var i = 0; i < this.member_list.length; i++){
 			if (id == this.member_list[i].get_id()){
 				this.member_list.splice(i, 1);
 			}
@@ -32,7 +32,7 @@ class Group {
 			member_list: []
 		}
 
-		for (var i = 0; i < this.member_list.lenght; i++){
+		for (var i = 0; i < this.member_list.length; i++){
 			ret.member_list.push(this.member_list[i].name);
 		}
 

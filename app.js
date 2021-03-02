@@ -318,11 +318,12 @@ io.on('connection', (socket) => {
 	});
 
 	socket.on('addUserToGroup', (g_name) => {
-		var gr = lecture_1.get_queue(g_name);
-		console.log(gr);
+		var gr = lecture_1.get_group(g_name);
 		var stud = lecture_1.get_student_by_id(socket.request.session.id);
-		gr.add_student(stud);
-		console.log("group: ", gr.to_json());
+		if (gr != null && stud != null) {
+			gr.add_student(stud);
+			console.log("group: ", gr.to_json());
+		}
 	});
 
 	socket.on('answer', (questionID) => {
