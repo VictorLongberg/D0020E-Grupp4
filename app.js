@@ -281,6 +281,7 @@ io.on('connection', (socket) => {
 			console.log("added ticket:\n", n_ticket);
 			console.log("json queue:\n", q.to_json());
 		}
+		io.emit('updateQueues', lecture_1.get_queue_json());
 	});
 
 	socket.on('get_first_queue', (q_name) => {
@@ -296,6 +297,7 @@ io.on('connection', (socket) => {
 				});
 			}
 		}
+		io.emit('updateQueues', lecture_1.get_queue_json());
 	});
 	
 	socket.on('createQueue', (q_name) => {

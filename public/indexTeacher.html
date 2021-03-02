@@ -226,18 +226,26 @@
 				
 				// Spawn new queues
 				for (i = 0; i < queues.length; i++) {
-					var queueElement = $('<li>').html("<b>" +queues[i] +"</b>"
+					var jsonQueue = JSON.parse(queues[i]);
+					var queueHTML = "<b>" + jsonQueue.qname +"</b>"
+					
+					// Number of people in queue
+					+ "<br> In queue: " + jsonQueue.rarr.length;
+					
+					// People in queue + message
+					for (j = 0; j < jsonQueue.rarr.length; j++) {
+						queueHTML += "<br> Student #" + j + ": " + jsonQueue.rarr[j].name + ": " + jsonQueue.rarr[j].message;
+					}
 					
 					// Pick first in queue button
-					+ "<input type='button' onclick='pickFirst(\"" +queues[i] +"\")' value='Pick first in queue' />"
+					queueHTML += "<br> <input type='button' onclick='pickFirst(\"" +jsonQueue.qname +"\")' value='Pick first in queue' />"
 					
 					// Remove queue button
-					+ "<br> <input type='button' onclick='removeQueue(\"" +queues[i] +"\")' value='Remove queue' />"
-					
-					);
+					+ "<br> <input type='button' onclick='removeQueue(\"" +jsonQueue.qname +"\")' value='Remove queue' />";
+					var queueElement = $('<li>').html(queueHTML);
 					
 					// placeholder CSS
-					queueElement.css({"display":"block", "background-color":"rgb(3,32,64)", "color":"white", "text-align":"center", "padding":"16px", "text-decoration":"none"});
+					queueElement.css({"display":"block", "background-color":"rgb(3,32,64)", "color":"white", "text-align":"center", "margin":"3px", "padding":"16px", "text-decoration":"none"});
 					
 					$("#queues").append(queueElement);
 				}
@@ -443,7 +451,7 @@
 
 
 		socket.on('updateQueue', function(json_queue) {
-			console.log("Update queue json:", json_queue);
+			//console.log("Update queue json:", json_queue);
 
 			// code to update queue from JSON object goes here
 			//

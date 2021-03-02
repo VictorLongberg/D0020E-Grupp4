@@ -193,11 +193,24 @@
 
 			<script>
 			// --- Queues ---
+			
+			var inQueue = false;
+			
 			function askJoinQueue(qName) {
+				if (inQueue) {
+					alert("You are already in a queue!");
+					return;
+				}
+				
+				inQueue = true;
 				message = prompt("Join with message:");
 				console.log("message");
 				console.log(message);
 				socket.emit('join_queue', qName, message);
+			}
+			
+			function exitQueue() {
+				inQueue = false;
 			}
 			
 			function updateQueues() {
@@ -214,15 +227,24 @@
 				
 				// Spawn new queues
 				for (i = 0; i < queues.length; i++) {
-					var queueElement = $('<li>').html("<b>" +queues[i] +"</b>" +
+					var jsonQueue = JSON.parse(queues[i]);
+					var queueHTML = "<b>" + jsonQueue.qname +"</b>"
+					
+					// Number of people in queue
+					+ "<br> In queue: " + jsonQueue.rarr.length;
+					
+					// People in queue + message
+					for (j = 0; j < jsonQueue.rarr.length; j++) {
+						queueHTML += "<br> Student #" + j + ": " + jsonQueue.rarr[j].name + ": " + jsonQueue.rarr[j].message;
+					}
 					
 					// Join queue button
-					"<input type='button' onclick='askJoinQueue(\"" +queues[i] +"\")' value='Join queue' />"
+					queueHTML += "<br> <input type='button' onclick='askJoinQueue(\"" + jsonQueue.qname +"\")' value='Join queue' />";
 					
-					);
+					var queueElement = $('<li>').html(queueHTML);
 					
 					// placeholder CSS
-					queueElement.css({"display":"block", "background-color":"rgb(3,32,64)", "color":"white", "text-align":"center", "padding":"16px", "text-decoration":"none"});
+					queueElement.css({"display":"block", "background-color":"rgb(3,32,64)", "color":"white", "text-align":"center", "margin":"3px", "padding":"16px", "text-decoration":"none"});
 					
 					$("#queues").append(queueElement);
 				}
@@ -405,6 +427,7 @@
 
 		socket.on('picked_out', () => {
 			alert("Your turn!");
+			inQueue = false;
 		});
 
 		socket.on('update_queue_place', function(place) {

@@ -95,11 +95,10 @@ class Lecture {
 	get_queue_json() {
 		var ret = [];
 		for (var i = 0; i < this.queues.length; i++){
-			ret.push(this.queues[i].name);
+			ret.push(this.queues[i].to_json());
 		}
 		return ret;
 	}
-
 }
 
 module.exports = {Lecture};
