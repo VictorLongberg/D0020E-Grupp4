@@ -9,7 +9,7 @@ class Group {
 	get_socket_list() {
 		var ret = [];
 		for (var i = 0; i < this.member_list.lenght; i++){
-			ret.push(this.member_list[i].get_socket();
+			ret.push(this.member_list[i].get_socket());
 		}
 		return ret;
 	}
@@ -24,6 +24,19 @@ class Group {
 				this.member_list.splice(i, 1);
 			}
 		}
+	}
+
+	to_json() {
+		var ret = {
+			name: this.name,
+			member_list: []
+		}
+
+		for (var i = 0; i < this.member_list.lenght; i++){
+			ret.member_list.push(this.member_list[i].name);
+		}
+
+		return ret;
 	}
 }
 

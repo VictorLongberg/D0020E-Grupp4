@@ -32,6 +32,11 @@
 		function getName() {
 			return name;
 		}
+
+		function joinGroup() {
+			var g_name = prompt("Group name?");
+			socket.emit("addUserToGroup", g_name);
+		}
 	</script>
 
 	<title>Simple chat</title>
@@ -181,6 +186,10 @@
 					</li>
 				</ul>
 			</div>
+
+			<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="joinGroup()">
+				Join group
+			</button>
 
 			<script>
 			// --- Queues ---

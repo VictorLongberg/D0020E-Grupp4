@@ -1,5 +1,6 @@
 var student = require('./student.js');
 var queue = require('./queue.js');
+var group = require('./group.js');
 
 /** Class representing a Lecture. */
 class Lecture {
@@ -73,7 +74,9 @@ class Lecture {
 	}
 
 	get_group(name){
+		console.log("get_group():");
 		for (var i = 0; i < this.groups.length; i++){
+			console.log(this.groups[i].name);
 			if (this.groups[i].name == name){
 				return this.groups[i];
 			}

@@ -274,7 +274,7 @@ io.on('connection', (socket) => {
 		console.log(q);
 		console.log("parameters:", q_name, message);
 		if (q != null){
-			var stud = lecture_1.get_student_by_id(socket.request.session.id)
+			var stud = lecture_1.get_student_by_id(socket.request.session.id);
 			console.log(stud);
 			var n_ticket = new ticket.Ticket(0, stud, message);
 			q.add_ticket(n_ticket);
@@ -314,6 +314,15 @@ io.on('connection', (socket) => {
 
 	socket.on('createGroup', (g_name) => {
 		lecture_1.add_group(g_name);
+		console.log("groups ", lecture_1.groups);
+	});
+
+	socket.on('addUserToGroup', (g_name) => {
+		var gr = lecture_1.get_queue(g_name);
+		console.log(gr);
+		var stud = lecture_1.get_student_by_id(socket.request.session.id);
+		gr.add_student(stud);
+		console.log("group: ", gr.to_json());
 	});
 
 	socket.on('answer', (questionID) => {
