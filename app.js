@@ -95,15 +95,15 @@ app.get('/student', (req, res) => {
 });
 
 app.get('/teacher', (req, res) => {
-	if (amisafe()){
+	if (amisafe(req)){
 		res.sendFile(__dirname + '/public/indexTeacher.html');
 	} 
-	else if (!amisafe()){
+	else if (!amisafe(req)){
 		res.status(400);
 	}
 });
 
-function amisafe() {
+function amisafe(req) {
 	const kakan = get_cookies(req)["tss"]
 	if  (kakan == teacher_1.get_session()) {
 		return true;

@@ -25,6 +25,14 @@ class Teacher {
 		this.name = name;
 	}
 
+	set_session(session){
+		this.session = session;
+	}
+
+	get_session(){
+		return this.session;
+	}
+	
 	get_socket() {
 		return this.socket;
 	}
