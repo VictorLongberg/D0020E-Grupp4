@@ -9,13 +9,19 @@ var io 				= require('socket.io')(http);
 var session   		= require('express-session');
 var bodyParser 		= require("body-parser");
 var cookieParser 	= require('cookie-parser');
+
+//Login&Register stuff. 
+app.use(bodyParser.json()); // for parsing application/json	
+app.use(express.json());
+app.use(cookieParser()); 
+
+
 //db
 const MongoClient = require('mongodb').MongoClient;
 const url = "mongodb+srv://Elie:Elie123@cluster0.fhfjx.mongodb.net/mydb?retryWrites=true&w=majority"; //https://cloud.mongodb.com/v2/6020afbf25845140b0c65d17#metrics/replicaSet/6020b097ea48a608bd83ea68/explorer/mydb/Chat/find
 const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
-
 const { Mongoose } = require('mongoose');
-//var url = "mongodb://localhost:27017/";
+var ObjectID = require('mongodb').ObjectID;
 
 // Own requirements
 var student = require('./student.js');
@@ -23,6 +29,7 @@ var lecture = require('./lecture.js');
 var queue = require('./queue.js');
 var ticket = require('./ticket.js');
 
+//Session.
 var sessionMiddleware = session({
   secret: '=very! ¤secret# "key/',
   resave: false,
@@ -30,7 +37,17 @@ var sessionMiddleware = session({
   //cookie: { secure: true , maxAge : 60000}
 });
 
+//Sessions (experess-session)
+app.use(sessionMiddleware);
+
+//Express. 
+app.use(express.static('public'));
+1
 const port = 3000;
+
+io.use((socket, next) => {
+	sessionMiddleware(socket.request, {}, next);
+});
 
 /** Class representing a Message. */
 class Message{
@@ -46,15 +63,12 @@ class Message{
 const lecture_1 = new lecture.Lecture();
 lecture_1.add_queue('test');
 
-//Sessions (experess-session)
-app.use(sessionMiddleware);
+//GlobalVariables
+var questionCounter = 0;
+var memberCounter = 0;
+var confuseCounter = 0;
 
-io.use((socket, next) => {
-	sessionMiddleware(socket.request, {}, next);
-});
-
-app.use(express.static('public'));
-
+//Mappings
 app.get("/register", function (req, res) {
 	res.sendFile(__dirname + "/public/register.html");
 });
@@ -69,95 +83,112 @@ app.get('/student', (req, res) => {
 	console.log(lecture_1.get_student_name(req.session.id));
 });
 
-app.get('/teacher', (req, res) => {
-	res.sendFile(__dirname + '/public/indexTeacher.html');
-	//console.log(req.cookies.name);'
-	const kakan = get_cookies(req)["tss"];
-	client.connect( async  err => {	
-			const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
-			var dbo = client.db("mydb");
-			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
-			checkLogin = await dbo.collection("login").findOne({_id: kakan});
-		try {
-			if ( checkLogin != null ){
-					res.header("Set-Cookie", "tss=" + checkLogin._id);
-					//res.header("Cookie", "tss=" +  checkLogin._id);
-					res.redirect("/teacher");
-			} else { res.status(400)}
-		} catch (error) {
-			console.log(err); 
-		} finally {
-			await client.close(); 		
-		}
-	});	
-});
-
-//Login&Register stuff. 
-app.use(bodyParser.json()); // for parsing application/json	
-app.use(express.json());
-app.use(cookieParser()); 
-
-var get_cookies = function(request) {
-	var cookies = {};
-	request.headers && request.headers.cookie.split(';').forEach(function(cookie) {
-	  var parts = cookie.match(/(.*?)=(.*)$/)
-	  cookies[ parts[1].trim() ] = (parts[2] || '').trim();
-	});
-	return cookies;
-};
-
 
 //Login.
-app.post("/login",  function (req, res )  { 
-	var checkLogin = null; 
-	//connectar till databasen för att titta utifall vi kan hitta email. 
-	client.connect( async  err => {	
-			const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
-			var dbo = client.db("mydb");
-			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
-			checkLogin = await dbo.collection("login").findOne({email: req.body.email, password: req.body.password});
-		try {
-			if ( checkLogin != null ){
-					res.header("Set-Cookie", "tss=" + checkLogin._id);
-					//res.header("Cookie", "tss=" +  checkLogin._id);
-					res.redirect("/teacher");
-			} else { res.status(400).send({message: 'This is an error!'}); }
-		} catch (error) {
-			console.log(err); 
-		} finally {
-			await client.close(); 		
-		}
-	});	
+app.post("/login", async function (req, res) {
+	login(req, res);
 });
 
 //Registering.
-app.post("/register",  function (req, res )  { 
-	//formdatan från register sparad i emailpass. 
-	var emailpass = {email: req.body.email, password: req.body.password};
-	var checkNull = null; 
-	//connectar till databasen för att titta utifall vi kan hitta email. 
-	client.connect( async  err => {	
-			const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
-			var dbo = client.db("mydb");
-			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
-			checkNull = await dbo.collection("login").findOne({email: req.body.email});
-		try {
-			if ( checkNull == null ){
-					const insertdata = await dbo.collection("login").insertOne(emailpass);
-					console.log("banan" + insertdata);
-					res.redirect("/login");
-			} else { res.status(400).send({message: 'This is an error!'}); }
-		} catch (error) {
-			console.log(err); 
-		} finally {
-			await client.close(); 		
-		}
-	});	
+app.post("/register", async function (req, res) {
+	register(req, res);
 });
 
-var questionCounter = 0;
-var memberCounter = 0;
-var confuseCounter = 0;
+app.get('/teacher', (req, res) => {
+	//amisafe(req);
+	//var authenticated = amisafe(req);
+	amisafe(req).then(authenticated => {
+		if (authenticated) {
+			console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+			console.log(authenticated);
+			console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+			res.sendFile(__dirname + '/public/indexTeacher.html');
+		} if (!authenticated) {
+			console.log("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
+			console.log(authenticated);
+			console.log("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
+			res.redirect("/register");
+		}
+	});
+})
+
+//funktion for authentication. 
+function amisafe(req, res) {
+	const kakan = get_cookies(req)["tss"];
+
+	client.connect;
+	//const client = MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
+	//var dbo = client.db("mydb");
+	console.log("{_id: kakan}");
+	console.log({ _id: kakan });
+
+	var o_id = new ObjectID(kakan);
+	console.log("o_id");
+	console.log(o_id);
+	client.db("mydb").collection("login").findOne({ "_id": o_id }).then(function (checkLogin) {
+		if (checkLogin != null) {
+			res.sendFile(__dirname + '/public/indexTeacher.html');
+		} else {
+			res.redirect("/register");
+		}
+		// })
+		// .catch(() => {
+		// 	console.log("err");
+	}).finally(() => {
+		client.close();
+	});
+};
+
+
+//Functions for logging and register.
+
+var get_cookies = function (request) {
+	var cookies = {};
+	request.headers && request.headers.cookie.split(';').forEach(function (cookie) {
+		var parts = cookie.match(/(.*?)=(.*)$/);
+		cookies[parts[1].trim()] = (parts[2] || '').trim();
+	});
+	return cookies;
+}
+
+function login(req, res) {
+	client.connect(async err => {
+		const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
+		var dbo = client.db("mydb");
+		dbo.collection("login").findOne({ email: req.body.email, password: req.body.password }).then(checkLogin => {
+			try {
+				if (checkLogin != null) {	
+					res.header("Set-Cookie", "tss=" + checkLogin._id);
+					res.redirect("/teacher");
+				} else { res.status(400).send({ message: 'This is an error!' }); }
+			} catch (error) {
+				console.log(err);
+			} finally {
+				client.close();
+			}
+		});
+	});
+}
+
+function register(req, res) {
+	var checkNull = null;
+	client.connect(async err => {
+		const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
+		var dbo = client.db("mydb");
+		checkNull = await dbo.collection("login").findOne({ email: req.body.email });
+		try {
+			if (checkNull == null) {
+				const insertdata = await dbo.collection("login").insertOne({ email: req.body.email, password: req.body.password });
+				console.log("banan" + insertdata);
+				res.redirect("/login");
+			} else { res.status(400).send({ message: 'This is an error!' }); }
+		} catch (error) {
+			console.log(err);
+		} finally {
+			client.close();
+		}
+	});
+}
 
 io.on('connection', (socket) => {
 	memberCounter++;
@@ -339,7 +370,6 @@ function appendLog(logInfo) {
 
 http.listen(port, () => {
 	console.log('Listening on 3000...');
-
 });
 
 
