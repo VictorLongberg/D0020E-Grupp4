@@ -102,6 +102,22 @@ class Lecture {
 		}
 		return ret;
 	}
+
+	get_group_names_json() {
+		var ret = [];
+		for (var i = 0; i < this.groups.length; i++){
+			ret.push(this.groups[i].name);
+		}
+		return ret;
+	}
+
+	get_groups_json() {
+		var ret = [];
+		for (var i = 0; i < this.groups.length; i++){
+			ret.push(this.groups[i].to_json());
+		}
+		return ret;
+	}
 	
 	get_group_by_student_id(id) {
 		for (var i = 0; i < this.groups.length; i++){

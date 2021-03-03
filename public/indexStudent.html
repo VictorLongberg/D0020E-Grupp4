@@ -302,6 +302,10 @@
 	socket.on('deniedQueueJoin', function() {
 		alert("Oops! You are already in a queue it seems...");
 	});
+
+	socket.on('updateGroupNames', function(groups) {
+		// gets group namess
+	});
 	
 	socket.on('updateQueues', function(queues) {
 		// Clear queues tab

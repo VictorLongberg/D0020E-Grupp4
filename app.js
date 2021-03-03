@@ -393,6 +393,7 @@ io.on('connection', (socket) => {
 	socket.on('createGroup', (g_name) => {
 		lecture_1.add_group(g_name);
 		console.log("groups ", lecture_1.groups);
+		io.emit('updateGroupNames', lecture_1.get_group_names_json());
 	});
 
 	socket.on('addUserToGroup', (g_name) => {
@@ -402,6 +403,7 @@ io.on('connection', (socket) => {
 			gr.add_student(stud);
 			console.log("group: ", gr.to_json());
 		}
+		io.emit('updateGroups', lecture_1.get_groups_json());
 	});
 	
 	socket.on('answer', (questionID) => {

@@ -525,6 +525,10 @@ $(function () {
 	socket.on('updateConfused', function(confuseNum) {
 		$("#confusedCount").text(confuseNum);
 	});
+
+	socket.on('updateGroups', function(groups) {
+		// gets groups and the names of who are in them 
+	});
 });
 </script>
 <div class="footer">
