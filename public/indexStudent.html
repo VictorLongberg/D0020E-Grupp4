@@ -264,11 +264,12 @@
 			setTimeout(confuseCoolDownDone, 3050);
 			socket.emit('removeConfused');
 		}
-
-	var inQueue = false;
-	updateQueues();
+	}
 
 	// --- Queues ---
+	var inQueue = false;
+	updateQueues();
+	
 	function askJoinQueue(qName) {
 		if (inQueue) {
 			alert("You are already in a queue!");
