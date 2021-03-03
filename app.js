@@ -10,19 +10,17 @@ var session   		= require('express-session');
 var bodyParser 		= require("body-parser");
 var cookieParser 	= require('cookie-parser');
 //db
-const MongoClient = require('mongodb').MongoClient;
-const url = "mongodb+srv://Elie:Elie123@cluster0.fhfjx.mongodb.net/mydb?retryWrites=true&w=majority"; //https://cloud.mongodb.com/v2/6020afbf25845140b0c65d17#metrics/replicaSet/6020b097ea48a608bd83ea68/explorer/mydb/Chat/find
-const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
-
-const { Mongoose } = require('mongoose');
-//var url = "mongodb://localhost:27017/";
+const MongoClient 	= require('mongodb').MongoClient;
+const url 			= "mongodb+srv://Elie:Elie123@cluster0.fhfjx.mongodb.net/mydb?retryWrites=true&w=majority"; //https://cloud.mongodb.com/v2/6020afbf25845140b0c65d17#metrics/replicaSet/6020b097ea48a608bd83ea68/explorer/mydb/Chat/find
+const client		= new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+const { Mongoose } 	= require('mongoose');
 
 // Own requirements
 var student = require('./student.js');
 var lecture = require('./lecture.js');
 var queue = require('./queue.js');
 var ticket = require('./ticket.js');
-var teacker = require('./teacher.js');
+var teacher = require('./teacher.js');
 
 var sessionMiddleware = session({
   secret: '=very! ¤secret# "key/',
@@ -46,6 +44,7 @@ class Message{
 
 const lecture_1 = new lecture.Lecture();
 lecture_1.add_queue('test');
+const teacher_1 = new teacher.Teacher();
 
 //Sessions (experess-session)
 app.use(sessionMiddleware);
@@ -65,6 +64,7 @@ app.get('/login', (req, res) => {
 });
 
 app.set('view engine', 'ejs');
+
 app.get('/lecture', (req, res) => {
 	client.connect( async  err => {	
 		let lect = "Inget";
@@ -95,27 +95,22 @@ app.get('/student', (req, res) => {
 });
 
 app.get('/teacher', (req, res) => {
-	res.sendFile(__dirname + '/public/indexTeacher.html');
-	//console.log(req.cookies.name);'
-	const kakan = get_cookies(req)["tss"];
-	client.connect( async  err => {	
-			const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
-			var dbo = client.db("mydb");
-			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
-			checkLogin = await dbo.collection("login").findOne({_id: kakan});
-		try {
-			if ( checkLogin != null ){
-					res.header("Set-Cookie", "tss=" + checkLogin._id);
-					//res.header("Cookie", "tss=" +  checkLogin._id);
-					res.redirect("/teacher");
-			} else { res.status(400)}
-		} catch (error) {
-			console.log(err); 
-		} finally {
-			await client.close(); 		
-		}
-	});	
+	if (amisafe()){
+		res.sendFile(__dirname + '/public/indexTeacher.html');
+	} 
+	else if (!amisafe()){
+		res.status(400);
+	}
 });
+
+function amisafe() {
+	const kakan = get_cookies(req)["tss"]
+	if  (kakan == teacher_1.get_session()) {
+		return true;
+	} else {
+		return false;
+	}
+}
 
 //Login&Register stuff. 
 app.use(bodyParser.json()); // for parsing application/json	
@@ -143,9 +138,11 @@ app.post("/login",  function (req, res )  {
 			checkLogin = await dbo.collection("login").findOne({email: req.body.email, password: req.body.password});
 		try {
 			if ( checkLogin != null ){
-					res.header("Set-Cookie", "tss=" + checkLogin._id);
-					//res.header("Cookie", "tss=" +  checkLogin._id);
-					res.redirect("/teacher");
+				teacher_1.set_session(checkLogin._id);
+				teacher_1.set_name(req.body.email);
+				res.header("Set-Cookie", "tss=" + checkLogin._id);
+					//teacher.set_socket(socket.request.session.id);
+				res.redirect("/teacher");
 			} else { res.status(400).send({message: 'This is an error!'}); }
 		} catch (error) {
 			console.log(err); 
@@ -440,7 +437,7 @@ io.on('connection', (socket) => {
 
 function confusedStop(id) {
 	io.to(id).emit("toggleConfuse");
-}
+}	
 
 
 // Logging (WILL PROBABLY BE HANDLED VIA DATABASE INSTEAD)
@@ -478,7 +475,6 @@ function appendLog(logInfo) {
 
 http.listen(port, () => {
 	console.log('Listening on 3000...');
-
 });
 
 
