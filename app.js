@@ -391,6 +391,7 @@ io.on('connection', (socket) => {
 		lecture_1.add_group(g_name);
 		console.log("groups ", lecture_1.groups);
 		io.emit('updateGroupNames', lecture_1.get_group_names_json());
+		io.emit('updateGroups', lecture_1.get_groups_json());
 	});
 
 	socket.on('addUserToGroup', (g_name) => {
