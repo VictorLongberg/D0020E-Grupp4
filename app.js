@@ -28,6 +28,7 @@ var student = require('./student.js');
 var lecture = require('./lecture.js');
 var queue = require('./queue.js');
 var ticket = require('./ticket.js');
+var teacker = require('./teacher.js');
 
 //Session.
 var sessionMiddleware = session({
@@ -63,18 +64,37 @@ class Message{
 const lecture_1 = new lecture.Lecture();
 lecture_1.add_queue('test');
 
-//GlobalVariables
-var questionCounter = 0;
-var memberCounter = 0;
-var confuseCounter = 0;
-
 //Mappings
 app.get("/register", function (req, res) {
 	res.sendFile(__dirname + "/public/register.html");
 });
 
-  app.get('/login', (req, res) => {
+app.get('/login', (req, res) => {
 	res.sendFile(__dirname + '/public/login.html');
+});
+
+app.set('view engine', 'ejs');
+app.get('/lecture', (req, res) => {
+	client.connect( async  err => {	
+		let lect = "Inget";
+		const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
+		var db = client.db("mydb");
+		chat = await db.collection("Chat").find({roomId:lect}).toArray();
+		confused = await db.collection("Confused").find({roomId:lect}).toArray();
+		try {
+			//console.log("213789373829412432");
+			//console.log(docs);
+			res.render('lecture', {
+				'chat':chat, 
+				'lecture':lect, 
+				'confused':confused
+			})
+		} catch (error) {
+			console.log(err); 
+		} finally {
+			await client.close(); 		
+		}
+	});	
 });
 
 app.get('/student', (req, res) => {
@@ -187,8 +207,16 @@ function register(req, res) {
 		} finally {
 			client.close();
 		}
-	});
+
+	});	
 }
+
+//Get data when logged in.
+
+var questionCounter = 0;
+var memberCounter = 0;
+var confuseCounter = 0;
+
 
 io.on('connection', (socket) => {
 	memberCounter++;
@@ -611,6 +639,66 @@ async function updateConfused(roomId, id, date) {
         
 		let res = await collection.updateOne({roomId:roomId, id:id},{$push: {confusion:confusedObj}});
 
+        return res;
+
+    } catch (err) {
+
+        console.log(err);
+
+    } finally {
+
+        client.close();
+    }
+}
+
+async function getDocument(coll) {
+
+    const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  })
+        .catch(err => { console.log(err); });
+
+    if (!client) {
+        return;
+    }
+
+    try {
+
+        const db = client.db("mydb");
+
+        let collection = db.collection(coll);
+
+		let res = await collection.find({});
+
+        return res;
+
+    } catch (err) {
+
+        console.log(err);
+
+    } finally {
+
+        client.close();
+    }
+}
+
+async function addLectureToDB(ownerMail) {
+
+    const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  })
+        .catch(err => { console.log(err); });
+
+    if (!client) {
+        return;
+    }
+
+    try {
+		var date = new Date();
+        const db = client.db("mydb");
+        let collection = db.collection('Lecture');
+		let object = {
+			ownerMail: ownerMail,
+			startDate : date,
+			endDate : null
+		};
+		let res = await collection.insertOne(object)
         return res;
 
     } catch (err) {
