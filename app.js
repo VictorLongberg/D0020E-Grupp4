@@ -186,13 +186,29 @@ var questionCounter = 0;
 var memberCounter = 0;
 var confuseCounter = 0;
 
+var queuedStudents = [];
+
 io.on('connection', (socket) => {
 	memberCounter++;
 	console.log('user connected, total users: ' +memberCounter);
+	
+	// If reconnected student, update socket
+	if (lecture_1.get_student_by_id(socket.request.session.id)) { 					// false if null
+		lecture_1.get_student_by_id(socket.request.session.id).socket = socket;
+	}
 
 	socket.on('disconnect', () => {
 		memberCounter--;
 		console.log('user disconnected, total users: ' +memberCounter);
+		
+		// If disconnected person was in a queue, remove them (NEEDS SUPPORT FROM FIFO_QUEUE)
+		/* for (i = 0; i < queuedStudents.length; i++) {
+			if (queuedStudents[i] == socket.id) {
+				console.log("queuer disconnected: " +socket.id);
+				queuedStudents.splice(i, 1);
+				return;
+			}
+		} */
 	});
 
 	socket.on('chat message', (isAnonymous, msg, date) => {
@@ -203,15 +219,15 @@ io.on('connection', (socket) => {
             name = lecture_1.get_student_name(socket.request.session.id);
         }
         io.emit('chat message', name, msg, date.valueOf());
-        
+
         var logInfo = "Chat by: " +name +":" +msg;
-        
+
         if (date.getHours() < 10) {
             logInfo += " - 0" +date.getHours();
         } else {
             logInfo += " - " +date.getHours();
         }
-        
+
         if (date.getMinutes() < 10) {
             logInfo += ":0" +date.getMinutes();
         } else {
@@ -243,7 +259,7 @@ io.on('connection', (socket) => {
 			name = lecture_1.get_student_name(socket.request.session.id);
 		}
 		io.emit('question', name, msg, questionCounter, date.valueOf());
-		
+
 		var logInfo = "Question #" +questionCounter +" by: " +name +":" +msg;
 
 		if (date.getHours() < 10) {
@@ -257,7 +273,7 @@ io.on('connection', (socket) => {
 		} else {
 			logInfo += ":" +date.getMinutes();
 		}
-		
+
 		addQuestion(roomId="Inget",id=questionCounter,name=name,question=msg,date=date, upvote=0);
 		appendLog(logInfo);
 		questionCounter++;
@@ -272,10 +288,11 @@ io.on('connection', (socket) => {
 
 	socket.on('join_queue', (q_name, message) => {
 		var q = lecture_1.get_queue(q_name);
-		console.log(q);
-		console.log("parameters:", q_name, message);
+		//console.log("parameters:", q_name, message);
 		if (q != null){
 			var id = socket.request.session.id;
+			
+			// Group joining queue
 			var gr = lecture_1.get_group_by_student_id(id);
 			if (gr != null){
 				var n_ticket = new ticket.Ticket(0, gr, message);
@@ -284,9 +301,24 @@ io.on('connection', (socket) => {
 				//console.log(stud);
 				var n_ticket = new ticket.Ticket(0, stud, message);
 			}
+			
+			// Checking if student is already queued
+			// !!! (Probably not compatible with groups right now) !!!
+			var stud = lecture_1.get_student_by_id(id);
+			
+			for (i = 0; i < queuedStudents.length; i++) {
+				if (queuedStudents[i] == stud) {
+					console.log("already queued, denying " +stud.socket.id);
+					io.to(stud.socket.id).emit("deniedQueueJoin");
+					return;
+				}
+			}
+			
+			queuedStudents.push(stud);
+			
 			q.add_ticket(n_ticket);
-			console.log("added ticket:\n", n_ticket);
-			console.log("json queue:\n", q.to_json());
+			//console.log("added ticket:\n", n_ticket);
+			//console.log("json queue:\n", q.to_json());
 		}
 		io.emit('updateQueues', lecture_1.get_queue_json());
 	});
@@ -300,23 +332,60 @@ io.on('connection', (socket) => {
 				let sl = tick.get_socketlist();
 				sl.forEach((st) => {
 					st.emit('picked_out');
-					st.emit('update_queue_place', 'none');
+					
+					// Remove picked out students from queuedStudents array
+					for (i = 0; i < queuedStudents.length; i++) {
+						if (queuedStudents[i].socket.id == st.id) {
+							queuedStudents.splice(i, 1);
+							break;
+						}
+					}
+					
+					if(q.l_fifo_q.last == null){
+						st.emit('update_queue_information',0,'none','none');
+					}
 				});
 			}
 		}
 		io.emit('updateQueues', lecture_1.get_queue_json());
 	});
-	
+
+  socket.on('get_queue_position', () => {
+		var queues = lecture_1.get_all_queues();
+    if(queues.length != 0){
+      queues.forEach((queue) => {
+        var n = 1;
+    		var s = queue.l_fifo_q.last;
+        var qName = queue.name;
+        //console.log(s);
+    		while (s != null) {
+    			let sl = s.value.get_socketlist();
+    			sl.forEach((i) => {
+            var message = s.value.message;
+            var studid = i.request.session.id;
+            console.log("socket id: " + socket.request.session.id);
+            console.log("studid: " + studid);
+            if(socket.request.session.id == studid){
+              socket.emit('update_queue_information', n, qName, message);
+            }
+    			});
+    			n++;
+    			s = s.prev;
+    		}
+      });
+    }
+	});
+
 	socket.on('createQueue', (q_name) => {
 		var q = lecture_1.add_queue(q_name);
 		io.emit('updateQueues', lecture_1.get_queue_json());
 	});
-	
+
 	socket.on('removeQueue', (q_name) => {
 		var q = lecture_1.remove_queue(q_name);
 		io.emit('updateQueues', lecture_1.get_queue_json());
 	});
-	
+
 	socket.on('updateQueues', () => {
 		io.emit('updateQueues', lecture_1.get_queue_json());
 	});
@@ -334,14 +403,13 @@ io.on('connection', (socket) => {
 			console.log("group: ", gr.to_json());
 		}
 	});
-
+	
 	socket.on('answer', (questionID) => {
 		console.log('question ' +questionID +' was answered');
 		io.emit('answer', questionID);
 	});
-	
+
 	socket.on('reactConfused', () => {
-		var date = new Date();
 		confuseCounter++;
 		io.emit('updateConfused', confuseCounter);
 		var id = socket.id;
@@ -356,7 +424,7 @@ io.on('connection', (socket) => {
 				updateConfused(roomId="Inget", socket.request.session.id, date=date);
 			}
 		 })
-		
+
 		setTimeout(confusedStop, 3000, id);
 	});
 
@@ -376,7 +444,7 @@ function confusedStop(id) {
 
 
 // Logging (WILL PROBABLY BE HANDLED VIA DATABASE INSTEAD)
-		
+
 
 // Logging
 const dir = "./logs/sessionID";
@@ -461,10 +529,10 @@ async function addMessage(roomId, id, name, date, msg, date){
         let collection = db.collection('Chat');
 
         let object = {
-            roomId:roomId, 
-            id:id, 
-            name:name, 
-            date:date, 
+            roomId:roomId,
+            id:id,
+            name:name,
+            date:date,
             message:[{ message: msg, date: date }]
         };
 
@@ -494,7 +562,7 @@ async function updateMessage(roomId, id, msg, date){
         const db = client.db("mydb");
 
         let collection = db.collection('Chat');
-		
+
 		let messageObj = {message: msg, date: date};
         let res = await collection.updateOne({id:id, roomId:roomId}, {$push: {message:messageObj}});
 
@@ -525,11 +593,11 @@ async function addQuestion(roomId, id, name, question, date, upvote){
         let collection = db.collection('Question');
 
 		let object = {
-            roomId:roomId, 
-            id:id, 
+            roomId:roomId,
+            id:id,
             name:name,
-            question:question, 
-            date:date, 
+            question:question,
+            date:date,
             upvote:upvote
         };
 
@@ -587,7 +655,7 @@ async function addConfused(roomId, id, date){
         let collection = db.collection('Confused');
 
 		let object = {
-            roomId:roomId, 
+            roomId:roomId,
             id:id,
             confusion:[{confused:1, date,date}]
         };
@@ -647,9 +715,9 @@ async function updateConfused(roomId, id, date) {
         const db = client.db("mydb");
 
         let collection = db.collection('Confused');
-		
+
 		let confusedObj = {confused:1, date,date};
-        
+
 		let res = await collection.updateOne({roomId:roomId, id:id},{$push: {confusion:confusedObj}});
 
         return res;

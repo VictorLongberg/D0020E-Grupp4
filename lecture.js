@@ -53,6 +53,9 @@ class Lecture {
 		return null;
 	}
 
+	get_all_queues(){
+		return this.queues;
+	}
 
 	add_queue(name){
 		var queue_e = this.get_queue(name);
@@ -99,7 +102,7 @@ class Lecture {
 		}
 		return ret;
 	}
-
+	
 	get_group_by_student_id(id) {
 		for (var i = 0; i < this.groups.length; i++){
 			for (var j = 0; j < this.groups[i].member_list.length; j++){

@@ -78,6 +78,39 @@ Skriver över lite bootstrap css för att få önskad funktion
   height:20%;
 }
 
+.dropdown-menu{
+  background-color: rgb(3,32,64);
+}
+
+#queue_dropdown{
+  display:inline;
+  color:white;
+  text-align:left;
+}
+
+#queue_info{
+  color:white;
+  background-color: rgb(3,32,64);
+}
+
+#queues{
+  color:white;
+  margin-left:5px;
+  margin-right:5px;
+  padding-left: 0px;
+  text-align: left;
+  font-weight: bold;
+}
+
+#que_button{
+  margin:0;
+}
+
+#invert_buttons{
+  background-color: white;
+  color: rgb(3,32,64);
+}
+
 /* Memes */
 .clock {
   width: 260px;
