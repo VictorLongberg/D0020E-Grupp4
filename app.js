@@ -2,18 +2,23 @@
 
 // Outside requirements
 //var app = require('express')();
-const express		= require('express');
-const app 			= express();
-var http 			= require('http').createServer(app);
-var io 				= require('socket.io')(http);
-var session   		= require('express-session');
-var bodyParser 		= require("body-parser");
-var cookieParser 	= require('cookie-parser');
+const express = require('express');
+const app = express();
+var http = require('http').createServer(app);
+var io = require('socket.io')(http);
+var session = require('express-session');
+var bodyParser = require("body-parser");
+var cookieParser = require('cookie-parser');
 //db
-const MongoClient 	= require('mongodb').MongoClient;
-const url 			= "mongodb+srv://Elie:Elie123@cluster0.fhfjx.mongodb.net/mydb?retryWrites=true&w=majority"; //https://cloud.mongodb.com/v2/6020afbf25845140b0c65d17#metrics/replicaSet/6020b097ea48a608bd83ea68/explorer/mydb/Chat/find
-const client		= new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
-const { Mongoose } 	= require('mongoose');
+const MongoClient = require('mongodb').MongoClient;
+const url = "mongodb+srv://Elie:Elie123@cluster0.fhfjx.mongodb.net/mydb?retryWrites=true&w=majority"; //https://cloud.mongodb.com/v2/6020afbf25845140b0c65d17#metrics/replicaSet/6020b097ea48a608bd83ea68/explorer/mydb/Chat/find
+const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+const { Mongoose } = require('mongoose');
+
+//Login&Register stuff. 
+app.use(bodyParser.json()); // for parsing application/json	
+app.use(express.json());
+app.use(cookieParser());
 
 // Own requirements
 var student = require('./student.js');
@@ -23,17 +28,17 @@ var ticket = require('./ticket.js');
 var teacher = require('./teacher.js');
 
 var sessionMiddleware = session({
-  secret: '=very! ¤secret# "key/',
-  resave: false,
-  saveUninitialized: true,
-  //cookie: { secure: true , maxAge : 60000}
+	secret: '=very! ¤secret# "key/',
+	resave: false,
+	saveUninitialized: true,
+	//cookie: { secure: true , maxAge : 60000}
 });
 
 const port = 3000;
 
 /** Class representing a Message. */
-class Message{
-	constructor(name, content, time, type){
+class Message {
+	constructor(name, content, time, type) {
 		this.name = name;
 		this.content = content;
 		this.time = time;
@@ -41,6 +46,16 @@ class Message{
 		this.upvote = this.upvote;
 	}
 }
+
+//Global variables!
+//Get data when logged in.
+
+var questionCounter = 0;
+var memberCounter = 0;
+var confuseCounter = 0;
+
+var queuedStudents = [];
+
 
 const lecture_1 = new lecture.Lecture();
 lecture_1.add_queue('test');
@@ -53,6 +68,8 @@ io.use((socket, next) => {
 	sessionMiddleware(socket.request, {}, next);
 });
 
+app.set('view engine', 'ejs');
+
 app.use(express.static('public'));
 
 app.get("/register", function (req, res) {
@@ -63,29 +80,8 @@ app.get('/login', (req, res) => {
 	res.sendFile(__dirname + '/public/login.html');
 });
 
-app.set('view engine', 'ejs');
-
 app.get('/lecture', (req, res) => {
-	client.connect( async  err => {	
-		let lect = "Inget";
-		const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
-		var db = client.db("mydb");
-		chat = await db.collection("Chat").find({roomId:lect}).toArray();
-		confused = await db.collection("Confused").find({roomId:lect}).toArray();
-		try {
-			//console.log("213789373829412432");
-			//console.log(docs);
-			res.render('lecture', {
-				'chat':chat, 
-				'lecture':lect, 
-				'confused':confused
-			})
-		} catch (error) {
-			console.log(err); 
-		} finally {
-			await client.close(); 		
-		}
-	});	
+	lecture(res);
 });
 
 app.get('/student', (req, res) => {
@@ -95,100 +91,117 @@ app.get('/student', (req, res) => {
 });
 
 app.get('/teacher', (req, res) => {
-	if (amisafe(req)){
+	if (amisafe(req)) {
 		res.sendFile(__dirname + '/public/indexTeacher.html');
-	} 
-	else if (!amisafe(req)){
+	}
+	else if (!amisafe(req)) {
 		res.status(400);
 	}
 });
 
+//Login.
+app.post("/login", function (req, res) {
+	login(req);
+});
+
+//Registering.
+app.post("/register", function (req, res) {
+	register(req);
+});
+
+function lecture(res) {
+	client.connect(async err => {
+		let lect = "Inget";
+		const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
+		var db = client.db("mydb");
+		chat = await db.collection("Chat").find({ roomId: lect }).toArray();
+		confused = await db.collection("Confused").find({ roomId: lect }).toArray();
+		try {
+			//console.log("213789373829412432");
+			//console.log(docs);
+			res.render('lecture', {
+				'chat': chat,
+				'lecture': lect,
+				'confused': confused
+			})
+		} catch (error) {
+			console.log(err);
+		} finally {
+			await client.close();
+		}
+	});
+}
+
+function login(req) {
+	var checkLogin = null;
+	//connectar till databasen för att titta utifall vi kan hitta email. 
+	client.connect(async err => {
+		const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
+		var dbo = client.db("mydb");
+		//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
+		checkLogin = await dbo.collection("login").findOne({ email: req.body.email, password: req.body.password });
+		try {
+			if (checkLogin != null) {
+				teacher_1.set_session(checkLogin._id);
+				teacher_1.set_name(req.body.email);
+				res.header("Set-Cookie", "tss=" + checkLogin._id);
+				//teacher.set_socket(socket.request.session.id);
+				res.redirect("/teacher");
+			} else { res.status(400).send({ message: 'This is an error!' }); }
+		} catch (error) {
+			console.log(err);
+		} finally {
+			await client.close();
+		}
+	});
+}
+
+function register(req) {
+	//formdatan från register sparad i emailpass. 
+	var emailpass = { email: req.body.email, password: req.body.password };
+	var checkNull = null;
+	//connectar till databasen för att titta utifall vi kan hitta email. 
+	client.connect(async err => {
+		const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
+		var dbo = client.db("mydb");
+		//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
+		checkNull = await dbo.collection("login").findOne({ email: req.body.email });
+		try {
+			if (checkNull == null) {
+				const insertdata = await dbo.collection("login").insertOne(emailpass);
+				console.log("banan" + insertdata);
+				res.redirect("/login");
+			} else { res.status(400).send({ message: 'This is an error!' }); }
+		} catch (error) {
+			console.log(err);
+		} finally {
+			await client.close();
+		}
+	});
+}
+
 function amisafe(req) {
 	const kakan = get_cookies(req)["tss"]
-	if  (kakan == teacher_1.get_session()) {
+	if (kakan == teacher_1.get_session()) {
 		return true;
 	} else {
 		return false;
 	}
 }
 
-//Login&Register stuff. 
-app.use(bodyParser.json()); // for parsing application/json	
-app.use(express.json());
-app.use(cookieParser()); 
-
-var get_cookies = function(request) {
+var get_cookies = function (request) {
 	var cookies = {};
-	request.headers && request.headers.cookie.split(';').forEach(function(cookie) {
-	  var parts = cookie.match(/(.*?)=(.*)$/)
-	  cookies[ parts[1].trim() ] = (parts[2] || '').trim();
+	request.headers && request.headers.cookie.split(';').forEach(function (cookie) {
+		var parts = cookie.match(/(.*?)=(.*)$/)
+		cookies[parts[1].trim()] = (parts[2] || '').trim();
 	});
 	return cookies;
 };
 
-
-//Login.
-app.post("/login",  function (req, res )  { 
-	var checkLogin = null; 
-	//connectar till databasen för att titta utifall vi kan hitta email. 
-	client.connect( async  err => {	
-			const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
-			var dbo = client.db("mydb");
-			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
-			checkLogin = await dbo.collection("login").findOne({email: req.body.email, password: req.body.password});
-		try {
-			if ( checkLogin != null ){
-				teacher_1.set_session(checkLogin._id);
-				teacher_1.set_name(req.body.email);
-				res.header("Set-Cookie", "tss=" + checkLogin._id);
-					//teacher.set_socket(socket.request.session.id);
-				res.redirect("/teacher");
-			} else { res.status(400).send({message: 'This is an error!'}); }
-		} catch (error) {
-			console.log(err); 
-		} finally {
-			await client.close(); 		
-		}
-	});	
-});
-
-//Registering.
-app.post("/register",  function (req, res )  { 
-	//formdatan från register sparad i emailpass. 
-	var emailpass = {email: req.body.email, password: req.body.password};
-	var checkNull = null; 
-	//connectar till databasen för att titta utifall vi kan hitta email. 
-	client.connect( async  err => {	
-			const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
-			var dbo = client.db("mydb");
-			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
-			checkNull = await dbo.collection("login").findOne({email: req.body.email});
-		try {
-			if ( checkNull == null ){
-					const insertdata = await dbo.collection("login").insertOne(emailpass);
-					console.log("banan" + insertdata);
-					res.redirect("/login");
-			} else { res.status(400).send({message: 'This is an error!'}); }
-		} catch (error) {
-			console.log(err); 
-		} finally {
-			await client.close(); 		
-		}
-	});	
-});
-
-//Get data when logged in.
-
-var questionCounter = 0;
-var memberCounter = 0;
-var confuseCounter = 0;
-
-var queuedStudents = [];
-
 io.on('connection', (socket) => {
 	memberCounter++;
-	console.log('user connected, total users: ' +memberCounter);
-	
+	console.log('user connected, total users: ' + memberCounter);
+
 	// If reconnected student, update socket
 	if (lecture_1.get_student_by_id(socket.request.session.id)) { 					// false if null
 		lecture_1.get_student_by_id(socket.request.session.id).socket = socket;
@@ -196,8 +209,8 @@ io.on('connection', (socket) => {
 
 	socket.on('disconnect', () => {
 		memberCounter--;
-		console.log('user disconnected, total users: ' +memberCounter);
-		
+		console.log('user disconnected, total users: ' + memberCounter);
+
 		// If disconnected person was in a queue, remove them (NEEDS SUPPORT FROM FIFO_QUEUE)
 		/* for (i = 0; i < queuedStudents.length; i++) {
 			if (queuedStudents[i] == socket.id) {
@@ -209,39 +222,39 @@ io.on('connection', (socket) => {
 	});
 
 	socket.on('chat message', (isAnonymous, msg, date) => {
-        var date = new Date();
-        if (isAnonymous){
-            name = "Anonymous";
-        } else {
-            name = lecture_1.get_student_name(socket.request.session.id);
-        }
-        io.emit('chat message', name, msg, date.valueOf());
+		var date = new Date();
+		if (isAnonymous) {
+			name = "Anonymous";
+		} else {
+			name = lecture_1.get_student_name(socket.request.session.id);
+		}
+		io.emit('chat message', name, msg, date.valueOf());
 
-        var logInfo = "Chat by: " +name +":" +msg;
+		var logInfo = "Chat by: " + name + ":" + msg;
 
-        if (date.getHours() < 10) {
-            logInfo += " - 0" +date.getHours();
-        } else {
-            logInfo += " - " +date.getHours();
-        }
+		if (date.getHours() < 10) {
+			logInfo += " - 0" + date.getHours();
+		} else {
+			logInfo += " - " + date.getHours();
+		}
 
-        if (date.getMinutes() < 10) {
-            logInfo += ":0" +date.getMinutes();
-        } else {
-            logInfo += ":" +date.getMinutes();
-        }
+		if (date.getMinutes() < 10) {
+			logInfo += ":0" + date.getMinutes();
+		} else {
+			logInfo += ":" + date.getMinutes();
+		}
 
 		let res = findMessageById("Inget", socket.request.session.id);
-		res.then(function(result) {
+		res.then(function (result) {
 			//console.log(result)
-			if(result==null){//New User
-				addMessage(roomId="Inget",id=socket.request.session.id, name=name,date=date,msg=msg,date=date);
-			}else{//Old User
-				updateMessage(roomId="Inget",socket.request.session.id,msg=msg,date=date);
+			if (result == null) {//New User
+				addMessage(roomId = "Inget", id = socket.request.session.id, name = name, date = date, msg = msg, date = date);
+			} else {//Old User
+				updateMessage(roomId = "Inget", socket.request.session.id, msg = msg, date = date);
 			}
-		 })
-        appendLog(logInfo);
-    });
+		})
+		appendLog(logInfo);
+	});
 
 	socket.on('name', (name) => {
 		lecture_1.add_student(socket.request.session.id, name, socket);
@@ -250,69 +263,69 @@ io.on('connection', (socket) => {
 
 	socket.on('question', (isAnonymous, msg) => {
 		var date = new Date();
-		if (isAnonymous){
+		if (isAnonymous) {
 			name = "Anonymous";
 		} else {
 			name = lecture_1.get_student_name(socket.request.session.id);
 		}
 		io.emit('question', name, msg, questionCounter, date.valueOf());
 
-		var logInfo = "Question #" +questionCounter +" by: " +name +":" +msg;
+		var logInfo = "Question #" + questionCounter + " by: " + name + ":" + msg;
 
 		if (date.getHours() < 10) {
-			logInfo += " - 0" +date.getHours();
+			logInfo += " - 0" + date.getHours();
 		} else {
-			logInfo += " - " +date.getHours();
+			logInfo += " - " + date.getHours();
 		}
 
 		if (date.getMinutes() < 10) {
-			logInfo += ":0" +date.getMinutes();
+			logInfo += ":0" + date.getMinutes();
 		} else {
-			logInfo += ":" +date.getMinutes();
+			logInfo += ":" + date.getMinutes();
 		}
 
-		addQuestion(roomId="Inget",id=questionCounter,name=name,question=msg,date=date, upvote=0);
+		addQuestion(roomId = "Inget", id = questionCounter, name = name, question = msg, date = date, upvote = 0);
 		appendLog(logInfo);
 		questionCounter++;
 	});
 
 	socket.on('upvote', (questionID, memberNum) => {
-		console.log('question ' +questionID +' was upvoted');
+		console.log('question ' + questionID + ' was upvoted');
 		io.emit('upvote', questionID, memberCounter);
 
-		upvoteQuestion(roomId="Inget",questionID);
+		upvoteQuestion(roomId = "Inget", questionID);
 	});
 
 	socket.on('join_queue', (q_name, message) => {
 		var q = lecture_1.get_queue(q_name);
 		//console.log("parameters:", q_name, message);
-		if (q != null){
+		if (q != null) {
 			var id = socket.request.session.id;
-			
+
 			// Group joining queue
 			var gr = lecture_1.get_group_by_student_id(id);
-			if (gr != null){
+			if (gr != null) {
 				var n_ticket = new ticket.Ticket(0, gr, message);
 			} else {
 				var stud = lecture_1.get_student_by_id(id);
 				//console.log(stud);
 				var n_ticket = new ticket.Ticket(0, stud, message);
 			}
-			
+
 			// Checking if student is already queued
 			// !!! (Probably not compatible with groups right now) !!!
 			var stud = lecture_1.get_student_by_id(id);
-			
+
 			for (i = 0; i < queuedStudents.length; i++) {
 				if (queuedStudents[i] == stud) {
-					console.log("already queued, denying " +stud.socket.id);
+					console.log("already queued, denying " + stud.socket.id);
 					io.to(stud.socket.id).emit("deniedQueueJoin");
 					return;
 				}
 			}
-			
+
 			queuedStudents.push(stud);
-			
+
 			q.add_ticket(n_ticket);
 			//console.log("added ticket:\n", n_ticket);
 			//console.log("json queue:\n", q.to_json());
@@ -329,7 +342,7 @@ io.on('connection', (socket) => {
 				let sl = tick.get_socketlist();
 				sl.forEach((st) => {
 					st.emit('picked_out');
-					
+
 					// Remove picked out students from queuedStudents array
 					for (i = 0; i < queuedStudents.length; i++) {
 						if (queuedStudents[i].socket.id == st.id) {
@@ -337,9 +350,9 @@ io.on('connection', (socket) => {
 							break;
 						}
 					}
-					
-					if(q.l_fifo_q.last == null){
-						st.emit('update_queue_information',0,'none','none');
+
+					if (q.l_fifo_q.last == null) {
+						st.emit('update_queue_information', 0, 'none', 'none');
 					}
 				});
 			}
@@ -347,30 +360,30 @@ io.on('connection', (socket) => {
 		io.emit('updateQueues', lecture_1.get_queue_json());
 	});
 
-  socket.on('get_queue_position', () => {
+	socket.on('get_queue_position', () => {
 		var queues = lecture_1.get_all_queues();
-    if(queues.length != 0){
-      queues.forEach((queue) => {
-        var n = 1;
-    		var s = queue.l_fifo_q.last;
-        var qName = queue.name;
-        //console.log(s);
-    		while (s != null) {
-    			let sl = s.value.get_socketlist();
-    			sl.forEach((i) => {
-            var message = s.value.message;
-            var studid = i.request.session.id;
-            console.log("socket id: " + socket.request.session.id);
-            console.log("studid: " + studid);
-            if(socket.request.session.id == studid){
-              socket.emit('update_queue_information', n, qName, message);
-            }
-    			});
-    			n++;
-    			s = s.prev;
-    		}
-      });
-    }
+		if (queues.length != 0) {
+			queues.forEach((queue) => {
+				var n = 1;
+				var s = queue.l_fifo_q.last;
+				var qName = queue.name;
+				//console.log(s);
+				while (s != null) {
+					let sl = s.value.get_socketlist();
+					sl.forEach((i) => {
+						var message = s.value.message;
+						var studid = i.request.session.id;
+						console.log("socket id: " + socket.request.session.id);
+						console.log("studid: " + studid);
+						if (socket.request.session.id == studid) {
+							socket.emit('update_queue_information', n, qName, message);
+						}
+					});
+					n++;
+					s = s.prev;
+				}
+			});
+		}
 	});
 
 	socket.on('createQueue', (q_name) => {
@@ -400,9 +413,9 @@ io.on('connection', (socket) => {
 			console.log("group: ", gr.to_json());
 		}
 	});
-	
+
 	socket.on('answer', (questionID) => {
-		console.log('question ' +questionID +' was answered');
+		console.log('question ' + questionID + ' was answered');
 		io.emit('answer', questionID);
 	});
 
@@ -413,14 +426,14 @@ io.on('connection', (socket) => {
 		//Måste få tag på roomID!
 
 		let res = findConfusedById("Inget", socket.request.session.id);
-		res.then(function(result) {
+		res.then(function (result) {
 			//console.log(result)
-			if(result==null){//New User getting confused
-				addConfused(roomId="Inget", socket.request.session.id, date=date);
-			}else{//Old User getting confused
-				updateConfused(roomId="Inget", socket.request.session.id, date=date);
+			if (result == null) {//New User getting confused
+				addConfused(roomId = "Inget", socket.request.session.id, date = date);
+			} else {//Old User getting confused
+				updateConfused(roomId = "Inget", socket.request.session.id, date = date);
 			}
-		 })
+		})
 
 		setTimeout(confusedStop, 3000, id);
 	});
@@ -431,13 +444,13 @@ io.on('connection', (socket) => {
 	});
 
 });
- 
+
 
 
 
 function confusedStop(id) {
 	io.to(id).emit("toggleConfuse");
-}	
+}
 
 
 // Logging (WILL PROBABLY BE HANDLED VIA DATABASE INSTEAD)
@@ -464,7 +477,7 @@ function appendLog(logInfo) {
 		}
 	}
 
-	fs.appendFile('logs/sessionID/log.txt', logInfo +"\n", function(err) {
+	fs.appendFile('logs/sessionID/log.txt', logInfo + "\n", function (err) {
 		if (err) {
 			directoryFound = false;
 			return console.error(err);
@@ -477,313 +490,310 @@ http.listen(port, () => {
 	console.log('Listening on 3000...');
 });
 
-
-
-
 //db stuff
 async function findMessageById(roomId, id) {
 
-    const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  })
-        .catch(err => { console.log(err); });
+	const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+		.catch(err => { console.log(err); });
 
-    if (!client) {
-        return;
-    }
+	if (!client) {
+		return;
+	}
 
-    try {
+	try {
 
-        const db = client.db("mydb");
+		const db = client.db("mydb");
 
-        let collection = db.collection('Chat');
+		let collection = db.collection('Chat');
 
-        let query = {roomId:roomId, id: id }
+		let query = { roomId: roomId, id: id }
 
-        let res = await collection.findOne(query);
+		let res = await collection.findOne(query);
 
-        return res;
+		return res;
 
-    } catch (err) {
+	} catch (err) {
 
-        console.log(err);
-    } finally {
+		console.log(err);
+	} finally {
 
-        client.close();
-    }
+		client.close();
+	}
 }
 
-async function addMessage(roomId, id, name, date, msg, date){
-    const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  })
-        .catch(err => { console.log(err); });
+async function addMessage(roomId, id, name, date, msg, date) {
+	const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+		.catch(err => { console.log(err); });
 
-    if (!client) {
-        return;
-    }
+	if (!client) {
+		return;
+	}
 
-    try {
-        const db = client.db("mydb");
+	try {
+		const db = client.db("mydb");
 
-        let collection = db.collection('Chat');
-
-        let object = {
-            roomId:roomId,
-            id:id,
-            name:name,
-            date:date,
-            message:[{ message: msg, date: date }]
-        };
-
-        let res = await collection.insertOne(object);
-
-        console.log("Succesfully added message to new User");
-
-
-    } catch (err) {
-
-        console.log(err);
-    } finally {
-
-        client.close();
-    }
-}
-
-async function updateMessage(roomId, id, msg, date){
-    const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  })
-        .catch(err => { console.log(err); });
-
-    if (!client) {
-        return;
-    }
-
-    try {
-        const db = client.db("mydb");
-
-        let collection = db.collection('Chat');
-
-		let messageObj = {message: msg, date: date};
-        let res = await collection.updateOne({id:id, roomId:roomId}, {$push: {message:messageObj}});
-
-        console.log("Succesfully added message to user");
-
-    } catch (err) {
-
-        console.log(err);
-    } finally {
-
-        client.close();
-    }
-}
-
-
-
-async function addQuestion(roomId, id, name, question, date, upvote){
-    const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  })
-        .catch(err => { console.log(err); });
-
-    if (!client) {
-        return;
-    }
-
-    try {
-        const db = client.db("mydb");
-
-        let collection = db.collection('Question');
+		let collection = db.collection('Chat');
 
 		let object = {
-            roomId:roomId,
-            id:id,
-            name:name,
-            question:question,
-            date:date,
-            upvote:upvote
-        };
+			roomId: roomId,
+			id: id,
+			name: name,
+			date: date,
+			message: [{ message: msg, date: date }]
+		};
+
+		let res = await collection.insertOne(object);
+
+		console.log("Succesfully added message to new User");
+
+
+	} catch (err) {
+
+		console.log(err);
+	} finally {
+
+		client.close();
+	}
+}
+
+async function updateMessage(roomId, id, msg, date) {
+	const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+		.catch(err => { console.log(err); });
+
+	if (!client) {
+		return;
+	}
+
+	try {
+		const db = client.db("mydb");
+
+		let collection = db.collection('Chat');
+
+		let messageObj = { message: msg, date: date };
+		let res = await collection.updateOne({ id: id, roomId: roomId }, { $push: { message: messageObj } });
+
+		console.log("Succesfully added message to user");
+
+	} catch (err) {
+
+		console.log(err);
+	} finally {
+
+		client.close();
+	}
+}
+
+
+
+async function addQuestion(roomId, id, name, question, date, upvote) {
+	const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+		.catch(err => { console.log(err); });
+
+	if (!client) {
+		return;
+	}
+
+	try {
+		const db = client.db("mydb");
+
+		let collection = db.collection('Question');
+
+		let object = {
+			roomId: roomId,
+			id: id,
+			name: name,
+			question: question,
+			date: date,
+			upvote: upvote
+		};
 
 		let res = await collection.insertOne(object);
 
 		console.log("Inserted question succesfully");
 
-    } catch (err) {
+	} catch (err) {
 
-        console.log(err);
-    } finally {
+		console.log(err);
+	} finally {
 
-        client.close();
-    }
+		client.close();
+	}
 }
 
 //BUG IN QUESTION WHERE THE FIRST QUESTION CANT GET ANY UPVOTES!!!!!
-async function upvoteQuestion(roomId, id){
-    const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  })
-        .catch(err => { console.log(err); });
+async function upvoteQuestion(roomId, id) {
+	const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+		.catch(err => { console.log(err); });
 
-    if (!client) {
-        return;
-    }
+	if (!client) {
+		return;
+	}
 
-    try {
-        const db = client.db("mydb");
+	try {
+		const db = client.db("mydb");
 
-        let collection = db.collection('Question');
+		let collection = db.collection('Question');
 
-		let res = await collection.updateOne({id:id},{$inc:{upvote:10}});
+		let res = await collection.updateOne({ id: id }, { $inc: { upvote: 10 } });
 
 		console.log("Succesfully incremented upvote in database");
 
-    } catch (err) {
+	} catch (err) {
 
-        console.log(err);
-    } finally {
+		console.log(err);
+	} finally {
 
-        client.close();
-    }
+		client.close();
+	}
 }
 
-async function addConfused(roomId, id, date){
-    const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  })
-        .catch(err => { console.log(err); });
+async function addConfused(roomId, id, date) {
+	const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+		.catch(err => { console.log(err); });
 
-    if (!client) {
-        return;
-    }
+	if (!client) {
+		return;
+	}
 
-    try {
-        const db = client.db("mydb");
+	try {
+		const db = client.db("mydb");
 
-        let collection = db.collection('Confused');
+		let collection = db.collection('Confused');
 
 		let object = {
-            roomId:roomId,
-            id:id,
-            confusion:[{confused:1, date,date}]
-        };
+			roomId: roomId,
+			id: id,
+			confusion: [{ confused: 1, date, date }]
+		};
 
 		let res = await collection.insertOne(object);
 
-    } catch (err) {
+	} catch (err) {
 
-        console.log(err);
-    } finally {
+		console.log(err);
+	} finally {
 
-        client.close();
-    }
+		client.close();
+	}
 }
 
 async function findConfusedById(roomId, id) {
 
-    const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  })
-        .catch(err => { console.log(err); });
+	const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+		.catch(err => { console.log(err); });
 
-    if (!client) {
-        return;
-    }
+	if (!client) {
+		return;
+	}
 
-    try {
+	try {
 
-        const db = client.db("mydb");
+		const db = client.db("mydb");
 
-        let collection = db.collection('Confused');
+		let collection = db.collection('Confused');
 
-        let query = { roomId:roomId, id: id }
+		let query = { roomId: roomId, id: id }
 
-        let res = await collection.findOne(query);
+		let res = await collection.findOne(query);
 
-        return res;
+		return res;
 
-    } catch (err) {
+	} catch (err) {
 
-        console.log(err);
-    } finally {
+		console.log(err);
+	} finally {
 
-        client.close();
-    }
+		client.close();
+	}
 }
 
 async function updateConfused(roomId, id, date) {
 
-    const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  })
-        .catch(err => { console.log(err); });
+	const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+		.catch(err => { console.log(err); });
 
-    if (!client) {
-        return;
-    }
+	if (!client) {
+		return;
+	}
 
-    try {
+	try {
 
-        const db = client.db("mydb");
+		const db = client.db("mydb");
 
-        let collection = db.collection('Confused');
+		let collection = db.collection('Confused');
 
-		let confusedObj = {confused:1, date,date};
+		let confusedObj = { confused: 1, date, date };
 
-		let res = await collection.updateOne({roomId:roomId, id:id},{$push: {confusion:confusedObj}});
+		let res = await collection.updateOne({ roomId: roomId, id: id }, { $push: { confusion: confusedObj } });
 
-        return res;
+		return res;
 
-    } catch (err) {
+	} catch (err) {
 
-        console.log(err);
+		console.log(err);
 
-    } finally {
+	} finally {
 
-        client.close();
-    }
+		client.close();
+	}
 }
 
 async function getDocument(coll) {
 
-    const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  })
-        .catch(err => { console.log(err); });
+	const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+		.catch(err => { console.log(err); });
 
-    if (!client) {
-        return;
-    }
+	if (!client) {
+		return;
+	}
 
-    try {
+	try {
 
-        const db = client.db("mydb");
+		const db = client.db("mydb");
 
-        let collection = db.collection(coll);
+		let collection = db.collection(coll);
 
 		let res = await collection.find({});
 
-        return res;
+		return res;
 
-    } catch (err) {
+	} catch (err) {
 
-        console.log(err);
+		console.log(err);
 
-    } finally {
+	} finally {
 
-        client.close();
-    }
+		client.close();
+	}
 }
 
 async function addLectureToDB(ownerMail) {
 
-    const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  })
-        .catch(err => { console.log(err); });
+	const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+		.catch(err => { console.log(err); });
 
-    if (!client) {
-        return;
-    }
+	if (!client) {
+		return;
+	}
 
-    try {
+	try {
 		var date = new Date();
-        const db = client.db("mydb");
-        let collection = db.collection('Lecture');
+		const db = client.db("mydb");
+		let collection = db.collection('Lecture');
 		let object = {
 			ownerMail: ownerMail,
-			startDate : date,
-			endDate : null
+			startDate: date,
+			endDate: null
 		};
 		let res = await collection.insertOne(object)
-        return res;
+		return res;
 
-    } catch (err) {
+	} catch (err) {
 
-        console.log(err);
+		console.log(err);
 
-    } finally {
+	} finally {
 
-        client.close();
-    }
+		client.close();
+	}
 }
