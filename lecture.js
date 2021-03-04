@@ -95,6 +95,14 @@ class Lecture {
 		}
 	}
 
+	remove_group(name){
+		for(var i = 0; i < this.groups.length; i++){
+			if(name == this.groups[i].name){
+				this.groups.splice(i, 1);
+			}
+		}
+	}
+
 	get_queue_json() {
 		var ret = [];
 		for (var i = 0; i < this.queues.length; i++){
@@ -102,7 +110,23 @@ class Lecture {
 		}
 		return ret;
 	}
-	
+
+	get_group_names_json() {
+		var ret = [];
+		for (var i = 0; i < this.groups.length; i++){
+			ret.push(this.groups[i].name);
+		}
+		return ret;
+	}
+
+	get_groups_json() {
+		var ret = [];
+		for (var i = 0; i < this.groups.length; i++){
+			ret.push(this.groups[i].to_json());
+		}
+		return ret;
+	}
+
 	get_group_by_student_id(id) {
 		for (var i = 0; i < this.groups.length; i++){
 			for (var j = 0; j < this.groups[i].member_list.length; j++){

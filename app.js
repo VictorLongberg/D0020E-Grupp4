@@ -49,11 +49,9 @@ class Message {
 
 //Global variables!
 //Get data when logged in.
-
 var questionCounter = 0;
 var memberCounter = 0;
 var confuseCounter = 0;
-
 var queuedStudents = [];
 
 
@@ -81,6 +79,7 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/lecture', (req, res) => {
+
 	lecture(res);
 });
 
@@ -166,6 +165,7 @@ function register(req) {
 		var dbo = client.db("mydb");
 		//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
 		checkNull = await dbo.collection("login").findOne({ email: req.body.email });
+
 		try {
 			if (checkNull == null) {
 				const insertdata = await dbo.collection("login").insertOne(emailpass);
@@ -180,6 +180,7 @@ function register(req) {
 	});
 }
 
+//Get data when logged in.
 function amisafe(req) {
 	const kakan = get_cookies(req)["tss"]
 	if (kakan == teacher_1.get_session()) {
@@ -201,7 +202,6 @@ var get_cookies = function (request) {
 io.on('connection', (socket) => {
 	memberCounter++;
 	console.log('user connected, total users: ' + memberCounter);
-
 	// If reconnected student, update socket
 	if (lecture_1.get_student_by_id(socket.request.session.id)) { 					// false if null
 		lecture_1.get_student_by_id(socket.request.session.id).socket = socket;
@@ -210,7 +210,6 @@ io.on('connection', (socket) => {
 	socket.on('disconnect', () => {
 		memberCounter--;
 		console.log('user disconnected, total users: ' + memberCounter);
-
 		// If disconnected person was in a queue, remove them (NEEDS SUPPORT FROM FIFO_QUEUE)
 		/* for (i = 0; i < queuedStudents.length; i++) {
 			if (queuedStudents[i] == socket.id) {
@@ -351,6 +350,7 @@ io.on('connection', (socket) => {
 						}
 					}
 
+
 					if (q.l_fifo_q.last == null) {
 						st.emit('update_queue_information', 0, 'none', 'none');
 					}
@@ -403,6 +403,15 @@ io.on('connection', (socket) => {
 	socket.on('createGroup', (g_name) => {
 		lecture_1.add_group(g_name);
 		console.log("groups ", lecture_1.groups);
+		io.emit('updateGroupNames', lecture_1.get_group_names_json());
+		io.emit('updateGroups', lecture_1.get_groups_json());
+	});
+
+	socket.on('removeGroup', (g_name) => {
+		console.log("ta bort grupper", lecture_1.groups);
+		lecture_1.remove_group(g_name);
+		console.log("ta bort grupper", lecture_1.groups);
+		io.emit('updateGroups', lecture_1.get_groups_json());
 	});
 
 	socket.on('addUserToGroup', (g_name) => {
@@ -412,6 +421,7 @@ io.on('connection', (socket) => {
 			gr.add_student(stud);
 			console.log("group: ", gr.to_json());
 		}
+		io.emit('updateGroups', lecture_1.get_groups_json());
 	});
 
 	socket.on('answer', (questionID) => {
@@ -793,7 +803,6 @@ async function addLectureToDB(ownerMail) {
 		console.log(err);
 
 	} finally {
-
 		client.close();
 	}
 }

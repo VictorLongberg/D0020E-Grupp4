@@ -15,7 +15,7 @@
 		while (name == "null" || !name || name.length > 30) {
 			name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
 		}
-		
+
 		//Sanitizing
 		var element = document.createElement('div');
 		element.innerText = name;
@@ -28,11 +28,16 @@
 	function getName() {
 		return name;
 	}
-	
+
 	function create_group() {
 		var gname = prompt("Group name: ");
 		socket.emit('createGroup', gname);
 	}
+
+	function removeGroup(gName){
+		socket.emit('removeGroup', gName);
+	}
+
 	</script>
 
 	<title>Simple chat</title>
@@ -95,7 +100,7 @@
 
 <div class="row">
 
-	<div class="col-6">
+	<div class="col-3">
 		<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="createQueue()">
 			Create queue
 		</button>
@@ -103,8 +108,13 @@
 		Queues:
 		<ul id="queues">
 		</ul>
-
 	</div>
+	<div class="col-3">
+		All groups:
+		<ul id="all_groups" style="margin:0; padding:0;">
+		</ul>
+	</div>
+
 
 	<div class="col-6">
 		<div class="messages overflow-auto">
@@ -161,11 +171,11 @@
 					<input type="user" id="currentUser" />
 				</label>
 			</div>
-			
+
 			<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="create_group()">
 				Create group
 			</button>
-			
+
 			<div class="input-group mb-3 order-1">
 				<input type="text" class="form-control" id="m" aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="off" />
 				<div class="input-group-append">
@@ -176,155 +186,89 @@
 			</div>
 		</div>
 	</div>
-			
+
 	<script>
-	
+
 	// --- Queues ---
 	function pickFirst(qName) {
 		socket.emit('get_first_queue', (qName));
 	}
-	
+
 	function createQueue() {
 		qName = prompt("Queue name?");
-		
+
 		if (qName == "null" || !qName || qName.length > 30) {
 			alert("Invalid name");
 			return;
 		}
-		
+
 		socket.emit('createQueue', (qName));
 	}
-	
+
 	function removeQueue(qName) {
 		if (confirm("Remove queue " +qName +"?")) {
 			socket.emit('removeQueue', (qName));
 		}
 	}
-	
+
 	function updateQueues() {
 		socket.emit('updateQueues');
 	}
 	updateQueues();
-	
+
 	socket.on('updateQueues', function(queues) {
 		// Clear queues tab
 		var queueLength = document.getElementById("queues").children.length;
 		for (i = 0; i < queueLength; i++) {
 			document.getElementById("queues").children[0].remove();
 		}
-		
+
 		// Spawn new queues
 		for (i = 0; i < queues.length; i++) {
 			var jsonQueue = JSON.parse(queues[i]);
 			var queueHTML = "<b>" + jsonQueue.qname +"</b>"
-			
+
 			// Number of people in queue
 			+ "<br> In queue: " + jsonQueue.rarr.length;
-			
+
 			// People in queue + message
 			for (j = 0; j < jsonQueue.rarr.length; j++) {
 				queueHTML += "<br> Student #" + j + ": " + jsonQueue.rarr[j].name + ": " + jsonQueue.rarr[j].message;
 			}
-			
+
 			// Pick first in queue button
 			queueHTML += "<br> <input type='button' onclick='pickFirst(\"" +jsonQueue.qname +"\")' value='Pick first in queue' />"
-			
+
 			// Remove queue button
 			+ "<br> <input type='button' onclick='removeQueue(\"" +jsonQueue.qname +"\")' value='Remove queue' />";
 			var queueElement = $('<li>').html(queueHTML);
-			
+
 			// placeholder CSS
 			queueElement.css({"display":"block", "background-color":"rgb(3,32,64)", "color":"white", "text-align":"center", "margin":"3px", "padding":"16px", "text-decoration":"none"});
-			
+
 			$("#queues").append(queueElement);
 		}
 	});
-	
-	// --- Reactions ---
-	var confuseBool = false;
 
-	function toggleConfused() {
-		if (!confuseBool) {
-			confuseBool = true;
-			$("#confusedPic").fadeTo(300, 0.2);
-			$('#messages').append($('<li>').text("You are confused!"));
-			socket.emit('reactConfused');
-		}
 
-		else {
-			confuseBool = false;
-			$('#messages').append($('<li>').text("You are no longer confused."));
-			document.getElementById("confusedPic").setAttribute("onclick", ""); 
-			setTimeout(confuseCoolDownDone, 3050);
-			socket.emit('removeConfused');
-		}
-	}
-	
-	function confuseCoolDownDone() {
-		$("#confusedPic").fadeTo(300, 1);
-		document.getElementById("confusedPic").setAttribute("onclick", "toggleConfused()"); 
-	}
-			
-	// --- Queues ---
-	function pickFirst(qName) {
-		socket.emit('get_first_queue', (qName));
-	}
+	// --- Display groups ---
+	socket.on('updateGroups', function(groups) {
+		var all_groups = document.getElementById("all_groups");
+		all_groups.innerHTML='';
 
-	function createQueue() {
-		qName = prompt("Queue name?");
-
-		if (qName == "null" || !qName || qName.length > 30) {
-			alert("Invalid name");
-			return;
-		}
-
-		socket.emit('createQueue', (qName));
-	}
-
-	function removeQueue(qName) {
-		if (confirm("Remove queue " +qName +"?")) {
-			socket.emit('removeQueue', (qName));
-		}
-	}
-
-	function updateQueues() {
-		socket.emit('updateQueues');
-	}
-	updateQueues();
-
-	socket.on('updateQueues', function(queues) {
-		// Clear queues tab
-		var queueLength = document.getElementById("queues").children.length;
-		for (i = 0; i < queueLength; i++) {
-			document.getElementById("queues").children[0].remove();
-		}
-
-		// Spawn new queues
-		for (i = 0; i < queues.length; i++) {
-			var jsonQueue = JSON.parse(queues[i]);
-			var queueHTML = "<b>" + jsonQueue.qname +"</b>"
-
-			// Number of people in queue
-			+ "<br> In queue: " + jsonQueue.rarr.length;
-
-			// People in queue + message
-			for (j = 0; j < jsonQueue.rarr.length; j++) {
-				var temp = j+1;
-				queueHTML += "<br> #" + temp + ": " + jsonQueue.rarr[j].name + ": " + jsonQueue.rarr[j].message;
-			}
-
-			// Pick first in queue button
-			queueHTML += "<br> <button id='invert_buttons' class='btn btn-secondary' type='button' onclick='pickFirst(\"" +jsonQueue.qname +"\")'>Pick first in queue</button>"
-
-			// Remove queue button
-			+ "<br> <button id='invert_buttons' class='btn btn-secondary' type='button' onclick='removeQueue(\"" +jsonQueue.qname +"\")'>Remove queue</button>";
-
-			var queueElement = $('<li>').html(queueHTML);
+		// Display the new group
+		for(i = 0; i < groups.length; i++){
+			var groupHTML = "<b>"+ groups[i].name + "</b>" + ": " + groups[i].member_list.length + "<br>"
+			+ "<button type='button' class='btn btn-secondary' onclick='removeGroup(\"" +groups[i].name +"\")'>Remove group</button>"
+			+ "<button class='btn btn-secondary dropdown-toggle' type='button' id='dropDownMembers' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>"
+			+ "View members </button><div class='dropdown-menu' aria-labelledby='dropDownMembers' style='color:white'>"
+			+ groups[i].member_list + "</div>";
+			var groupElement = $('<li>').html(groupHTML);
 
 			// placeholder CSS
-			queueElement.css({"display":"block", "background-color":"rgb(3,32,64)", "color":"white", "text-align":"center", "margin":"3px", "padding":"16px", "text-decoration":"none"});
+			groupElement.css({"display":"block", "color":"rgb(3,32,64)","text-decoration":"none"});
 
-			$("#queues").append(queueElement);
+			$("#all_groups").append(groupElement);
 		}
 	});
 
@@ -352,6 +296,33 @@
 		$("#confusedPic").fadeTo(300, 1);
 		document.getElementById("confusedPic").setAttribute("onclick", "toggleConfused()");
 	}
+
+	// --- Queues ---
+	function pickFirst(qName) {
+		socket.emit('get_first_queue', (qName));
+	}
+
+	function createQueue() {
+		qName = prompt("Queue name?");
+
+		if (qName == "null" || !qName || qName.length > 30) {
+			alert("Invalid name");
+			return;
+		}
+
+		socket.emit('createQueue', (qName));
+	}
+
+	function removeQueue(qName) {
+		if (confirm("Remove queue " +qName +"?")) {
+			socket.emit('removeQueue', (qName));
+		}
+	}
+
+	function updateQueues() {
+		socket.emit('updateQueues');
+	}
+	updateQueues();
 
 	function updateChatAs() {
 		var chatAsText = "";
@@ -524,6 +495,10 @@ $(function () {
 
 	socket.on('updateConfused', function(confuseNum) {
 		$("#confusedCount").text(confuseNum);
+	});
+
+	socket.on('updateGroups', function(groups) {
+		// gets groups and the names of who are in them
 	});
 });
 </script>
