@@ -66,7 +66,7 @@ app.get('/login', (req, res) => {
 app.set('view engine', 'ejs');
 
 app.get('/lecture', (req, res) => {
-	client.connect( async  err => {	
+	client.connect( async  err => {
 		let lect = "Inget";
 		const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
 		var db = client.db("mydb");
@@ -76,16 +76,16 @@ app.get('/lecture', (req, res) => {
 			//console.log("213789373829412432");
 			//console.log(docs);
 			res.render('lecture', {
-				'chat':chat, 
-				'lecture':lect, 
+				'chat':chat,
+				'lecture':lect,
 				'confused':confused
 			})
 		} catch (error) {
-			console.log(err); 
+			console.log(err);
 		} finally {
-			await client.close(); 		
+			await client.close();
 		}
-	});	
+	});
 });
 
 app.get('/student', (req, res) => {
@@ -97,7 +97,7 @@ app.get('/student', (req, res) => {
 app.get('/teacher', (req, res) => {
 	if (amisafe(req)){
 		res.sendFile(__dirname + '/public/indexTeacher.html');
-	} 
+	}
 	else if (!amisafe(req)){
 		res.status(400);
 	}
@@ -112,10 +112,10 @@ function amisafe(req) {
 	}
 }
 
-//Login&Register stuff. 
-app.use(bodyParser.json()); // for parsing application/json	
+//Login&Register stuff.
+app.use(bodyParser.json()); // for parsing application/json
 app.use(express.json());
-app.use(cookieParser()); 
+app.use(cookieParser());
 
 var get_cookies = function(request) {
 	var cookies = {};
@@ -128,13 +128,13 @@ var get_cookies = function(request) {
 
 
 //Login.
-app.post("/login",  function (req, res )  { 
-	var checkLogin = null; 
-	//connectar till databasen för att titta utifall vi kan hitta email. 
-	client.connect( async  err => {	
+app.post("/login",  function (req, res )  {
+	var checkLogin = null;
+	//connectar till databasen för att titta utifall vi kan hitta email.
+	client.connect( async  err => {
 			const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
 			var dbo = client.db("mydb");
-			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
+			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null.
 			checkLogin = await dbo.collection("login").findOne({email: req.body.email, password: req.body.password});
 		try {
 			if ( checkLogin != null ){
@@ -145,23 +145,23 @@ app.post("/login",  function (req, res )  {
 				res.redirect("/teacher");
 			} else { res.status(400).send({message: 'This is an error!'}); }
 		} catch (error) {
-			console.log(err); 
+			console.log(err);
 		} finally {
-			await client.close(); 		
+			await client.close();
 		}
-	});	
+	});
 });
 
 //Registering.
-app.post("/register",  function (req, res )  { 
-	//formdatan från register sparad i emailpass. 
+app.post("/register",  function (req, res )  {
+	//formdatan från register sparad i emailpass.
 	var emailpass = {email: req.body.email, password: req.body.password};
-	var checkNull = null; 
-	//connectar till databasen för att titta utifall vi kan hitta email. 
-	client.connect( async  err => {	
+	var checkNull = null;
+	//connectar till databasen för att titta utifall vi kan hitta email.
+	client.connect( async  err => {
 			const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true  });
 			var dbo = client.db("mydb");
-			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
+			//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null.
 			checkNull = await dbo.collection("login").findOne({email: req.body.email});
 		try {
 			if ( checkNull == null ){
@@ -170,11 +170,11 @@ app.post("/register",  function (req, res )  {
 					res.redirect("/login");
 			} else { res.status(400).send({message: 'This is an error!'}); }
 		} catch (error) {
-			console.log(err); 
+			console.log(err);
 		} finally {
-			await client.close(); 		
+			await client.close();
 		}
-	});	
+	});
 });
 
 //Get data when logged in.
@@ -188,7 +188,7 @@ var queuedStudents = [];
 io.on('connection', (socket) => {
 	memberCounter++;
 	console.log('user connected, total users: ' +memberCounter);
-	
+
 	// If reconnected student, update socket
 	if (lecture_1.get_student_by_id(socket.request.session.id)) { 					// false if null
 		lecture_1.get_student_by_id(socket.request.session.id).socket = socket;
@@ -197,7 +197,7 @@ io.on('connection', (socket) => {
 	socket.on('disconnect', () => {
 		memberCounter--;
 		console.log('user disconnected, total users: ' +memberCounter);
-		
+
 		// If disconnected person was in a queue, remove them (NEEDS SUPPORT FROM FIFO_QUEUE)
 		/* for (i = 0; i < queuedStudents.length; i++) {
 			if (queuedStudents[i] == socket.id) {
@@ -288,7 +288,7 @@ io.on('connection', (socket) => {
 		//console.log("parameters:", q_name, message);
 		if (q != null){
 			var id = socket.request.session.id;
-			
+
 			// Group joining queue
 			var gr = lecture_1.get_group_by_student_id(id);
 			if (gr != null){
@@ -298,11 +298,11 @@ io.on('connection', (socket) => {
 				//console.log(stud);
 				var n_ticket = new ticket.Ticket(0, stud, message);
 			}
-			
+
 			// Checking if student is already queued
 			// !!! (Probably not compatible with groups right now) !!!
 			var stud = lecture_1.get_student_by_id(id);
-			
+
 			for (i = 0; i < queuedStudents.length; i++) {
 				if (queuedStudents[i] == stud) {
 					console.log("already queued, denying " +stud.socket.id);
@@ -310,9 +310,9 @@ io.on('connection', (socket) => {
 					return;
 				}
 			}
-			
+
 			queuedStudents.push(stud);
-			
+
 			q.add_ticket(n_ticket);
 			//console.log("added ticket:\n", n_ticket);
 			//console.log("json queue:\n", q.to_json());
@@ -329,7 +329,7 @@ io.on('connection', (socket) => {
 				let sl = tick.get_socketlist();
 				sl.forEach((st) => {
 					st.emit('picked_out');
-					
+
 					// Remove picked out students from queuedStudents array
 					for (i = 0; i < queuedStudents.length; i++) {
 						if (queuedStudents[i].socket.id == st.id) {
@@ -337,7 +337,7 @@ io.on('connection', (socket) => {
 							break;
 						}
 					}
-					
+
 					if(q.l_fifo_q.last == null){
 						st.emit('update_queue_information',0,'none','none');
 					}
@@ -394,6 +394,13 @@ io.on('connection', (socket) => {
 		io.emit('updateGroups', lecture_1.get_groups_json());
 	});
 
+  socket.on('removeGroup', (g_name) =>{
+    console.log("ta bort grupper", lecture_1.groups);
+    lecture_1.remove_group(g_name);
+    console.log("ta bort grupper", lecture_1.groups);
+    io.emit('updateGroups', lecture_1.get_groups_json());
+  });
+
 	socket.on('addUserToGroup', (g_name) => {
 		var gr = lecture_1.get_group(g_name);
 		var stud = lecture_1.get_student_by_id(socket.request.session.id);
@@ -403,7 +410,7 @@ io.on('connection', (socket) => {
 		}
 		io.emit('updateGroups', lecture_1.get_groups_json());
 	});
-	
+
 	socket.on('answer', (questionID) => {
 		console.log('question ' +questionID +' was answered');
 		io.emit('answer', questionID);
@@ -434,13 +441,13 @@ io.on('connection', (socket) => {
 	});
 
 });
- 
+
 
 
 
 function confusedStop(id) {
 	io.to(id).emit("toggleConfuse");
-}	
+}
 
 
 // Logging (WILL PROBABLY BE HANDLED VIA DATABASE INSTEAD)
