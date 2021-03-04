@@ -122,59 +122,16 @@
 		</div>
 
 		<form action="">  <!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
-			<div class="d-flex">
-				<div class="dropdown">
-					<button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						Reactions
-					</button>
-					<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-						<a disabled class="dropdown-item" href="#" id="confusedPic">
-							<img src="/images/confused.png" class="reactionIcon">
-							Confused - <span id="confusedCount">0</span>
-						</a>
-						<a disabled class="dropdown-item" href="#">
-							<img src="/images/confused.png" class="reactionIcon">
-							Yes - <span id="yesCount">0</span>
-						</a>
-						<a disabled class="dropdown-item" href="#">
-							<img src="/images/confused.png" class="reactionIcon">
-							No - <span id="noCount">0</span>
-						</a>
-					</div>
-				</div>
-
-				<div class="form-check form-switch ms-1">
-					<button disabled type="button" class="btn btn-secondary btn-sm">
-						<label class="form-check-label" for="questionCheck">
-							Question
-						</label>
-					</button>
-					<input disabled class="form-check-input" type="checkbox" id="questionCheck" onclick="updateChatAs()" />
-				</div>
-
-				<div class="form-check form-switch ms-1">
-					<button disabled type="button" class="btn btn-secondary btn-sm">
-						<label class="form-check-label" for="anonCheck">
-							Anonymous
-						</label>
-					</button>
-					<input disabled class="form-check-input" type="checkbox" id="anonCheck" onclick="updateChatAs()" />
-				</div>
-				<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="setName()">
-					Change name
-				</button>
-			</div>
-
+			<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="create_group()">
+				Create group
+			</button>
+			
 			<div class="CurrentUser float-left" id="currentName">
 				Chatting as:
 				<label>
 					<input type="user" id="currentUser" />
 				</label>
 			</div>
-
-			<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="create_group()">
-				Create group
-			</button>
 
 			<div class="input-group mb-3 order-1">
 				<input type="text" class="form-control" id="m" aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="off" />
@@ -184,6 +141,10 @@
 					</button>
 				</div>
 			</div>
+			
+			<button type="button" class="btn btn-secondary btn-sm d-block" onclick="setName()">
+				Change name
+			</button>
 		</div>
 	</div>
 
@@ -325,24 +286,8 @@
 	updateQueues();
 
 	function updateChatAs() {
-		var chatAsText = "";
-
-		if (document.getElementById('questionCheck').checked) {
-			chatAsText += 'Asking question as: ';
-		}
-
-		else {
-			chatAsText += 'Chatting as: ';
-		}
-
-		if (document.getElementById('anonCheck').checked) {
-			chatAsText += 'Anonymous';
-		}
-
-		else {
-			chatAsText += getName();
-		}
-
+		chatAsText = 'Chatting as: ' +getName();
+		
 		document.getElementById('currentName').innerHTML = chatAsText;
 	}
 

@@ -118,63 +118,18 @@
 		<div class="messages overflow-auto">
 			<ul id="messages"></ul>
 		</div>
+		
+		<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="joinGroup()">
+				Join group
+		</button>
 
 		<form action="">  <!--Tillåter skapandet av meddelanden att vissas på chatten?!?-->
-			<div>
-				<div class="dropdown d-inline-block">
-					<button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						Reaction
-					</button>
-					<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-						<a class="dropdown-item" href="#" id="confusedPic" onclick="toggleConfused()">
-							<img src="/images/confused.png" class="reactionIcon">
-							Confused - <span id="confusedCount">0</span>
-						</a>
-						<a class="dropdown-item" href="#">
-							<img src="/images/confused.png" class="reactionIcon">
-							Yes - <span id="yesCount">0</span>
-						</a>
-						<a class="dropdown-item" href="#">
-							<img src="/images/confused.png" class="reactionIcon">
-							No - <span id="noCount">0</span>
-						</a>
-					</div>
-				</div>
-
-				<div class="form-check form-switch ms-1 d-inline-block">
-					<button type="button" class="btn btn-secondary btn-sm">
-						<label class="form-check-label" for="questionCheck">
-							Question
-						</label>
-					</button>
-					<input class="form-check-input" type="checkbox" id="questionCheck" onclick="updateChatAs()" />
-				</div>
-
-				<div class="form-check form-switch ms-1 d-inline-block">
-					<button type="button" class="btn btn-secondary btn-sm">
-						<label class="form-check-label" for="anonCheck">
-							Anonymous
-						</label>
-					</button>
-					<input class="form-check-input" type="checkbox" id="anonCheck" onclick="updateChatAs()" />
-				</div>
-				<div class="d-inline-block">
-					<button type="button" class="btn btn-secondary btn-sm" onclick="setName()">
-						Change name
-					</button>
-				</div>
-			</div>
-
 			<div class="CurrentUser float-left" id="currentName">
 				Chatting as:
 				<label>
 					<input type="user" id="currentUser" />
 				</label>
 			</div>
-
-			<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="joinGroup()">
-				Join group
-			</button>
 			
 			<div class="input-group mb-3 order-1">
 				<input type="text" class="form-control" id="m" aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="off" />
@@ -182,6 +137,76 @@
 					<button class="btn btn-secondary" id="button-addon2">
 						Send
 					</button>
+				</div>
+			</div>
+			
+			<div class="container-fluid px-0">
+				<div class="row">
+					<div class="col-lg-3 py-1 px-0">
+						<div class="dropdown d-block mx-auto">
+							<button class="btn btn-secondary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								Reaction
+							</button>
+							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+								<a class="dropdown-item" href="#" id="confusedPic" onclick="toggleConfused()">
+									<img src="/images/confused.png" class="reactionIcon">
+									Confused - <span id="confusedCount">0</span>
+								</a>
+								<a class="dropdown-item" href="#">
+									<img src="/images/confused.png" class="reactionIcon">
+									Yes - <span id="yesCount">0</span>
+								</a>
+								<a class="dropdown-item" href="#">
+									<img src="/images/confused.png" class="reactionIcon">
+									No - <span id="noCount">0</span>
+								</a>
+							</div>
+						</div>
+					</div>
+					
+					<div class="col-lg-3 py-1 px-0">
+						<div class="form-check form-switch d-block align-middle mx-auto">
+							<button type="button" class="btn btn-secondary btn-sm mw-100" onclick="questionButton()">
+									Question
+							</button>
+							
+							<script>
+								function questionButton() {
+									var check = document.getElementById('questionCheck');
+									check.checked = !check.checked;
+									updateChatAs();
+								}
+							</script>
+						
+						
+							<input class="form-check-input" type="checkbox" id="questionCheck" onclick="updateChatAs()" />
+						</div>
+					</div>
+					
+					<div class="col-lg-3 py-1 px-0">
+						<div class="form-check form-switch d-block align-middle mx-auto">
+							<button type="button" class="btn btn-secondary btn-sm mw-100" onclick="anonButton()">
+									Anonymous
+							</button>
+							
+							<script>
+								function anonButton() {
+									var check = document.getElementById('anonCheck');
+									check.checked = !check.checked;
+									updateChatAs();
+								}
+							</script>
+						
+						
+							<input class="form-check-input" type="checkbox" id="anonCheck" onclick="updateChatAs()" />
+						</div>
+					</div>
+					
+					<div class="col-lg-3 py-1 px-0">
+						<button type="button" class="btn btn-secondary btn-sm d-block ms-lg-auto" onclick="setName()">
+							Change name
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
