@@ -9,6 +9,7 @@
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
 	var socket = io();
+	var ingroup = "";
 	//console.log(socket.id);
 
 	if (!name) {
@@ -20,7 +21,7 @@
 		while (name == "null" || !name || name.length > 30) {
 			name = prompt("Please enter valid nickname (MAX 30 CHARACTERS) : ");
 		}
-		
+
 		//Sanitizing
 		var element = document.createElement('div');
 		element.innerText = name;
@@ -33,11 +34,24 @@
 	function getName() {
 		return name;
 	}
-	
-	function joinGroup() {
-		var g_name = prompt("Group name?");
-		socket.emit("addUserToGroup", g_name);
+
+	function joinGroup(g_name) {
+		if(ingroup != ""){
+			alert("You are already in a group!");
+			return;
+		}
+		else{
+			ingroup = g_name;
+			$("#in_group").text(ingroup);
+			socket.emit("addUserToGroup", g_name);
+		}
 	}
+
+	/*function leaveGroup(){
+	ingroup = "";
+	$("#in_group").text(ingroup);
+		socket.emit("leaveGroup", ?id?);
+	}*/
 
 	</script>
 
@@ -47,7 +61,7 @@
 </head>
 
 <body>
-	
+
 	<!-- Memes? -->
 	<script  type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 	<!--<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>-->
@@ -101,7 +115,7 @@
 
 <div class="row">
 
-	<div class="col-6">
+	<div class="col-3">
 		<p>Place in <span id="queue_name">none</span>: <br><span id="queue_place">0</span></p>
 		<p>Message sent: <br><span id="queue_message">none</span></p>
 		<div class="dropdown" id="queue_dropdown">
@@ -114,11 +128,17 @@
 		</div>
 	</div>
 
+	<div class="col-3">
+		In group: <span id="in_group">none</span>
+		<ul id="all_groups" style="margin:0; padding-left:0;">
+		</ul>
+	</div>
+
 	<div class="col-6">
 		<div class="messages overflow-auto">
 			<ul id="messages"></ul>
 		</div>
-		
+
 		<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="joinGroup()">
 				Join group
 		</button>
@@ -130,7 +150,7 @@
 					<input type="user" id="currentUser" />
 				</label>
 			</div>
-			
+
 			<div class="input-group mb-3 order-1">
 				<input type="text" class="form-control" id="m" aria-label="Recipient's username" aria-describedby="button-addon2" autocomplete="off" />
 				<div class="input-group-append">
@@ -139,7 +159,7 @@
 					</button>
 				</div>
 			</div>
-			
+
 			<div class="container-fluid px-0">
 				<div class="row">
 					<div class="col-lg-3 py-1 px-0">
@@ -163,13 +183,13 @@
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="col-lg-3 py-1 px-0">
 						<div class="form-check form-switch d-block align-middle mx-auto">
 							<button type="button" class="btn btn-secondary btn-sm mw-100" onclick="questionButton()">
 									Question
 							</button>
-							
+
 							<script>
 								function questionButton() {
 									var check = document.getElementById('questionCheck');
@@ -177,18 +197,18 @@
 									updateChatAs();
 								}
 							</script>
-						
-						
+
+
 							<input class="form-check-input" type="checkbox" id="questionCheck" onclick="updateChatAs()" />
 						</div>
 					</div>
-					
+
 					<div class="col-lg-3 py-1 px-0">
 						<div class="form-check form-switch d-block align-middle mx-auto">
 							<button type="button" class="btn btn-secondary btn-sm mw-100" onclick="anonButton()">
 									Anonymous
 							</button>
-							
+
 							<script>
 								function anonButton() {
 									var check = document.getElementById('anonCheck');
@@ -196,12 +216,12 @@
 									updateChatAs();
 								}
 							</script>
-						
-						
+
+
 							<input class="form-check-input" type="checkbox" id="anonCheck" onclick="updateChatAs()" />
 						</div>
 					</div>
-					
+
 					<div class="col-lg-3 py-1 px-0">
 						<button type="button" class="btn btn-secondary btn-sm d-block ms-lg-auto" onclick="setName()">
 							Change name
@@ -214,63 +234,86 @@
 
 	<script>
 	// --- Queues ---
-	
+
 	var inQueue = false;
-	
+
 	function askJoinQueue(qName) {
 		if (inQueue) {
 			alert("You are already in a queue!");
 			return;
 		}
-		
+
 		inQueue = true;
 		message = prompt("Join with message:");
 		console.log("message");
 		console.log(message);
 		socket.emit('join_queue', qName, message);
 	}
-	
+
 	function exitQueue() {
 		inQueue = false;
 	}
-	
+
 	function updateQueues() {
 		socket.emit('updateQueues');
 	}
 	updateQueues();
-	
+
 	socket.on('updateQueues', function(queues) {
 		// Clear queues tab
 		var queueLength = document.getElementById("queues").children.length;
 		for (i = 0; i < queueLength; i++) {
 			document.getElementById("queues").children[0].remove();
 		}
-		
+
 		// Spawn new queues
 		for (i = 0; i < queues.length; i++) {
 			var jsonQueue = JSON.parse(queues[i]);
 			var queueHTML = "<b>" + jsonQueue.qname +"</b>"
-			
+
 			// Number of people in queue
 			+ "<br> In queue: " + jsonQueue.rarr.length;
-			
+
 			// People in queue + message
 			for (j = 0; j < jsonQueue.rarr.length; j++) {
 				queueHTML += "<br> Student #" + j + ": " + jsonQueue.rarr[j].name + ": " + jsonQueue.rarr[j].message;
 			}
-			
+
 			// Join queue button
 			queueHTML += "<br> <input type='button' onclick='askJoinQueue(\"" + jsonQueue.qname +"\")' value='Join queue' />";
-			
+
 			var queueElement = $('<li>').html(queueHTML);
-			
+
 			// placeholder CSS
 			queueElement.css({"display":"block", "background-color":"rgb(3,32,64)", "color":"white", "text-align":"center", "margin":"3px", "padding":"16px", "text-decoration":"none"});
-			
+
 			$("#queues").append(queueElement);
 		}
 	});
-	
+
+	// --- Display groups ---
+	socket.on('updateGroups', function(groups) {
+		var all_groups = document.getElementById("all_groups");
+		all_groups.innerHTML='';
+
+		// Display the new group
+		for(i = 0; i < groups.length; i++){
+			var groupHTML = "<b>"+ groups[i].name + "</b>" + ": " + groups[i].member_list.length + "<br>"
+			+ "<div class='btn-group' role='group' aria-label='groups'><button type='button' class='btn btn-secondary' onclick='joinGroup(\"" +groups[i].name +"\")'>Join group</button>"
+			+ "<button type='button' class='btn btn-secondary' id='leave_group' onclick='leaveGroup()'>Leave group</button></div>"
+			+ "<button class='btn btn-secondary dropdown-toggle' type='button' id='dropDownMembers' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>"
+			+ "View members </button><div class='dropdown-menu' aria-labelledby='dropDownMembers' style='color:white; padding-left:5px'>"
+			+ groups[i].member_list + "</div>";
+			var groupElement = $('<li>').html(groupHTML);
+
+			// placeholder CSS
+			groupElement.css({"display":"block", "color":"rgb(3,32,64)","text-decoration":"none"});
+			$("#all_groups").append(groupElement);
+		}
+	});
+
+	//If sats för att sätta en class på "Leave group"-knappen
+
 	// --- Reactions ---
 	var confuseBool = false;
 
@@ -285,7 +328,7 @@
 		else {
 			confuseBool = false;
 			$('#messages').append($('<li>').text("You are no longer confused."));
-			document.getElementById("confusedPic").setAttribute("onclick", ""); 
+			document.getElementById("confusedPic").setAttribute("onclick", "");
 			setTimeout(confuseCoolDownDone, 3050);
 			socket.emit('removeConfused');
 		}
@@ -294,7 +337,7 @@
 	// --- Queues ---
 	var inQueue = false;
 	updateQueues();
-	
+
 	function askJoinQueue(qName) {
 		if (inQueue) {
 			alert("You are already in a queue!");
@@ -307,6 +350,18 @@
 		socket.emit('join_queue', qName, message);
 		updateQueues();
 	}
+
+	// --- Function to leave queues to be implemented ---
+	/*function leaveGroup(qName){
+		if(inQueue){
+			inQueue = false;
+			socket.emit('')
+		}
+		else{
+			alert("You are not in a queue!");
+			return;
+		}
+	}*/
 
 	function exitQueue() {
 		inQueue = false;
@@ -323,7 +378,7 @@
 		socket.emit('get_queue_position');
 		//socket.emit('update_queue_place', 'none');
 	}
-	
+
 	socket.on('deniedQueueJoin', function() {
 		alert("Oops! You are already in a queue it seems...");
 	});
@@ -331,7 +386,7 @@
 	socket.on('updateGroupNames', function(groups) {
 		// gets group namess
 	});
-	
+
 	socket.on('updateQueues', function(queues) {
 		// Clear queues tab
 		var queueLength = document.getElementById("queues").children.length;

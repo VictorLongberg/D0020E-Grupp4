@@ -111,7 +111,7 @@
 	</div>
 	<div class="col-3">
 		All groups:
-		<ul id="all_groups" style="margin:0; padding:0;">
+		<ul id="all_groups" style="margin:0; padding-left:0;">
 		</ul>
 	</div>
 
@@ -125,7 +125,7 @@
 			<button type="button" class="btn btn-secondary btn-sm ms-1 mb-3" onclick="create_group()">
 				Create group
 			</button>
-			
+
 			<div class="CurrentUser float-left" id="currentName">
 				Chatting as:
 				<label>
@@ -141,7 +141,7 @@
 					</button>
 				</div>
 			</div>
-			
+
 			<button type="button" class="btn btn-secondary btn-sm d-block" onclick="setName()">
 				Change name
 			</button>
@@ -222,7 +222,7 @@
 			var groupHTML = "<b>"+ groups[i].name + "</b>" + ": " + groups[i].member_list.length + "<br>"
 			+ "<button type='button' class='btn btn-secondary' onclick='removeGroup(\"" +groups[i].name +"\")'>Remove group</button>"
 			+ "<button class='btn btn-secondary dropdown-toggle' type='button' id='dropDownMembers' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>"
-			+ "View members </button><div class='dropdown-menu' aria-labelledby='dropDownMembers' style='color:white'>"
+			+ "View members </button><div class='dropdown-menu' aria-labelledby='dropDownMembers' style='color:white; padding-left:5px'>"
 			+ groups[i].member_list + "</div>";
 			var groupElement = $('<li>').html(groupHTML);
 
@@ -287,7 +287,7 @@
 
 	function updateChatAs() {
 		chatAsText = 'Chatting as: ' +getName();
-		
+
 		document.getElementById('currentName').innerHTML = chatAsText;
 	}
 
