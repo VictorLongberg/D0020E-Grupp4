@@ -27,6 +27,7 @@
     "randomcolor": "^0.6.2",
     "req-flash": "0.0.3",
     "socket.io": "^3.1.1",
+    "split": "^1.0.1",
     "uuid": "^8.3.1"
   }
 }
