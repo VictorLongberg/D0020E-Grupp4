@@ -15,8 +15,8 @@ const url = "mongodb+srv://Elie:Elie123@cluster0.fhfjx.mongodb.net/mydb?retryWri
 const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
 const { Mongoose } = require('mongoose');
 
-//Login&Register stuff. 
-app.use(bodyParser.json()); // for parsing application/json	
+//Login&Register stuff.
+app.use(bodyParser.json()); // for parsing application/json
 app.use(express.json());
 app.use(cookieParser());
 
@@ -135,11 +135,11 @@ function lecture(res) {
 
 function login(req,res) {
 	var checkLogin = null;
-	//connectar till databasen för att titta utifall vi kan hitta email. 
+	//connectar till databasen för att titta utifall vi kan hitta email.
 	client.connect(async err => {
 		const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
 		var dbo = client.db("mydb");
-		//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
+		//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null.
 		checkLogin = await dbo.collection("login").findOne({ email: req.body.email, password: req.body.password });
 		try {
 			if (checkLogin != null) {
@@ -161,11 +161,11 @@ function register(req,res) {
 	//formdatan från register sparad i emailpass. 
 	var emailpass = { email: req.body.email, password: req.body.password };
 	var checkNull = null;
-	//connectar till databasen för att titta utifall vi kan hitta email. 
+	//connectar till databasen för att titta utifall vi kan hitta email.
 	client.connect(async err => {
 		const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
 		var dbo = client.db("mydb");
-		//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
+		//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null.
 		checkNull = await dbo.collection("login").findOne({ email: req.body.email });
 		try {
 			if (checkNull == null) {
@@ -202,6 +202,7 @@ io.on('connection', (socket) => {
 	// If reconnected student, update socket
 	if (lecture_1.get_student_by_id(socket.request.session.id)) { 					// false if null
 		lecture_1.get_student_by_id(socket.request.session.id).socket = socket;
+		socket.emit('updateGroups',lecture_1.groups);
 	}
 
 	socket.on('disconnect', () => {
@@ -407,11 +408,11 @@ io.on('connection', (socket) => {
 	socket.on('removeGroup', (g_name) => {
 		console.log("ta bort grupper", lecture_1.groups);
 		lecture_1.remove_group(g_name);
-		console.log("ta bort grupper", lecture_1.groups);
 		io.emit('updateGroups', lecture_1.get_groups_json());
 	});
 
 	socket.on('addUserToGroup', (g_name) => {
+		console.log("hello?", g_name);
 		var gr = lecture_1.get_group(g_name);
 		var stud = lecture_1.get_student_by_id(socket.request.session.id);
 		if (gr != null && stud != null) {
@@ -419,6 +420,10 @@ io.on('connection', (socket) => {
 			console.log("group: ", gr.to_json());
 		}
 		io.emit('updateGroups', lecture_1.get_groups_json());
+	});
+
+	socket.on('removeUserFromGroup', () => {
+
 	});
 
 	socket.on('answer', (questionID) => {
