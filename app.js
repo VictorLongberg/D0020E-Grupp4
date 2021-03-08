@@ -118,8 +118,6 @@ function lecture(res) {
 		chat = await db.collection("Chat").find({ roomId: lect }).toArray();
 		confused = await db.collection("Confused").find({ roomId: lect }).toArray();
 		try {
-			//console.log("213789373829412432");
-			//console.log(docs);
 			res.render('lecture', {
 				'chat': chat,
 				'lecture': lect,
@@ -170,7 +168,7 @@ function register(req,res) {
 		try {
 			if (checkNull == null) {
 				const insertdata = await dbo.collection("login").insertOne(emailpass);
-				console.log("banan" + insertdata);
+				//console.log("banan" + insertdata);
 				res.redirect("/login");
 			} else { res.status(400).send({ message: 'This is an error!' }); }
 		} catch (error) {
@@ -183,14 +181,10 @@ function register(req,res) {
 
 //Get data when logged in.
 function amisafe(req) { 
-	console.log("111111111111111111111111111111111111111111");
-	console.log(req.cookies.tss);
 	const kakan = req.cookies.tss; 
 	if (kakan == teacher_1.get_session() && req.cookies.tss != null &&  kakan != null ) {
-		console.log("22222222222222222222222222222222222222222222222222");
 		return true;
 	} else {
-		console.log("3333333333333333333333333333333333333333333333");
 		return false;
 	}
 }
