@@ -338,12 +338,14 @@ io.on('connection', (socket) => {
 					st.emit('picked_out');
 
 					// Remove picked out students from queuedStudents array
+					/*
 					for (i = 0; i < queuedStudents.length; i++) {
 						if (queuedStudents[i].socket.id == st.id) {
 							queuedStudents.splice(i, 1);
 							break;
 						}
 					}
+					*/
 
 
 					if (q.l_fifo_q.last == null) {

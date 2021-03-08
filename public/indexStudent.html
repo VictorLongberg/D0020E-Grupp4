@@ -597,6 +597,10 @@ $(function () {
 		$("#queue_place").text(place);
 	});
 
+	socket.on('update_queue_place', function(place) {
+		$("#queue_place").text(place);
+	});
+
 	socket.on('answer', function (questionID) {
 		var fontsize = $('#' + 'question' + questionID).css("font-size");
 		newFontsize = "120%";
