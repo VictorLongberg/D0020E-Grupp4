@@ -326,14 +326,20 @@
 			"<button type='button' id='que_button' class='btn btn-secondary' onclick='askJoinQueue(\"" +jsonQueue.qname +"\")'>Join queue"+
 			"<span class='badge badge-light'>In Q: <span id='in_queue'>"+inQueue_counter+"</span></span></button>"
 
-		);
+			);
 
-		$("#queues").append(queueElement);
-		//Printing out the amount of people in the queue (does not work!!!!!)
-	}
-	$("#queue_count").text(tempnum);
-	//$("#in_queue").text(queue_counter);
-});
+			$("#queues").append(queueElement);
+			//Printing out the amount of people in the queue (does not work!!!!!)
+		}
+		$("#queue_count").text(tempnum);
+		//$("#in_queue").text(queue_counter);
+	});
+
+	socket.on('picked_out', () => {
+		alert("Your turn!");
+		inQueue = false;
+	});
+
 
 // --- Reactions ---
 var confuseBool = false;
@@ -508,11 +514,6 @@ $(function () {
 		}
 
 		$('#' + 'question' + questionID).css("font-size", newFontsize);
-	});
-
-	socket.on('picked_out', () => {
-		alert("Your turn!");
-		inQueue = false;
 	});
 
 	socket.on('update_queue_information', function(place, qName, message) {
