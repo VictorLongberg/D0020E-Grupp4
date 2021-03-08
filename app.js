@@ -90,22 +90,24 @@ app.get('/student', (req, res) => {
 });
 
 app.get('/teacher', (req, res) => {
+	console.log(req.cookies.tss);
+	console.log("TESTTEST"); 
 	if (amisafe(req)) {
 		res.sendFile(__dirname + '/public/indexTeacher.html');
 	}
 	else if (!amisafe(req)) {
-		res.status(400);
+		res.redirect("/login");
 	}
 });
 
 //Login.
 app.post("/login", function (req, res) {
-	login(req);
+	login(req,res);
 });
 
 //Registering.
 app.post("/register", function (req, res) {
-	register(req);
+	register(req,res);
 });
 
 function lecture(res) {
@@ -116,8 +118,6 @@ function lecture(res) {
 		chat = await db.collection("Chat").find({ roomId: lect }).toArray();
 		confused = await db.collection("Confused").find({ roomId: lect }).toArray();
 		try {
-			//console.log("213789373829412432");
-			//console.log(docs);
 			res.render('lecture', {
 				'chat': chat,
 				'lecture': lect,
@@ -131,7 +131,7 @@ function lecture(res) {
 	});
 }
 
-function login(req) {
+function login(req,res) {
 	var checkLogin = null;
 	//connectar till databasen för att titta utifall vi kan hitta email.
 	client.connect(async err => {
@@ -155,8 +155,8 @@ function login(req) {
 	});
 }
 
-function register(req) {
-	//formdatan från register sparad i emailpass.
+function register(req,res) {
+	//formdatan från register sparad i emailpass. 
 	var emailpass = { email: req.body.email, password: req.body.password };
 	var checkNull = null;
 	//connectar till databasen för att titta utifall vi kan hitta email.
@@ -165,11 +165,10 @@ function register(req) {
 		var dbo = client.db("mydb");
 		//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null.
 		checkNull = await dbo.collection("login").findOne({ email: req.body.email });
-
 		try {
 			if (checkNull == null) {
 				const insertdata = await dbo.collection("login").insertOne(emailpass);
-				console.log("banan" + insertdata);
+				//console.log("banan" + insertdata);
 				res.redirect("/login");
 			} else { res.status(400).send({ message: 'This is an error!' }); }
 		} catch (error) {
@@ -181,23 +180,15 @@ function register(req) {
 }
 
 //Get data when logged in.
-function amisafe(req) {
-	const kakan = get_cookies(req)["tss"]
-	if (kakan == teacher_1.get_session()) {
+function amisafe(req) { 
+	const kakan = req.cookies.tss; 
+	if (kakan == teacher_1.get_session() && req.cookies.tss != null &&  kakan != null ) {
 		return true;
 	} else {
 		return false;
 	}
 }
 
-var get_cookies = function (request) {
-	var cookies = {};
-	request.headers && request.headers.cookie.split(';').forEach(function (cookie) {
-		var parts = cookie.match(/(.*?)=(.*)$/)
-		cookies[parts[1].trim()] = (parts[2] || '').trim();
-	});
-	return cookies;
-};
 
 io.on('connection', (socket) => {
 	memberCounter++;
@@ -415,7 +406,7 @@ io.on('connection', (socket) => {
 	});
 
 	socket.on('addUserToGroup', (g_name) => {
-		console.log("hello?", g_name);
+		//console.log("hello?", g_name);
 		var gr = lecture_1.get_group(g_name);
 		var stud = lecture_1.get_student_by_id(socket.request.session.id);
 		if (gr != null && stud != null) {
@@ -425,12 +416,21 @@ io.on('connection', (socket) => {
 		io.emit('updateGroups', lecture_1.get_groups_json());
 	});
 
-	socket.on('leaveGroup', () => {
-	});
 
 	socket.on('exitQueue', () => {
 		var id = socket.request.session.id;
 		lecture_1.remove_ticket_from_queue(id);
+	});
+
+	socket.on('removeUserFromGroup', (g_name) => {
+		var gr = lecture_1.get_group(g_name);
+		var stud = lecture_1.get_student_by_id(socket.request.session.id);
+		//console.log(stud);
+		if (gr != null && stud != null) {
+			gr.remove_student(stud.session_id);
+			console.log("group: ", gr.to_json());
+		}
+		io.emit('updateGroups', lecture_1.get_groups_json());
 	});
 
 	socket.on('answer', (questionID) => {

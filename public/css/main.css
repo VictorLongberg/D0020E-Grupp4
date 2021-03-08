@@ -111,11 +111,6 @@ Skriver över lite bootstrap css för att få önskad funktion
   color: rgb(3,32,64);
 }
 
-#leave_group{
-  background-color:rgb(153, 153, 153);
-  color:black;
-}
-
 /* Memes */
 .clock {
   width: 260px;
