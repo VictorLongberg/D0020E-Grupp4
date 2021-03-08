@@ -296,12 +296,19 @@ io.on('connection', (socket) => {
 			// Group joining queue
 			var gr = lecture_1.get_group_by_student_id(id);
 			if (gr != null) {
+				var ent = gr;
 				var n_ticket = new ticket.Ticket(0, gr, message);
 			} else {
 				var stud = lecture_1.get_student_by_id(id);
+				var ent = stud;
 				//console.log(stud);
 				var n_ticket = new ticket.Ticket(0, stud, message);
 			}
+
+		var stlist = ent.get_socket_list();
+			stlist.forEach((st) => {
+				st.emit('update_queue_information', (q.l_fifo_q.size + 1), q.name, message);
+			});
 
 			// Checking if student is already queued
 			// !!! (Probably not compatible with groups right now) !!!
@@ -318,9 +325,10 @@ io.on('connection', (socket) => {
 			}
 			*/
 
-			queuedStudents.push(stud);
+			//queuedStudents.push(stud);
 
 			q.add_ticket(n_ticket);
+
 			//console.log("added ticket:\n", n_ticket);
 			//console.log("json queue:\n", q.to_json());
 		}

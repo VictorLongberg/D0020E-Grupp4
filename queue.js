@@ -53,6 +53,9 @@ class queue {
 							tmpt.prev.next = tmpt.next;
 							tmpt.next.prev = tmpt.prev;
 						}
+						tmpt.value.entity.get_socket_list().forEach((s) => {
+							s.emit('queue_leave_f');
+						});
 						this.l_fifo_q.size -= 1;
 						this.update_positions();
 
@@ -74,6 +77,9 @@ class queue {
 						tmpt.prev.next = tmpt.next;
 						tmpt.next.prev = tmpt.prev;
 					}
+					tmpt.value.entity.get_socket_list().forEach((s) => {
+						s.emit('queue_leave_f');
+					});
 					this.l_fifo_q.size -= 1;
 					this.update_positions();
 

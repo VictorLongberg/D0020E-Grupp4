@@ -595,10 +595,18 @@ $(function () {
 		$("#queue_name").text(qName);
 		$("#queue_message").text(message);
 		$("#queue_place").text(place);
+		inQueue = true;
 	});
 
 	socket.on('update_queue_place', function(place) {
 		$("#queue_place").text(place);
+	});
+
+	socket.on('queue_leave_f', function() {
+		$("#queue_name").text("None");
+		$("#queue_message").text("");
+		$("#queue_place").text("None");
+		inQueue = false;
 	});
 
 	socket.on('answer', function (questionID) {
