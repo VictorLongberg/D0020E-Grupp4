@@ -415,7 +415,7 @@ io.on('connection', (socket) => {
 	});
 
 	socket.on('addUserToGroup', (g_name) => {
-		console.log("hello?", g_name);
+		//console.log("hello?", g_name);
 		var gr = lecture_1.get_group(g_name);
 		var stud = lecture_1.get_student_by_id(socket.request.session.id);
 		if (gr != null && stud != null) {
@@ -425,8 +425,15 @@ io.on('connection', (socket) => {
 		io.emit('updateGroups', lecture_1.get_groups_json());
 	});
 
-	socket.on('removeUserFromGroup', () => {
-
+	socket.on('removeUserFromGroup', (g_name) => {
+		var gr = lecture_1.get_group(g_name);
+		var stud = lecture_1.get_student_by_id(socket.request.session.id);
+		//console.log(stud);
+		if (gr != null && stud != null) {
+			gr.remove_student(stud.session_id);
+			console.log("group: ", gr.to_json());
+		}
+		io.emit('updateGroups', lecture_1.get_groups_json());
 	});
 
 	socket.on('answer', (questionID) => {
