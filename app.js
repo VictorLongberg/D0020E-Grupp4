@@ -305,6 +305,8 @@ io.on('connection', (socket) => {
 
 			// Checking if student is already queued
 			// !!! (Probably not compatible with groups right now) !!!
+			// really bad way to do it
+			/*
 			var stud = lecture_1.get_student_by_id(id);
 
 			for (i = 0; i < queuedStudents.length; i++) {
@@ -314,6 +316,7 @@ io.on('connection', (socket) => {
 					return;
 				}
 			}
+			*/
 
 			queuedStudents.push(stud);
 
@@ -420,6 +423,7 @@ io.on('connection', (socket) => {
 	socket.on('exitQueue', () => {
 		var id = socket.request.session.id;
 		lecture_1.remove_ticket_from_queue(id);
+		io.emit('updateQueues', lecture_1.get_queue_json());
 	});
 
 	socket.on('removeUserFromGroup', (g_name) => {

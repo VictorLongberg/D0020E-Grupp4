@@ -40,7 +40,7 @@ class queue {
 				var members = tmpt.value.entity.member_list;
 				for (var i = 0; i < members.length; i++){
 					if (studID == members[i].get_id()){
-						if (tmpt.next == null && tmpr.prev == null){ //lonely
+						if (tmpt.next == null && tmpt.prev == null){ //lonely
 							this.l_fifo_q.first = null;
 							this.l_fifo_q.last = null;
 						} else if (tmpt.next == null){ //last
@@ -61,7 +61,7 @@ class queue {
 				}
 			} else if (tmpt.value.entity.class_string() == "Student"){
 				if (tmpt.value.entity.get_id() == studID) {
-					if (tmpt.next == null && tmpr.prev == null){ //lonely
+					if (tmpt.next == null && tmpt.prev == null){ //lonely
 						this.l_fifo_q.first = null;
 						this.l_fifo_q.last = null;
 					} else if (tmpt.next == null){ //last

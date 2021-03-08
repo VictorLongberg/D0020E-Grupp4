@@ -383,26 +383,31 @@ socket.on('updateQueues', function(queues) {
 	for (i = 0; i < queueLength; i++) {
 		document.getElementById("queues").children[0].remove();
 	}
+	
+	if (inQueue == false){
+		// Spawn new queues
+		var tempnum = queues.length;
+		for (i = 0; i < tempnum; i++) {
+			var jsonQueue = JSON.parse(queues[i]);
+			var inQueue_counter = jsonQueue.rarr.length;
+			//var queue_counter = document.getElementById("queues").children.size;
+			var queueElement = $("<li>").html(jsonQueue.qname +": " +
 
-	// Spawn new queues
-	var tempnum = queues.length;
-	for (i = 0; i < tempnum; i++) {
-		var jsonQueue = JSON.parse(queues[i]);
-		var inQueue_counter = jsonQueue.rarr.length;
-		//var queue_counter = document.getElementById("queues").children.size;
-		var queueElement = $("<li>").html(jsonQueue.qname +": " +
+			// Join queue button
+			"<button type='button' id='que_button' class='btn btn-secondary' onclick='askJoinQueue(\"" +jsonQueue.qname +"\")'>Join queue"+
+			"<span class='badge badge-light'>In Q: <span id='in_queue'>"+inQueue_counter+"</span></span></button>"
 
-		// Join queue button
-		"<button type='button' id='que_button' class='btn btn-secondary' onclick='askJoinQueue(\"" +jsonQueue.qname +"\")'>Join queue"+
-		"<span class='badge badge-light'>In Q: <span id='in_queue'>"+inQueue_counter+"</span></span></button>"
+			);
 
-	);
-
-	$("#queues").append(queueElement);
-	//Printing out the amount of people in the queue (does not work!!!!!)
-}
-$("#queue_count").text(tempnum);
-//$("#in_queue").text(queue_counter);
+			$("#queues").append(queueElement);
+			//Printing out the amount of people in the queue (does not work!!!!!)
+		}
+	} else {
+		var queueElement = "<li><button type='button' id='que_button' class='btn btn-secondary' onclick='exitQueue()'>Leave queue</button></li>"
+		$("#queues").append(queueElement);
+	}
+	$("#queue_count").text(tempnum);
+	//$("#in_queue").text(queue_counter);
 });
 
 socket.on('picked_out', () => {
