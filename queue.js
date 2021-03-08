@@ -82,6 +82,7 @@ class queue {
 			} else {
 				console.log("unsuported entity in remove_ticket");
 			}
+			tmpt = tmpt.prev;
 		}
 		return false;
 	}
