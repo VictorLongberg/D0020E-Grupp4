@@ -32,6 +32,60 @@ class queue {
 		this.update_positions();
 	}
 
+	//returns true if student was in queue
+	remove_ticket(studID) {
+		var tmpt = this.l_fifo_q.last;
+		while (tmpt != null) {
+			if (tmpt.value.entity.class_string() == "Group"){
+				var members = tmpt.value.entity.member_list;
+				for (var i = 0; i < members.length; i++){
+					if (studID == members[i].get_id()){
+						if (tmpt.next == null && tmpr.prev == null){ //lonely
+							this.l_fifo_q.first = null;
+							this.l_fifo_q.last = null;
+						} else if (tmpt.next == null){ //last
+							this.l_fifo_q.last = tmpt.prev;
+							this.l_fifo_q.last.next = null;
+						} else if (tmpt.prev == null){ // first
+							this.l_fifo_q.first = tmpt.next;
+							this.l_fifo_q.first.prev = null;
+						} else { // in the middle
+							tmpt.prev.next = tmpt.next;
+							tmpt.next.prev = tmpt.prev;
+						}
+						this.l_fifo_q.size -= 1;
+						this.update_positions();
+
+						return true;
+					}
+				}
+			} else if (tmpt.value.entity.class_string() == "Student"){
+				if (tmpt.value.entity.get_id() == studID) {
+					if (tmpt.next == null && tmpr.prev == null){ //lonely
+						this.l_fifo_q.first = null;
+						this.l_fifo_q.last = null;
+					} else if (tmpt.next == null){ //last
+						this.l_fifo_q.last = tmpt.prev;
+						this.l_fifo_q.last.next = null;
+					} else if (tmpt.prev == null){ // first
+						this.l_fifo_q.first = tmpt.next;
+						this.l_fifo_q.first.prev = null;
+					} else { // in the middle
+						tmpt.prev.next = tmpt.next;
+						tmpt.next.prev = tmpt.prev;
+					}
+					this.l_fifo_q.size -= 1;
+					this.update_positions();
+
+					return true;
+				}
+			} else {
+				console.log("unsuported entity in remove_ticket");
+			}
+		}
+		return false;
+	}
+
 	get_first() {
 		var first = this.l_fifo_q.remove_last();
 		if (first == null) {

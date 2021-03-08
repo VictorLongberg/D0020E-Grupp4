@@ -425,8 +425,12 @@ io.on('connection', (socket) => {
 		io.emit('updateGroups', lecture_1.get_groups_json());
 	});
 
-	socket.on('removeUserFromGroup', () => {
+	socket.on('leaveGroup', () => {
+	});
 
+	socket.on('exitQueue', () => {
+		var id = socket.request.session.id;
+		lecture_1.remove_ticket_from_queue(id);
 	});
 
 	socket.on('answer', (questionID) => {

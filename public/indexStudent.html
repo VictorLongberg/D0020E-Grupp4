@@ -35,17 +35,6 @@
 		return name;
 	}
 
-	function joinGroup(g_name) {
-		if(ingroup != ""){
-			alert("You are already in a group!");
-			return;
-		}
-		else{
-			ingroup = g_name;
-			$("#in_group").text(ingroup);
-			socket.emit("addUserToGroup", g_name);
-		}
-	}
 
 	/*function leaveGroup(){
 	ingroup = "";
@@ -351,20 +340,34 @@
 		updateQueues();
 	}
 
-	// --- Function to leave queues to be implemented ---
-	/*function leaveGroup(qName){
-		if(inQueue){
-			inQueue = false;
-			socket.emit('')
+	function leaveGroup(){
+		if(ingroup != ""){
+			ingroup = "";
+			socket.emit('leaveGroup')
 		}
 		else{
 			alert("You are not in a queue!");
 			return;
 		}
-	}*/
+	}
+
+	function joinGroup(g_name) {
+		if(ingroup != ""){
+			alert("You are already in a group!");
+			return;
+		}
+		else{
+			ingroup = g_name;
+			$("#in_group").text(ingroup);
+			socket.emit("addUserToGroup", g_name);
+		}
+	}
 
 	function exitQueue() {
-		inQueue = false;
+		if (inQueue == true){
+			inQueue = false;
+			socket.emit("exitQueue");
+		}
 	}
 
 	function updateQueues() {

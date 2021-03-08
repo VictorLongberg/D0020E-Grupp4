@@ -57,6 +57,15 @@ class Lecture {
 		return this.queues;
 	}
 
+	remove_ticket_from_queue(studID){
+		for (var i = 0; i < this.queues.length; i++){
+			if (this.queues[i].remove_ticket(studID) == true) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	add_queue(name){
 		var queue_e = this.get_queue(name);
 		if (queue_e == null){
