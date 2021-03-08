@@ -90,22 +90,24 @@ app.get('/student', (req, res) => {
 });
 
 app.get('/teacher', (req, res) => {
+	console.log(req.cookies.tss);
+	console.log("TESTTEST"); 
 	if (amisafe(req)) {
 		res.sendFile(__dirname + '/public/indexTeacher.html');
 	}
 	else if (!amisafe(req)) {
-		res.status(400);
+		res.redirect("/login");
 	}
 });
 
 //Login.
 app.post("/login", function (req, res) {
-	login(req);
+	login(req,res);
 });
 
 //Registering.
 app.post("/register", function (req, res) {
-	register(req);
+	register(req,res);
 });
 
 function lecture(res) {
@@ -131,7 +133,7 @@ function lecture(res) {
 	});
 }
 
-function login(req) {
+function login(req,res) {
 	var checkLogin = null;
 	//connectar till databasen för att titta utifall vi kan hitta email. 
 	client.connect(async err => {
@@ -155,7 +157,7 @@ function login(req) {
 	});
 }
 
-function register(req) {
+function register(req,res) {
 	//formdatan från register sparad i emailpass. 
 	var emailpass = { email: req.body.email, password: req.body.password };
 	var checkNull = null;
@@ -165,7 +167,6 @@ function register(req) {
 		var dbo = client.db("mydb");
 		//Sätter checknull till värdet som vi hittar i databasen, dvs utifall vi hittar en Email så blir checknull de annars returnas null. 
 		checkNull = await dbo.collection("login").findOne({ email: req.body.email });
-
 		try {
 			if (checkNull == null) {
 				const insertdata = await dbo.collection("login").insertOne(emailpass);
@@ -181,23 +182,19 @@ function register(req) {
 }
 
 //Get data when logged in.
-function amisafe(req) {
-	const kakan = get_cookies(req)["tss"]
-	if (kakan == teacher_1.get_session()) {
+function amisafe(req) { 
+	console.log("111111111111111111111111111111111111111111");
+	console.log(req.cookies.tss);
+	const kakan = req.cookies.tss; 
+	if (kakan == teacher_1.get_session() && req.cookies.tss != null &&  kakan != null ) {
+		console.log("22222222222222222222222222222222222222222222222222");
 		return true;
 	} else {
+		console.log("3333333333333333333333333333333333333333333333");
 		return false;
 	}
 }
 
-var get_cookies = function (request) {
-	var cookies = {};
-	request.headers && request.headers.cookie.split(';').forEach(function (cookie) {
-		var parts = cookie.match(/(.*?)=(.*)$/)
-		cookies[parts[1].trim()] = (parts[2] || '').trim();
-	});
-	return cookies;
-};
 
 io.on('connection', (socket) => {
 	memberCounter++;
