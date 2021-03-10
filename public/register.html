@@ -1,23 +1,36 @@
 <!doctype html>
 <html>
 <head>
+    <title> Register </title>
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/main.css">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
 <body> 
-<h1>
-    Registration: 
-</h1>
-<form id="reg-form" method="POST">
-    <input type="text" autocomplete="off" id="email" placeholder="Example@gmail.com" minlength="6" maxlength="69" />
-    <input type="password"  id="password" placeholder="Password" minlength="6" maxlength="69" />
-    <input type="password"  id="confirmpassword" placeholder="Confirm Password" minlength="6" maxlength="69" />
-    <input type="submit" value="Submit Form" />
-</form>
-<ul>
-    <li><a href="/login">login</a></li>
-</ul>
+
+    <div class="container">  
+        <div class="d-flex justify-content-center">
+        <h1>
+            Registration Page
+        </h1>
+        </div>
+        <div class="row">
+        <div class="d-flex justify-content-center" >
+            <div class="col-3"> 
+                <form id="reg-form" method="POST" class="form-horizontal" role="form">
+                    <input type="text" autocomplete="off" class="form-control" aria-describedby="btnGroupAddon" id="email" placeholder="Example@gmail.com" minlength="6" maxlength="69" />
+                    <input type="password"  id="password"  class="form-control" aria-describedby="btnGroupAddon" placeholder="Password" minlength="6" maxlength="69" />
+                    <input type="password"  id="confirmpassword"  class="form-control" aria-describedby="btnGroupAddon" placeholder="Confirm Password" minlength="6" maxlength="69" />
+                    <input type="submit"  class="form-control" aria-describedby="btnGroupAddon" value="Register" />
+                </form>
+            </div>
+            </div>
+            <div class="mt-3 d-flex justify-content-center" > 
+                <a class="btn btn-secondary" href="/login">Login</a>
+        </div>   
+        </div>
+        
 <script>
     const form = document.getElementById('reg-form')
     form.addEventListener('submit', registerUser)
