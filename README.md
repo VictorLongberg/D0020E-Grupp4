@@ -23,7 +23,7 @@ Hur man sätter upp mongodb finns det instruktioner för här
 	```sh
 	$ npm install
 	```
-4. Set upp databasen genom att gå till ```app.js``` och fyll i rätt information
+4. Set upp databasen genom att gå till ```createDb.js``` och fyll i rätt information
 	där det står:
 	```javascript
 	const MongoClient = require('mongodb').MongoClient;
