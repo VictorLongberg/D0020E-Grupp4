@@ -453,7 +453,7 @@ io.on('connection', (socket) => {
 		io.emit('answer', questionID);
 	});
 
-	socket.on('reactConfused', () => {
+	socket.on('reactConfused', (date) => {
 		confuseCounter++;
 		io.emit('updateConfused', confuseCounter);
 		var id = socket.id;
