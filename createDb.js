@@ -1,5 +1,5 @@
 const MongoClient = require('mongodb').MongoClient;
-const url = 'mongodb+srv://Elie:Elie123@cluster0.fhfjx.mongodb.net/mydb?retryWrites=true&w=majority';
+const url = 'Your URL here.';
 
 async function findMessageById(id) {
 
