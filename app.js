@@ -10,8 +10,9 @@ var session = require('express-session');
 var bodyParser = require("body-parser");
 var cookieParser = require('cookie-parser');
 //db
+var mdblib = require('./createDb.js');
 const MongoClient = require('mongodb').MongoClient;
-const url = "mongodb+srv://Elie:Elie123@cluster0.fhfjx.mongodb.net/mydb?retryWrites=true&w=majority"; //https://cloud.mongodb.com/v2/6020afbf25845140b0c65d17#metrics/replicaSet/6020b097ea48a608bd83ea68/explorer/mydb/Chat/find
+const url = mdblib.url;
 const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
 const { Mongoose } = require('mongoose');
 

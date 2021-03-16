@@ -92,6 +92,9 @@ async function updateMessage(roomId, id, msg, date){
         client.close();
     }
 }
+
+module.exports = {url};
+
 addMessage(1,1,1,1,1,1);
 updateMessage(1,1,"hej","datum");
 updateMessage(1,1,"hej","datum");
