@@ -1,22 +1,37 @@
 <!doctype html>
 <html>
 <head>
+    <title> Login </title>
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/main.css">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-<body>   
+</head>
+<body>
+
+<div class="container">  
+<div class="d-flex justify-content-center">
 <h1>
     Login Page
 </h1>
-<form id="login" method="POST">
-    <input type="text" autocomplete="off" id="email" placeholder="Example@gmail.com" />
-    <input type="password" autocomplete="off" id="password" placeholder="Password" />
-    <input type="submit" value="Submit Form" />
-</form>
-<ul>
-    <li><a href="/register">SignUp</a></li>
-</ul>
+</div>
+<div class="row">
+<div class="d-flex justify-content-center" >
+    <div class="col-3"> 
+        <form id="login" method="POST" class="form-horizontal" role="form">
+            <!--  <div class="d-flex input-group"> --> 
+                <input type="text" autocomplete="off" class="form-control"  aria-describedby="btnGroupAddon" id="email" placeholder="Example@gmail.com" />
+                <input type="password" autocomplete="off" class="form-control"  aria-describedby="btnGroupAddon" id="password" placeholder="Password" />
+                <input type="submit"  class="form-control" aria-describedby="btnGroupAddon" value="Login" />
+             <!--  </div> -->  
+        </form>
+    </div>
+    </div>
+    <div class="mt-3 d-flex justify-content-center" > 
+        <a class="btn btn-secondary" href="/register">Registration</a>
+</div>   
+</div>
+
 <script>
     const form = document.getElementById('login')
     form.addEventListener('submit', loginUser)

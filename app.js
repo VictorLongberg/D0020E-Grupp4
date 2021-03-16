@@ -91,7 +91,7 @@ app.get('/student', (req, res) => {
 
 app.get('/teacher', (req, res) => {
 	console.log(req.cookies.tss);
-	console.log("TESTTEST"); 
+	console.log("TESTTEST");
 	if (amisafe(req)) {
 		res.sendFile(__dirname + '/public/indexTeacher.html');
 	}
@@ -156,7 +156,7 @@ function login(req,res) {
 }
 
 function register(req,res) {
-	//formdatan från register sparad i emailpass. 
+	//formdatan från register sparad i emailpass.
 	var emailpass = { email: req.body.email, password: req.body.password };
 	var checkNull = null;
 	//connectar till databasen för att titta utifall vi kan hitta email.
@@ -180,8 +180,8 @@ function register(req,res) {
 }
 
 //Get data when logged in.
-function amisafe(req) { 
-	const kakan = req.cookies.tss; 
+function amisafe(req) {
+	const kakan = req.cookies.tss;
 	if (kakan == teacher_1.get_session() && req.cookies.tss != null &&  kakan != null ) {
 		return true;
 	} else {
@@ -298,17 +298,18 @@ io.on('connection', (socket) => {
 			if (gr != null) {
 				var ent = gr;
 				var n_ticket = new ticket.Ticket(0, gr, message);
+				var stlist = ent.get_socket_list();
+					stlist.forEach((st) => {
+						st.emit('update_queue_information', (q.l_fifo_q.size + 1), q.name, message);
+					});
 			} else {
 				var stud = lecture_1.get_student_by_id(id);
 				var ent = stud;
 				//console.log(stud);
 				var n_ticket = new ticket.Ticket(0, stud, message);
+				var stlist = ent.get_socket();
+				stlist.emit('update_queue_information', (q.l_fifo_q.size + 1), q.name, message);
 			}
-
-		var stlist = ent.get_socket_list();
-			stlist.forEach((st) => {
-				st.emit('update_queue_information', (q.l_fifo_q.size + 1), q.name, message);
-			});
 
 			// Checking if student is already queued
 			// !!! (Probably not compatible with groups right now) !!!
